@@ -1,12 +1,22 @@
 =============================
+       Technologies
+=============================
+- MongoDB (database)
+- Twisted (serveur TSP)
+- Flask
+- Python
+
+
+=============================
      Matériel nécessaire
 ============================= 
 - Réseau wi-fi connecté à Internet
 
 - PC serveur
+- Raspberry Pi
+- enceintes
 - Tablette / smartphone
 
-- enceintes
 - contact porte-fenêtre
 - 3 interrupteurs
 - 1 capteur de présence
@@ -18,14 +28,9 @@
 =============================
           Use cases
 =============================
-
-1 serveur
-1 client distant (web ou appli)
-
-
 Réveil
 - Détection : heure config serveur
-- Musique (serveur + enceintes)
+- Musique (raspberry + enceintes)
 - Lumière (interupteur)
 
 
