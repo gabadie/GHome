@@ -1,0 +1,64 @@
+=============================
+     Matériel nécessaire
+============================= 
+- Réseau wi-fi connecté à Internet
+
+- PC serveur
+- Tablette / smartphone
+
+- enceintes
+- contact porte-fenêtre
+- 3 interrupteurs
+- 1 capteur de présence
+
+- 1 vidéo-projecteur
+- 1 leap motion
+
+
+=============================
+          Use cases
+=============================
+
+1 serveur
+1 client distant (web ou appli)
+
+
+Réveil
+- Détection : heure config serveur
+- Musique (serveur + enceintes)
+- Lumière (interupteur)
+
+
+Sort de la maison
+- Détection : timeout sur la détection de présence
+- Alertes : fenêtre ouvertes (contact porte-fenêtre)
+- Éteindre le chauffage (interrupteur)
+- Éteindre les lumières (interrupteur)
+
+
+Entre dans la maison
+- Détection : capteur de présence
+- Allumer le chauffage (interrupteur)
+- Allumer la lumière de l'entrée (interrupteur)
+
+
+Entrer / sortir d'une pièce
+- Détection : capteur de présence
+- Éteindre la lumière de l'ancienne pièce (interrupteur)
+- Allumer la lumière de la nouvelle pièce (interrupteur)
+
+
+Cuisine
+- Détection : capteur de présence
+- Affichage d'un écran par vidéo-projecteur contrôlable par leap motion
+
+
+=============================
+        Configuration
+=============================
+2 pièces
+- Chambre : capteur de présence, serveur, enceintes, interrupteur chauffage, interrupteur lumière lumière
+- Cuisine : vidéo-projecteur, leap motion, capteur de présence, interrupteur lumière
+
+
+
