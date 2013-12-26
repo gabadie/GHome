@@ -2,7 +2,7 @@
        Technologies
 =============================
 - MongoDB (database)
-- Twisted (serveur TSP)
+- Twisted (serveur TCP)
 - Flask
 - Python
 
