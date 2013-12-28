@@ -1,0 +1,27 @@
+# Architecture web
+
+Pour que notre système soit modulaire, il faut qu'il y ai une vrai séparation entre les parties suivantes:
+
+## Le serveur central (réseau / bas niveau)
+
+Il reçoit les trames, les déchiffre et les stocke sous forme structrée dans notre base de données. Il peut aussi envoyer des trames.
+
+Il est connecté par TCP à la passerelle GHome.
+
+## Le serveur web/logique (couche applicative)
+
+Il offre une interface web à l'utilisateur pour visualiser les données des capteurs ainsi que voir les news, choisir des vêtements ou autre fonction qu'on va implémenter.
+Il cherche les données des capteurs dans la base de donnée, et communique avec le serveur central (en TCP?) s'il faut communiquer avec un actionneur.
+
+Il expose aussi plusieurs fonctionnalités via l'API REST suivante:
+
+Par exemple:
+
+* ```GET /api/thermometer``` : Donnera des données sur le thermomètre utilisé.
+* ```GET /api/thermometer/last?n=10``` : Donnera les dernières 10 mesures prises par le thermomètre.
+* ```POST /api/switch/toggle``` : Changera l'état du switch
+* ```POST /api/music/next``` : Passer à la chanson suivante
+
+## Daemon
+
+Éventuellement on pourrait avoir un daemon qui réalise des tâches routinières: activer le réveil à la bonne heure, mettre à jour la BdD ou en extraire des prévisions, ...
