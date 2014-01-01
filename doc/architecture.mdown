@@ -22,6 +22,8 @@ Par exemple:
 * ```POST /api/switch/toggle``` : Changera l'état du switch
 * ```POST /api/music/next``` : Passer à la chanson suivante
 
+L'interface web utilisera cette API pour afficher les informations (via des appels AJAX)
+
 ## Daemon
 
 Éventuellement on pourrait avoir un daemon qui réalise des tâches routinières: activer le réveil à la bonne heure, mettre à jour la BdD ou en extraire des prévisions, ...
