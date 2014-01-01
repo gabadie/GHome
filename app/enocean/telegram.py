@@ -1,11 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+class InvalidTelegram(Exception):
+    pass
+
 class Telegram(object):
     VALID_SYNC_BYTES = [0xA5, 0x5A]
 
     # TODO : Give default values for sync_bytes and checksum ?
-    def __init__(self, sync_bytes, h_seq, length, org, data, packet_id, status, checksum):
+    def __init__(self, sync_bytes, h_seq, length, org, data, packet_id, status, checksum, strict=False):
 
     	self.sync_bytes = sync_bytes
     	self.h_seq = h_seq
@@ -15,6 +18,13 @@ class Telegram(object):
     	self.packet_id = packet_id
     	self.status = status
         self.checksum = checksum
+
+        if strict and not self.valid_sync():
+            raise InvalidTelegram("Invalid sync bytes: {}".format(sync_bytes))
+
+        if strict and not self.valid_checksum():
+            msg = "Invalid checksum. Expected: {}, Actual: {}".format(checksum, self.actual_checksum())
+            raise InvalidTelegram(msg)
 
     @staticmethod
     def from_bytes(bytes):
@@ -29,11 +39,14 @@ class Telegram(object):
 
         return Telegram(sync_bytes, h_seq, length, org, data, packet_id, status, checksum)
 
+    def actual_checksum(self):
+        return sum(self.bytes()) & 0xFF
+
     def valid_sync(self):
         return self.sync_bytes == Telegram.VALID_SYNC_BYTES
 
     def valid_checksum(self):
-        return self.checksum == sum(self.bytes()) & 0xFF
+        return self.checksum == self.actual_checksum()
 
     def valid(self):
         return self.valid_sync() and self.valid_checksum()
