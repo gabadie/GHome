@@ -40,9 +40,20 @@ class Telegram(object):
             raise InvalidTelegram("Invalid sync bytes: {}".format(sync_bytes))
 
         if strict and not self.valid_checksum():
-            msg = "Invalid checksum. Expected: {}, Actual: {}".format(checksum, self.actual_checksum())
+            msg = "Invalid checksum. Expected: {}, Actual: {}".format(checksum, self.actual_checksum)
             raise InvalidTelegram(msg)
 
+    def valid_sync(self):
+        return self.sync_bytes == Telegram.VALID_SYNC_BYTES
+
+    def valid_checksum(self):
+        return self.checksum == self.actual_checksum
+
+    def valid(self):
+        return self.valid_sync() and self.valid_checksum()
+
+    # Properties
+    @property
     def bytes(self):
         """
             Structure of an EnOcean telegram:
@@ -71,19 +82,9 @@ class Telegram(object):
 
         return bytes
 
-
-    # TODO : Check how we're supposed to calculate the checksum
+    @property
     def actual_checksum(self):
-        return sum(self.bytes()[:13]) & 0xFF
-
-    def valid_sync(self):
-        return self.sync_bytes == Telegram.VALID_SYNC_BYTES
-
-    def valid_checksum(self):
-        return self.checksum == self.actual_checksum()
-
-    def valid(self):
-        return self.valid_sync() and self.valid_checksum()
+        return sum(self.bytes[:13]) & 0xFF
 
     @property
     def rp_counter(self):
@@ -113,11 +114,18 @@ class Telegram(object):
     def epp(self):
         return (self.org, self.func, self.type)
 
+    # Standard operators
+    def __eq__(self, other):
+        if not isinstance(other, Telegram):
+            return False
+        else:
+            return self.bytes == other.bytes
+
 if __name__ == '__main__':
     t = Telegram([0xA5, 0x5A], h_seq=3, length=12, org=5, data=0x11111111,
                  sensor_id=39, status=2, checksum=36)
 
-    assert t.bytes() == Telegram.from_bytes(t.bytes()).bytes()
+    assert t == Telegram.from_bytes(t.bytes)
 
     # Example from Listing_devices.pdf
     t = Telegram.from_bytes([0xA5, 0x5A, 0x0B, 0X07, 0X10, 0x08, 0x02, 0x87,
