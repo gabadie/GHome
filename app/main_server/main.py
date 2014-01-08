@@ -8,7 +8,7 @@
 
 from twisted.internet import protocol, reactor
 
-import MainServer
+import server
 
 main_server = MainServer.MainServer()
 

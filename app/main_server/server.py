@@ -11,3 +11,11 @@ class Device:
     def save(self):
         self.main_server.devices[self.id] = id
 
+class MainServer:
+
+    def __init__(self):
+        self.devices = {}
+
+    def getDevice(self, deviceId):
+        return self.devices[deviceId];
+
