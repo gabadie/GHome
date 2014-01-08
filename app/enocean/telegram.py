@@ -9,7 +9,6 @@ class IrrelevantAccess(Exception):
 
 class Telegram(object):
     VALID_SYNC_BYTES = [0xA5, 0x5A]
-
     UNKNOWN, NORMAL, TEACH_IN = range(3)
 
     @staticmethod
@@ -67,14 +66,13 @@ class Telegram(object):
         """
             Structure of an EnOcean telegram:
 
-            BYTE 0: Sync Byte 1 (should be 0xA5)
-            BYTE 1: Sync Byte 2 (should be 0x5A)
+            BYTES 0-1: Sync Byte 1 (should be [0xA5, 0x5A])
             BYTE 2: H_SEQ (3 bits, the telegram's function) + Length of the telegram (5 bits)
             BYTE 3: ORG (0x05 → RPS, 0x06 → 1BS, 0x07 → 4BS)
             BYTES 4-7: The telegram's data encoded on 4 bytes
             BYTES 8-11: The sensor's id encoded on 4 bytes
             BYTE 12: Status Byte
-            BYTE 13: Checksum
+            BYTE 13: Checksum (lower byte of the sum of all bytes except sync bytes and the checksum itself)
         """
 
         bytes = [0x0 for i in xrange(14)]
