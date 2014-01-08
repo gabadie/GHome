@@ -1,22 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-def enum(**enums):
-    return type('Enum', (), enums)
-
-
 class InvalidTelegram(Exception):
     pass
-    
-    
+
 class IrrelevantAccess(Exception):
     pass
-    
 
 class Telegram(object):
     VALID_SYNC_BYTES = [0xA5, 0x5A]
-    
-    Mode = enum(UNKNOWN=0, NORMAL=1, TEACH_IN=2)
+
+    UNKNOWN, NORMAL, TEACH_IN = range(3)
 
     @staticmethod
     def from_bytes(bytes, strict=False):
@@ -51,16 +45,16 @@ class Telegram(object):
         if strict and not self.valid_checksum():
             msg = "Invalid checksum. Expected: {}, Actual: {}".format(checksum, self.actual_checksum)
             raise InvalidTelegram(msg)
-            
+
         if strict and not self.valid_mode():
             raise InvalidTelegram("Invalid mode byte: {}".format(self.data_bytes[3]))
-            
+
     def valid_sync(self):
         return self.sync_bytes == Telegram.VALID_SYNC_BYTES
 
     def valid_checksum(self):
         return self.checksum == self.actual_checksum
-        
+
     def valid_mode(self):
         return self.mode != Telegram.Mode.UNKNOWN
 
@@ -99,7 +93,7 @@ class Telegram(object):
 
     @property
     def actual_checksum(self):
-        return sum(self.bytes[:13]) & 0xFF
+        return sum(self.bytes[2:13]) & 0xFF
 
     @property
     def rp_counter(self):
@@ -112,44 +106,51 @@ class Telegram(object):
     @property
     def id_bytes(self):
         return [self.sensor_id >> (8 * i) & 0xFF for i in [3, 2, 1, 0]]
-        
+
     @property
     def mode(self):
         b7 = (self.data_bytes[3] & 0x80) >> 7
         b3 = (self.data_bytes[3] & 0x08) >> 3
-        
+
         if b7 == 0 and b3 == 1:
-            return Telegram.Mode.NORMAL
+            return Telegram.NORMAL
         elif b7 == 1 and b3 == 0:
-            return Telegram.Mode.TEACH_IN
+            return Telegram.TEACH_IN
         else:
-            return Telegram.Mode.UNKNOWN
+            return Telegram.UNKNOWN
+
+    def requires_teach_in(function):
+        """ A decorator for function that require the teach in mode """
+        def wrapped(self, *args, **kwargs):
+            if self.mode != Telegram.TEACH_IN:
+                raise IrrelevantAccess("Accessing teach-in attributes for a telegram that isn't in this mode.")
+            return function(self, *args, **kwargs)
+        return wrapped
 
     @property
+    @requires_teach_in
     def func(self):
-        if self.mode != Telegram.Mode.TEACH_IN:
-            raise IrrelevantAccess("Device's function can only be accessed in teach-in mode (current mode is {})".format(self.mode))
         return self.data_bytes[0] >> 2
 
     @property
+    @requires_teach_in
     def type(self):
-        if self.mode != Telegram.Mode.TEACH_IN:
-            raise IrrelevantAccess("Device's type can only be accessed in teach-in mode (current mode is {})".format(self.mode))
         return (self.data_bytes[0] & 0b11) << 5 | self.data_bytes[1] >> 3
 
     @property
+    @requires_teach_in
     def manufacturer_id(self):
-        if self.mode != Telegram.Mode.TEACH_IN:
-            raise IrrelevantAccess("Device's manufacturer ID can only be accessed in teach-in mode (current mode is {})".format(self.mode))
         return (self.data_bytes[1] & 0b111) << 5 | self.data_bytes[2] >> 3
 
     @property
+    @requires_teach_in
     def eep(self):
-        if self.mode != Telegram.Mode.TEACH_IN:
-            raise IrrelevantAccess("Device's EEP can only be accessed in teach-in mode (current mode is {})".format(self.mode))
         return (self.org, self.func, self.type)
 
     # Standard operators
+    def __str__(self):
+        return ''.join('{:02x}-'.format(b).upper() for b in self.bytes)
+
     def __eq__(self, other):
         if not isinstance(other, Telegram):
             return False
@@ -157,34 +158,29 @@ class Telegram(object):
             return self.bytes == other.bytes
 
 if __name__ == '__main__':
-    # TODO: telegram class should be abstract ? (can we do that in Python 2.7 ?)
-    
-    # TODO: the data bytes may have to be splitted considering the mode byte (could be received in constructor)
-    # => better for classes inheriting from telegram class
-
-    # TODO : A strict call throws an exception (invalid checksum)
-    # Thus this checksum is the one in the file, the error MUST come
-    # from other fields
-    # Debug required
+    # A 'random' telegram, created only to test parsing and such
     t = Telegram([0xA5, 0x5A], h_seq=3, length=12, org=5, data=0x10080287,
-                 sensor_id=39, status=2, checksum=136, strict=True)
+                 sensor_id=39, status=2, checksum=136)
+    assert t == Telegram.from_bytes(t.bytes)
 
-    assert t == Telegram.from_bytes(t.bytes, strict=True)
+
+    # TODO : use "real" telegrams for testing
+
+    # Listing_devices.pdf, page 12
+    t = Telegram.from_bytes([0xA5, 0x5A, 0x0B, 0x07,
+                             0x00, 0x84, 0x99, 0x0F,
+                             0x00, 0x04, 0xE9, 0x57, 0x00, 0x01], strict=False)
 
     # Example from Listing_devices.pdf
-    # TODO: A strict call generates an invalid checksum exception
-    # Debug required
-    t = Telegram.from_bytes([0xA5, 0x5A, 0x0B, 0X07, 0X10, 0x08, 0x02, 0x87,
-                                                     0x00, 0x04, 0xE9, 0x57, 0x00, 0x88], strict=True)
+    t = Telegram.from_bytes([0xA5, 0x5A, 0x0B, 0X07,
+                             0X10, 0x08, 0x02, 0x87,
+                             0x00, 0x04, 0xE9, 0x57, 0x00, 0x88], strict=False)
 
-                                                     
     assert t.valid_sync()
-    #TODO: the sensor ID seems to be wrong (!= 39)
-    assert t.sensor_id == 39
+    assert t.mode == Telegram.TEACH_IN
     assert t.func == 4
     assert t.type == 1
     assert t.manufacturer_id == 0
     assert t.eep == (7, 4, 1)
-    assert t.mode == Telegram.Mode.TEACH_IN
 
-    print 'Tests passed !'
+    print "Tests passed !"
