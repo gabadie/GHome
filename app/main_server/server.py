@@ -1,14 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import telegram
+import enocean.telegram
 import logger
+import enocean.device.thermometer
 
 class Device:
 
     @staticmethod
-    def from_telegram(telegram):
-        #TODO : identify the device type and return the corresponding device object
+    def from_telegram(server, telegram):
+        # TODO : study every teach-in telegram in order to identify telegrams
+        # from their EEP
+        return ThermometerDevice(server, sensor_id)
+        Logger.error("Unknown device type")
 
     def __init__(self, main_server, id):
         self.main_server = main_server

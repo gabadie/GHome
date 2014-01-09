@@ -11,12 +11,14 @@ This file contains a logger class definition.
 import sys
 import logging
 import traceback
+from datetime import datetime
 
 class Logger:    
     LOGGER_ID = "mainServer"
     LOG_LEVEL = logging.INFO
     LOG_FORMAT = "%(asctime)s %(levelname)s %(message)s"
     INIT_TIMESTAMP = datetime.now()
+    LOG_DIRECTORY = "log"
     LOG_FILE_PATH = LOG_DIRECTORY + "/mainServer.log.{}.log".format(datetime.strftime(INIT_TIMESTAMP, "%d-%m-%Y_%Hh%Mm%Ss"))
 
     """
