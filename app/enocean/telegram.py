@@ -12,6 +12,14 @@ class Telegram(object):
     UNKNOWN, NORMAL, TEACH_IN = range(3)
 
     @staticmethod
+    def from_str(string, strict=False):
+        if len(string) != 28:
+            raise InvalidTelegram("Invalid telegram string: {} characters (expected 28)".format(len(string)))
+
+        bytes = bytearray.fromhex(string)
+        return Telegram.from_bytes(bytes, strict)
+
+    @staticmethod
     def from_bytes(bytes, strict=False):
         if len(bytes) != 14:
             raise InvalidTelegram("Invalid telegram length: {} (expected 14)".format(len(bytes)))
@@ -147,7 +155,7 @@ class Telegram(object):
 
     # Standard operators
     def __str__(self):
-        return ''.join('{:02x}-'.format(b).upper() for b in self.bytes)
+        return ''.join('{:02x}'.format(b).upper() for b in self.bytes)
 
     def __eq__(self, other):
         if not isinstance(other, Telegram):
@@ -160,14 +168,16 @@ if __name__ == '__main__':
     t = Telegram([0xA5, 0x5A], h_seq=3, length=12, org=5, data=0x10080287,
                  sensor_id=39, status=2, checksum=136)
     assert t == Telegram.from_bytes(t.bytes)
-
+    assert t == Telegram.from_str(str(t))
 
     # TODO : use "real" telegrams for testing
 
     # Listing_devices.pdf, page 12
-    t = Telegram.from_bytes([0xA5, 0x5A, 0x0B, 0x07,
+    t = Telegram.from_bytes([0xA5, 0x66, 0x0B, 0x07,
                              0x00, 0x84, 0x99, 0x0F,
                              0x00, 0x04, 0xE9, 0x57, 0x00, 0x01], strict=False)
+
+    assert not t.valid_sync()
 
     # Example from Listing_devices.pdf
     t = Telegram.from_bytes([0xA5, 0x5A, 0x0B, 0X07,
