@@ -26,7 +26,7 @@ class Logger:
     logger = logging.getLogger(LOGGER_ID)
     
     @staticmethod
-    def initLogger():
+    def init_logger():
         """
         Creates a log file and binds the logger with the output console and log file
         """
@@ -49,48 +49,48 @@ class Logger:
         """
         Write an error message in the console and the log file
         """
-        Logger.logFile(logging.ERROR, message)
-        Logger.logConsole(logging.ERROR, message)
+        Logger.log_file(logging.ERROR, message)
+        Logger.log_console(logging.ERROR, message)
     
     @staticmethod
     def info(message):
         """
         Write an info message in the console and the log file
         """
-        Logger.logFile(logging.INFO, message)
-        Logger.logConsole(logging.INFO, message)
+        Logger.log_file(logging.INFO, message)
+        Logger.log_console(logging.INFO, message)
 
     @staticmethod
     def warning(message):
         """
         Write a warning message in the console and the log file
         """
-        Logger.logFile(logging.WARNING, message)
-        Logger.logConsole(logging.WARNING, message)
+        Logger.log_file(logging.WARNING, message)
+        Logger.log_console(logging.WARNING, message)
         
     @staticmethod
-    def infoFile(message):
+    def info_file(message):
         """
         Write an info message in the log file
         """
-        Logger.logFile(logging.INFO, message)
+        Logger.log_file(logging.INFO, message)
         
     @staticmethod
-    def exceptionFile(e):
+    def exception_file(e):
         """
         Write an exception stacktrace in the log file
         """
         Logger.logger.exception(e)
 
     @staticmethod
-    def logFile(level, message):
+    def log_file(level, message):
         """
         Write a warning, error or info message in the log file
         """
         Logger.logger.log(level, message)
             
     @staticmethod
-    def logConsole(level, message):
+    def log_console(level, message):
         """
         Write a warning, error or info message in the console
         """

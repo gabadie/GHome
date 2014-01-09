@@ -4,11 +4,11 @@
 from reading import Reading
 
 class ThermometerReading(Reading):
-    def __init__(self, device, data_bytes):
+    def __init__(self, data_bytes):
         #TODO => thermometer device in constructor
-        self.device = device
         self.humidity = data_bytes[1] * 100 / 250.0
         self.temperature = data_bytes[2] * 40 / 250.0
+        super(Reading, self).__init__()
     
     def save(self):
         #TODO: database write access

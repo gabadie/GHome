@@ -4,7 +4,7 @@
 class InvalidTelegram(Exception):
     pass
 
-class IrrelevantAccess(Exception):
+class NotImplemented(Exception):
     pass
 
 class Telegram(object):
@@ -121,7 +121,7 @@ class Telegram(object):
         """ A decorator for function that require the teach in mode """
         def wrapped(self, *args, **kwargs):
             if self.mode != Telegram.TEACH_IN:
-                raise IrrelevantAccess("Accessing teach-in attributes for a telegram that isn't in this mode.")
+                raise NotImplemented("Accessing teach-in attributes for a telegram that isn't in this mode.")
             return function(self, *args, **kwargs)
         return wrapped
 
