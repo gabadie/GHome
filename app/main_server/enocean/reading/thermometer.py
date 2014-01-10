@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from reading import Reading
+from enocean.reading.reading import Reading
 
 class ThermometerReading(Reading):
     def __init__(self, data_bytes):
@@ -12,6 +12,7 @@ class ThermometerReading(Reading):
     
     def save(self):
         #TODO: database write access
+        raise NotImplemented()
     
 """
 #DATA TO BYTES
