@@ -36,3 +36,6 @@
 
 #OpenOffice lock files
 .~lock.*.*#
+
+#MainServer log files
+*.log
