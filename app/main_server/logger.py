@@ -9,6 +9,7 @@ This file contains a logger class definition.
 """
 
 import sys
+import os
 import logging
 import traceback
 from datetime import datetime
@@ -19,8 +20,8 @@ class Logger:
     LOG_FORMAT = "%(asctime)s %(levelname)s %(message)s"
     INIT_TIMESTAMP = datetime.now()
     LOG_DIRECTORY = "log"
-    LOG_FILE_PATH = LOG_DIRECTORY + "/mainServer.log.{}.log".format(datetime.strftime(INIT_TIMESTAMP, "%d-%m-%Y_%Hh%Mm%Ss"))
-
+    LOG_FILE_PATH = LOG_DIRECTORY + "/mainServer.{}.log".format(datetime.strftime(INIT_TIMESTAMP, "%d-%m-%Y_%Hh%Mm%Ss"))
+    
     """
     Logger used in order to write error, warning and info messages
     in the user console and a log file
@@ -32,11 +33,11 @@ class Logger:
         """
         Creates a log file and binds the logger with the output console and log file
         """
-        hdlr = logging.FileHandler(LOG_FILE_PATH)
-        formatter = logging.Formatter(LOG_FORMAT)
+        hdlr = logging.FileHandler(Logger.LOG_FILE_PATH)
+        formatter = logging.Formatter(Logger.LOG_FORMAT)
         hdlr.setFormatter(formatter)
         Logger.logger.addHandler(hdlr)
-        Logger.logger.setLevel(LOG_LEVEL)
+        Logger.logger.setLevel(Logger.LOG_LEVEL)
         
     @staticmethod
     def exception(e):
