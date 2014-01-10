@@ -4,9 +4,8 @@
 import sys
 sys.path.insert(0, '..')
 
-class Reading:
+class Reading(object):
     def __init__(self):
-        #TODO for database implementation => device in constructor
         self.device = None
     
     def save(self):

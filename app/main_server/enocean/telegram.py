@@ -163,6 +163,7 @@ if __name__ == '__main__':
     t = Telegram([0xA5, 0x5A], h_seq=3, length=12, org=5, data=0x10080287,
                  sensor_id=39, status=2, checksum=136)
     assert t == Telegram.from_bytes(t.bytes)
+    assert t.sensor_id == 39
 
 
     # TODO : use "real" telegrams for testing

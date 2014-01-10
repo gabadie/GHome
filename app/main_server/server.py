@@ -12,11 +12,17 @@ class MainServer:
         self.devices = {}
         Logger.init_logger()
         
-    def add_authorized_device(self, deviceId):
-        authorized_devices.append(deviceId)
+    def set_device_ignored(self, deviceId, ignored):
+        if self.is_known(deviceId):
+            device = self.get_device(deviceId)
+            device.ignored = ignored
+            Logger.info("Device <{}>.ignored={}".format(deviceId, ignored))
+        else:
+            Logger.error("Unknown device <{}>".format(deviceId))
 
     def add_device(self, device):
         self.devices[device.id] = device
+        Logger.info("{} {} added".format(device.__class__.__name__, device.id)) #Add sensor information
         
     def is_known(self, deviceId):
         return deviceId in self.devices
@@ -28,13 +34,12 @@ class MainServer:
         Logger.info("Telegram received: " + telegram.__str__())
         
         if telegram.mode == Telegram.TEACH_IN and not self.is_known(telegram.sensor_id):
-            print "unknown"
             self.add_device(Device.from_telegram(self, telegram))
                 
         elif telegram.mode == Telegram.NORMAL and self.is_known(telegram.sensor_id):
-            print "normal"
             device = self.get_device(telegram.sensor_id)
-            if not device.ignore:
-                print "adding"
-                device.add_telegram(telegram)
+            if not device.ignored:
+                device.add_reading(telegram)
             
+        else:
+            Logger.warning("Unknown telegram mode")
