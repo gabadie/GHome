@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import sys
+sys.path.insert(0, '..')
+
 class InvalidTelegram(Exception):
     pass
 
-class IrrelevantAccess(Exception):
+class NotImplemented(Exception):
     pass
 
 class Telegram(object):
@@ -129,7 +132,7 @@ class Telegram(object):
         """ A decorator for function that require the teach in mode """
         def wrapped(self, *args, **kwargs):
             if self.mode != Telegram.TEACH_IN:
-                raise IrrelevantAccess("Accessing teach-in attributes for a telegram that isn't in this mode.")
+                raise NotImplemented("Accessing teach-in attributes for a telegram that isn't in this mode.")
             return function(self, *args, **kwargs)
         return wrapped
 
@@ -169,6 +172,7 @@ if __name__ == '__main__':
                  sensor_id=39, status=2, checksum=136)
     assert t == Telegram.from_bytes(t.bytes)
     assert t == Telegram.from_str(str(t))
+    assert t.sensor_id == 39
 
     # TODO : use "real" telegrams for testing
 

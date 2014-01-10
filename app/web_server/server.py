@@ -1,8 +1,11 @@
 import sys
 sys.path.insert(0, '..')
-from model import device
 
 from flask import Flask, render_template, request
+
+from model import device
+
+
 
 
 app = Flask(__name__)
