@@ -7,9 +7,6 @@ sys.path.insert(0, '..')
 class InvalidTelegram(Exception):
     pass
 
-class NotImplemented(Exception):
-    pass
-
 class Telegram(object):
     VALID_SYNC_BYTES = [0xA5, 0x5A]
     UNKNOWN, NORMAL, TEACH_IN = range(3)
@@ -132,7 +129,7 @@ class Telegram(object):
         """ A decorator for function that require the teach in mode """
         def wrapped(self, *args, **kwargs):
             if self.mode != Telegram.TEACH_IN:
-                raise NotImplemented("Accessing teach-in attributes for a telegram that isn't in this mode.")
+                raise NotImplementedError("Accessing teach-in attributes for a telegram that isn't in this mode.")
             return function(self, *args, **kwargs)
         return wrapped
 

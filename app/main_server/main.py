@@ -6,6 +6,9 @@
 # udp : 4500
 #
 
+import sys
+sys.path.insert(0, '..')
+
 from twisted.internet import protocol, reactor
 from server import MainServer
 from enocean.telegram import Telegram
