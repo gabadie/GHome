@@ -1,14 +1,20 @@
-from flask import Flask
-app = Flask(__name__)
+import sys
+sys.path.insert(0, '..')
+from model import device
 
+from flask import Flask, render_template, request
+
+
+app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return 'Index Page'
+	devices = [device.Device('1337', None), device.Device('4242', None)]
+	return render_template('index.html', devices=devices)
 
 @app.route('/hello')
 def hello():
     return 'Hello World'
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True, port=5000)

@@ -1,0 +1,11 @@
+body {
+	background: #3A79FF;
+}
+
+.container {
+	width: 900px;
+	margin: 0 auto;
+	padding: 20px;
+	background: #FFF;
+	border: 1px solid #0045A6;
+}

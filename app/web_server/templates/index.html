@@ -1,0 +1,22 @@
+<html>
+
+<head>
+	<title>GHome web interface</title>
+    <link href="static/css/style.css" rel="stylesheet">
+    <script src="static/js/main.js"></script>
+
+</head>
+
+<body>
+	<div class="container">
+		<p>This is a paragraph !</p>
+
+		<ul>
+		{% for device in devices %}
+			<li>{{ device.id }}</li>
+		{% endfor %}
+		</ul>
+	</div>
+</body>
+
+</html>
