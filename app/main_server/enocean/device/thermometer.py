@@ -15,7 +15,7 @@ class ThermometerDevice(SensorDevice):
     def add_reading(self, telegram):
         reading = ThermometerReading(telegram.data_bytes)
         self.readings.append(reading)
-        Logger.info("Thermometer reading from <{}>: ".format(telegram.sensor_id, reading.temperature)
+        Logger.info("Thermometer reading from <{}>: {}".format(telegram.sensor_id, reading.temperature)
                                             + u"\u00B0" + "C, {}% humidity".format(reading.humidity))
     
     def save(self):
