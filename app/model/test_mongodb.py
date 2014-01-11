@@ -18,3 +18,8 @@ assert thermometer in core.Device.objects
 assert thermometer in core.Device.objects(device_id="Hello")
 assert not thermometer in core.Device.objects(device_id="World")
 
+thermometerValue = devices.Thermometer.Reading(device=thermometer, temperature=0.0, humidity=0.0)
+thermometerValue.save()
+
+assert thermometerValue in devices.Thermometer.Reading.objects(device=thermometer)
+
