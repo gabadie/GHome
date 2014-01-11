@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import mongoengine
-import components
+import core
 import readings
 
 import sys
@@ -10,7 +10,7 @@ sys.path.insert(0, '..')
 
 from main_server.logger import Logger
 
-class Sensor(components.Device):
+class Sensor(core.Device):
     def add_telegram(self, telegram, server):
         raise NotImplemented
 
