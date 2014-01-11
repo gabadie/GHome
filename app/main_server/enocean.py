@@ -13,7 +13,7 @@ class Thermometer(model.devices.Thermometer):
 
     @staticmethod
     def reading_from_data_bytes(thermometer, data_bytes):
-        return model.readings.ThermometerReading(device=thermometer, temperature=data_bytes[2] * 40 / 250.0, humidity=data_bytes[1] * 100 / 250.0)
+        return model.devices.Thermometer.Reading(device=thermometer, temperature=data_bytes[2] * 40 / 250.0, humidity=data_bytes[1] * 100 / 250.0)
 
     def proceed_telegram(self, telegram, server):
         reading = Thermometer.reading_from_data_bytes(self, telegram.data_bytes)
