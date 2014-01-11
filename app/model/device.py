@@ -8,43 +8,32 @@ from main_server.logger import Logger
 from reading import ThermometerReading
 
 class Device(object):
-    @staticmethod
-    def from_telegram(server, telegram):
-        # TODO : study every teach-in telegram in order to identify telegrams from their EEP
-        return Thermometer(server, telegram.sensor_id)
-        Logger.error("Unknown device type")
 
-    def __init__(self, main_server, id):
-        self.main_server = main_server
-        self.id = id
+    # TODO : study every teach-in telegram in order to identify telegrams from their EEP
+    @staticmethod
+    def from_telegram(telegram):
+        device = Thermometer(telegram.sensor_id)
+        device.save()
+        return device
+
+    def __init__(self, device_id):
+        self.id = device_id
         self.ignored = True
 
-    def save(self):
-        self.main_server.devices[self.id] = id
 
 class Sensor(Device):
-    def __init__(self, main_server, id):
-        super(Sensor, self).__init__(main_server, id)
-        self.readings = []
+    def __init__(self, device_id):
+        super(Sensor, self).__init__(device_id)
 
-    def add_reading(self, telegram):
-        raise NotImplemented
-
-    def save(self):
-        #TODO: database write access
+    def add_telegram(self, telegram, server):
         raise NotImplemented
 
 
 class Thermometer(Sensor):
-    def __init__(self, main_server, id):
-        super(Thermometer, self).__init__(main_server, id)
+    def __init__(self, id):
+        super(Thermometer, self).__init__(id)
 
-    def add_reading(self, telegram):
+    def add_telegram(self, telegram, server):
         reading = ThermometerReading(telegram.data_bytes)
-        self.readings.append(reading)
         Logger.info("Thermometer reading from <{}>: {}°C, {}% humidity".format(telegram.sensor_id, reading.temperature,
         	                                                                   reading.humidity))
-
-    def save(self):
-        raise NotImplementedError
-        #TODO: database write access
