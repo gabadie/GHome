@@ -7,6 +7,7 @@ from twisted.internet import protocol
 sys.path.insert(0, '..')
 
 import model
+import logger
 
 
 class Thermometer(model.devices.Thermometer):
@@ -18,6 +19,8 @@ class Thermometer(model.devices.Thermometer):
     def proceed_telegram(self, telegram, server):
         reading = Thermometer.reading_from_data_bytes(self, telegram.data_bytes)
         reading.save()
+
+        logger.info("EnOcean thermometer reading: temperature=" + str(reading.temperature) + "C, humidity=" + str(reading.humidity) + "%")
 
 
 def from_telegram(self, telegram):
