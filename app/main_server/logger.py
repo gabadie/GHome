@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-@file    Logger.py
+@file    py
 @author  Remi Domingues
 @date    30/07/2013
 
@@ -15,92 +15,82 @@ import logging
 import traceback
 from datetime import datetime
 
-class Logger:    
-    LOGGER_ID = "mainServer"
-    LOG_LEVEL = logging.INFO
-    LOG_FORMAT = "%(asctime)s %(levelname)s %(message)s"
-    INIT_TIMESTAMP = datetime.now()
-    LOG_DIRECTORY = "log"
-    LOG_FILE_PATH = LOG_DIRECTORY + "/mainServer.{}.log".format(datetime.strftime(INIT_TIMESTAMP, "%d-%m-%Y_%Hh%Mm%Ss"))
-    
+LOGGER_ID = "mainServer"
+LOG_LEVEL = logging.INFO
+LOG_FORMAT = "%(asctime)s %(levelname)s %(message)s"
+INIT_TIMESTAMP = datetime.now()
+LOG_DIRECTORY = "log"
+LOG_FILE_PATH = LOG_DIRECTORY + "/mainServer.{}.log".format(datetime.strftime(INIT_TIMESTAMP, "%d-%m-%Y_%Hh%Mm%Ss"))
+
+"""
+used in order to write error, warning and info messages
+in the user console and a log file
+"""
+logger = logging.getLOGGER_ID)
+
+def init_logger():
     """
-    Logger used in order to write error, warning and info messages
-    in the user console and a log file
+    Creates a log file and binds the logger with the output console and log file
     """
-    logger = logging.getLogger(LOGGER_ID)
-    
-    @staticmethod
-    def init_logger():
-        """
-        Creates a log file and binds the logger with the output console and log file
-        """
-        hdlr = logging.FileHandler(Logger.LOG_FILE_PATH)
-        formatter = logging.Formatter(Logger.LOG_FORMAT)
-        hdlr.setFormatter(formatter)
-        Logger.logger.addHandler(hdlr)
-        Logger.logger.setLevel(Logger.LOG_LEVEL)
-        
-    @staticmethod
-    def exception(e):
-        """
-        Write an exception stacktrace in the console and the log file
-        """
-        Logger.logger.exception(e)
-        traceback.print_exc()
+    hdlr = logging.FileHandler(LOG_FILE_PATH)
+    formatter = logging.Formatter(LOG_FORMAT)
+    hdlr.setFormatter(formatter)
+    logger.addHandler(hdlr)
+    logger.setLevel(LOG_LEVEL)
 
-    @staticmethod
-    def error(message):
-        """
-        Write an error message in the console and the log file
-        """
-        Logger.log_file(logging.ERROR, message)
-        Logger.log_console(logging.ERROR, message)
-    
-    @staticmethod
-    def info(message):
-        """
-        Write an info message in the console and the log file
-        """
-        Logger.log_file(logging.INFO, message)
-        Logger.log_console(logging.INFO, message)
+def exception(e):
+    """
+    Write an exception stacktrace in the console and the log file
+    """
+    logger.exception(e)
+    traceback.print_exc()
 
-    @staticmethod
-    def warning(message):
-        """
-        Write a warning message in the console and the log file
-        """
-        Logger.log_file(logging.WARNING, message)
-        Logger.log_console(logging.WARNING, message)
-        
-    @staticmethod
-    def info_file(message):
-        """
-        Write an info message in the log file
-        """
-        Logger.log_file(logging.INFO, message)
-        
-    @staticmethod
-    def exception_file(e):
-        """
-        Write an exception stacktrace in the log file
-        """
-        Logger.logger.exception(e)
+def error(message):
+    """
+    Write an error message in the console and the log file
+    """
+    log_file(logging.ERROR, message)
+    log_console(logging.ERROR, message)
 
-    @staticmethod
-    def log_file(level, message):
-        """
-        Write a warning, error or info message in the log file
-        """
-        Logger.logger.log(level, message)
-            
-    @staticmethod
-    def log_console(level, message):
-        """
-        Write a warning, error or info message in the console
-        """
-        if level == logging.INFO:
-            print message
-        if level == logging.WARNING:
-            print "WARNING : " + message
-        elif level == logging.ERROR:
-            sys.stderr.write(message + '\n')
+def info(message):
+    """
+    Write an info message in the console and the log file
+    """
+    log_file(logging.INFO, message)
+    log_console(logging.INFO, message)
+
+def warning(message):
+    """
+    Write a warning message in the console and the log file
+    """
+    log_file(logging.WARNING, message)
+    log_console(logging.WARNING, message)
+
+def info_file(message):
+    """
+    Write an info message in the log file
+    """
+    log_file(logging.INFO, message)
+
+def exception_file(e):
+    """
+    Write an exception stacktrace in the log file
+    """
+    logger.exception(e)
+
+def log_file(level, message):
+    """
+    Write a warning, error or info message in the log file
+    """
+    logger.log(level, message)
+
+def log_console(level, message):
+    """
+    Write a warning, error or info message in the console
+    """
+    if level == logging.INFO:
+        print message
+    if level == logging.WARNING:
+        print "WARNING : " + message
+    elif level == logging.ERROR:
+        sys.stderr.write(message + '\n')
