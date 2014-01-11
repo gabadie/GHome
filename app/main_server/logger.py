@@ -26,7 +26,7 @@ LOG_FILE_PATH = LOG_DIRECTORY + "/mainServer.{}.log".format(datetime.strftime(IN
 used in order to write error, warning and info messages
 in the user console and a log file
 """
-logger = logging.getLOGGER_ID)
+logger = logging.getLogger(LOGGER_ID)
 
 def init_logger():
     """
