@@ -1,11 +1,22 @@
 body {
-	background: #3A79FF;
+	background: #6B33A7;
 }
 
 .container {
 	width: 900px;
-	margin: 0 auto;
-	padding: 20px;
+	margin: 40px auto;
 	background: #FFF;
-	border: 1px solid #0045A6;
+	border: 1px solid #512580;
+	box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.3);
+}
+
+.header {
+	background: #222;
+	color: #FFF;
+	padding: 10px;
+}
+
+.header .logo {
+	font-size: 24px;
+	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
 }

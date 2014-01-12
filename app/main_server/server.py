@@ -9,12 +9,13 @@ sys.path.insert(0, '..')
 
 import enocean.client
 import logger
+import config
 
 
 class MainServer(object):
 
     def __init__(self):
-        self.db = mongoengine.connect('tumblelog')
+        self.db = mongoengine.connect(config.db_name)
         logger.info('main server initialized')
         pass
 

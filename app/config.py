@@ -3,8 +3,6 @@
 
 import json
 
-api_8tracks =  "cd7a9189d060c79845828dc26471dbd6397cdb31"
-
 class GlobalConfig:
 
     class EnOcean:
@@ -51,3 +49,8 @@ if __name__ == "__main__":
     assert config.enocean.port == 5000
     assert config.main_server.ip == "127.0.0.1"
     assert config.main_server.rpc_port == 8001
+
+gateway_ip = "127.0.0.1"
+gateway_port = 5000
+db_name = "ghome"
+api_8tracks =  "cd7a9189d060c79845828dc26471dbd6397cdb31"
