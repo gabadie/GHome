@@ -33,6 +33,8 @@ class InvalidTelegram(Exception):
 class Telegram(object):
     VALID_SYNC_BYTES = [0xA5, 0x5A]
     UNKNOWN, NORMAL, TEACH_IN = range(3)
+    #Temperature & humidity / window contact / simple switch / occupation & light
+    UNKNOWN_DEVICE, SR04RH, SRW01, FUNKSCHALTER, SR_MDS = range(5)
 
     def __init__(self, sync_bytes, h_seq, length, org, data, sensor_id, status, checksum, strict=False):
         self.sync_bytes = sync_bytes
@@ -150,6 +152,16 @@ class Telegram(object):
     @requires_teach_in
     def eep(self):
         return (self.org, self.func, self.type)
+        
+    @property
+    @requires_teach_in
+    def device_type(self):
+        if (self.org == 6 || self.org == 0xD5) && self.func == 0 && self.type == 1:
+            return Telegram.SRW01
+        elif (self.org == 7 || self.org == 0xA5) && self.func == 4 && self.type == 1:
+            return Telegram.SR04RH
+        else:
+            return Telegram.UNKNOWN_DEVICE        
 
     # Standard operators
     def __str__(self):
