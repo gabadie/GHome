@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import mongoengine
 import sys
+from twisted.internet import protocol
 
 sys.path.insert(0, '..')
 
 import model
+import logger
 
 
 class Thermometer(model.devices.Thermometer):
@@ -19,4 +20,9 @@ class Thermometer(model.devices.Thermometer):
         reading = Thermometer.reading_from_data_bytes(self, telegram.data_bytes)
         reading.save()
 
-        Logger.info("Thermometer reading from <{}>: {}°C, {}% humidity".format(telegram.sensor_id, reading.temperature, reading.humidity))
+        logger.info("EnOcean thermometer reading: temperature=" + str(reading.temperature) + "C, humidity=" + str(reading.humidity) + "%")
+
+
+def from_telegram(self, telegram):
+    #TODO: code all other devices
+    return Thermometer(device_id=telegram.sensor_id)

@@ -3,7 +3,6 @@
 
 import mongoengine
 import core
-import readings
 
 
 class Sensor(core.Device):
