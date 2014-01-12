@@ -115,12 +115,12 @@ class Telegram(object):
 
     @property
     def mode(self):
-        b7 = (self.data_bytes[3] & 0x80) >> 7
+        #b7 = (self.data_bytes[3] & 0x80) >> 7
         b3 = (self.data_bytes[3] & 0x08) >> 3
 
-        if b7 == 0 and b3 == 1:
+        if b3 == 1:                 #if b7 == 0 and b3 == 1:
             return Telegram.NORMAL
-        elif b7 == 1 and b3 == 0:
+        elif b3 == 0:               #elif b7 == 1 and b3 == 0:
             return Telegram.TEACH_IN
         else:
             return Telegram.UNKNOWN
@@ -160,6 +160,7 @@ class Telegram(object):
             return Telegram.SRW01
         elif (self.org == 7 or self.org == 0xA5) and self.func == 4 and self.type == 1:
             return Telegram.SR04RH
+        #TODO => SR-MDS Solar
         else:
             return Telegram.UNKNOWN_DEVICE        
 
