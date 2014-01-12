@@ -156,9 +156,9 @@ class Telegram(object):
     @property
     @requires_teach_in
     def device_type(self):
-        if (self.org == 6 || self.org == 0xD5) && self.func == 0 && self.type == 1:
+        if (self.org == 6 or self.org == 0xD5) and self.func == 0 and self.type == 1:
             return Telegram.SRW01
-        elif (self.org == 7 || self.org == 0xA5) && self.func == 4 && self.type == 1:
+        elif (self.org == 7 or self.org == 0xA5) and self.func == 4 and self.type == 1:
             return Telegram.SR04RH
         else:
             return Telegram.UNKNOWN_DEVICE        

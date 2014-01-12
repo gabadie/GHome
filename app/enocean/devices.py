@@ -29,10 +29,10 @@ class WindowContact(model.devices.WindowContact):
     def reading_from_data_bytes(thermometer, data_bytes):
         contact = self.data_bytes[3] & 0x01
         if contact == 0:
-            open = True
+            contact = True
         else:
-            open = False
-        return model.devices.WindowContact.Reading(device=windowContact, open)
+            contact = False
+        return model.devices.WindowContact.Reading(device=windowContact, open=contact)
 
     def proceed_telegram(self, telegram, server):
         reading = WindowContact.reading_from_data_bytes(self, telegram.data_bytes)
