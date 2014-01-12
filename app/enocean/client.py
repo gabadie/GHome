@@ -8,7 +8,7 @@ from twisted.internet import protocol
 sys.path.insert(0, '..')
 
 import model
-from telegram import Telegram
+import telegram
 import devices
 import logger
 
@@ -18,13 +18,13 @@ class ClientProtocol(protocol.Protocol):
     def __init__(self, main_server):
         self.main_server = main_server
 
-    def proceed_telegram(self, telegram):
-        logger.info("EnOcean telegram: " + str(telegram))
+    def proceed_telegram(self, t):
+        logger.info("EnOcean telegram: " + str(t))
 
-        if telegram.mode == Telegram.TEACH_IN:
-            telegram_device_id = str(telegram.sensor_id)
+        if t.mode == telegram.Telegram.TEACH_IN:
+            telegram_device_id = str(t.sensor_id)
 
-            device = devices.from_telegram(telegram)
+            device = devices.from_telegram(t)
 
             if len(model.core.Device.objects(device_id=device.device_id)) != 0:
                 logger.info("Device " + str(telegram_device_id) + " alreadu known")
@@ -33,8 +33,8 @@ class ClientProtocol(protocol.Protocol):
 
             logger.info("EnOcean create device " + device)
 
-        elif telegram.mode == Telegram.NORMAL:
-            telegram_device_id = str(telegram.sensor_id)
+        elif t.mode == telegram.Telegram.NORMAL:
+            telegram_device_id = str(t.sensor_id)
 
             res = model.core.Device.objects(device_id=telegram_device_id)
 
@@ -43,7 +43,7 @@ class ClientProtocol(protocol.Protocol):
                 return
 
             for device in res:
-                device.proceed_telegram(telegram)
+                device.proceed_telegram(t)
 
         else:
             logger.info("Unknown telegram mode")
@@ -52,8 +52,8 @@ class ClientProtocol(protocol.Protocol):
         logger.info("EnOcean connection made")
 
     def dataReceived(self, data):
-        telegram = Telegram.from_str(data)
-        self.proceed_telegram(telegram)
+        t = telegram.from_str(data)
+        self.proceed_telegram(t)
 
 
 class ClientProtocolFactory(protocol.ClientFactory):
