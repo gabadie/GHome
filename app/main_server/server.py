@@ -1,40 +1,36 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from enocean.telegram import Telegram
-from logger import Logger
-from enocean.device.thermometer import ThermometerDevice
-from device import Device
+import sys
+import mongoengine
+from twisted.internet import reactor
+import twisted.web
 
-class MainServer:
+sys.path.insert(0, '..')
 
-    def __init__(self):
-        self.devices = {}
-        Logger.init_logger()
-        
-    def add_authorized_device(self, deviceId):
-        authorized_devices.append(deviceId)
+import enocean.client
+import logger
+from rpc_server import RpcServer
 
-    def add_device(self, device):
-        self.devices[device.id] = device
-        
-    def is_known(self, deviceId):
-        return deviceId in self.devices
-        
-    def get_device(self, deviceId):
-        return self.devices[deviceId];
-        
-    def telegram_received(self, telegram):
-        Logger.info("Telegram received: " + telegram.__str__())
-        
-        if telegram.mode == Telegram.TEACH_IN and not self.is_known(telegram.sensor_id):
-            print "unknown"
-            self.add_device(Device.from_telegram(self, telegram))
-                
-        elif telegram.mode == Telegram.NORMAL and self.is_known(telegram.sensor_id):
-            print "normal"
-            device = self.get_device(telegram.sensor_id)
-            if not device.ignore:
-                print "adding"
-                device.add_telegram(telegram)
-            
+
+class MainServer(object):
+
+    def __init__(self, config):
+        self.config = config
+        self.db = mongoengine.connect(config.mongo_db)
+        self.rpc_server = None
+
+        logger.info('main server initialized')
+
+    def run(self):
+        logger.info('running main server...')
+
+        """ EnOcean client protocol factory """
+        reactor.connectTCP(self.config.enocean.ip, self.config.enocean.port, enocean.client.ClientProtocolFactory(self))
+
+        """ Launchs XML RPC server """
+        self.rpc_server = RpcServer(self)
+        reactor.listenTCP(self.config.main_server.rpc_port, twisted.web.server.Site(self.rpc_server))
+
+        """ Main loop """
+        reactor.run()

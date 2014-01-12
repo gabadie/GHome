@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import sys
+sys.path.insert(0, '../libs')
 
 from geopy import geocoders
 from shopsense.shopstyle import ShopStyle
