@@ -1,42 +1,45 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""
-@file    py
-@author  Remi Domingues
-@date    30/07/2013
-
-This file contains a logger class definition.
-"""
-
 import sys
 import os
 import logging
 import traceback
 from datetime import datetime
 
-LOGGER_ID = "mainServer"
-LOG_LEVEL = logging.INFO
-LOG_FORMAT = "%(asctime)s %(levelname)s %(message)s"
-INIT_TIMESTAMP = datetime.now()
-LOG_DIRECTORY = "log"
-LOG_FILE_PATH = LOG_DIRECTORY + "/mainServer.{}.log".format(datetime.strftime(INIT_TIMESTAMP, "%d-%m-%Y_%Hh%Mm%Ss"))
 
-"""
-used in order to write error, warning and info messages
-in the user console and a log file
-"""
-logger = logging.getLogger(LOGGER_ID)
+logger = logging.getLogger("ghome")
+logger.setLevel(logging.INFO)
 
-def init_logger():
+formatter = logging.Formatter("%(asctime)s - %(levelname)s: %(message)s")
+
+stream = logging.StreamHandler()
+stream.setFormatter(formatter)
+stream.setLevel(logging.INFO)
+logger.addHandler(stream)
+
+def add_file(logname):
     """
     Creates a log file and binds the logger with the output console and log file
     """
-    hdlr = logging.FileHandler(LOG_FILE_PATH)
-    formatter = logging.Formatter(LOG_FORMAT)
+    dest_log = "{}.{}.log".format(logname, datetime.strftime(datetime.now(), "%Y-%m-%d_%Hh%Mm%Ss"))
+    dest_dir = os.path.dirname(dest_log)
+
+    if not os.path.exists(dest_dir):
+        try:
+            os.makedirs(os.path.dirname(dest_log))
+        except:
+            error("failed to add log " + dest_log + " : can't create directory " + dest_dir)
+            return
+
+    elif not os.path.isdir(dest_dir):
+        error("failed to add log " + dest_log + " : " + dest_dir + " is not a directory")
+        return
+
+    hdlr = logging.FileHandler(dest_log)
     hdlr.setFormatter(formatter)
+    hdlr.setLevel(logging.INFO)
     logger.addHandler(hdlr)
-    logger.setLevel(LOG_LEVEL)
 
 def exception(e):
     """
@@ -49,48 +52,16 @@ def error(message):
     """
     Write an error message in the console and the log file
     """
-    log_file(logging.ERROR, message)
-    log_console(logging.ERROR, message)
+    logger.log(logging.ERROR, message)
 
 def info(message):
     """
     Write an info message in the console and the log file
     """
-    log_file(logging.INFO, message)
-    log_console(logging.INFO, message)
+    logger.log(logging.INFO, message)
 
 def warning(message):
     """
     Write a warning message in the console and the log file
     """
-    log_file(logging.WARNING, message)
-    log_console(logging.WARNING, message)
-
-def info_file(message):
-    """
-    Write an info message in the log file
-    """
-    log_file(logging.INFO, message)
-
-def exception_file(e):
-    """
-    Write an exception stacktrace in the log file
-    """
-    logger.exception(e)
-
-def log_file(level, message):
-    """
-    Write a warning, error or info message in the log file
-    """
-    logger.log(level, message)
-
-def log_console(level, message):
-    """
-    Write a warning, error or info message in the console
-    """
-    if level == logging.INFO:
-        print message
-    if level == logging.WARNING:
-        print "WARNING : " + message
-    elif level == logging.ERROR:
-        sys.stderr.write(message + '\n')
+    logger.log(logging.WARNING, message)

@@ -12,6 +12,7 @@ import logger
 class RpcServer(xmlrpc.XMLRPC):
 
     def __init__(self, main_server):
+        xmlrpc.XMLRPC.__init__(self)
         self.main_server = main_server
 
     def xmlrpc_ping(self, msg):

@@ -3,7 +3,7 @@
 
 import sys
 import mongoengine
-from twisted.internet import protocol
+from twisted.internet import protocol, task
 
 sys.path.insert(0, '..')
 
@@ -19,7 +19,9 @@ class ClientProtocol(protocol.Protocol):
         self.main_server = main_server
 
     def proceed_telegram(self, t):
-        logger.info("EnOcean telegram: " + str(t))
+        addr = self.transport.getPeer()
+
+        logger.info("EnOcean receive telegram from {}:{}: {}".format(addr.host, addr.port, t))
 
         if t.mode == telegram.Telegram.TEACH_IN:
             telegram_device_id = str(t.sensor_id)
@@ -48,26 +50,36 @@ class ClientProtocol(protocol.Protocol):
         else:
             logger.info("Unknown telegram mode")
 
-    def connectionMade(self):
-        logger.info("EnOcean connection made")
-
     def dataReceived(self, data):
         t = telegram.from_str(data)
         self.proceed_telegram(t)
 
 
-class ClientProtocolFactory(protocol.ClientFactory):
+class ClientProtocolFactory(protocol.ReconnectingClientFactory):
 
     def __init__(self, main_server):
         self.main_server = main_server
+        self.initialDelay = 1
+        self.maxDelay = 10
+        self.factor = 1.5
 
     def buildProtocol(self, addr):
+        logger.info("EnOcean connection to {}:{} started".format(addr.host, addr.port))
+
+        self.resetDelay()
+
         return ClientProtocol(self.main_server)
 
     def clientConnectionFailed(self, connector, reason):
-        logger.info("EnOcean connection failed : {}".format(reason))
+        addr = connector.getDestination()
+
+        logger.info("EnOcean connection to {}:{} failed: {}".format(addr.host, addr.port, reason))
+
+        self.retry(connector)
 
     def clientConnectionLost(self, connector, reason):
-        logger.info("EnOcean connection lost : {}".format(reason))
-        pass
+        addr = connector.getDestination()
 
+        logger.info("EnOcean connection to {}:{} losted: {}".format(addr.host, addr.port, reason))
+
+        self.retry(connector)
