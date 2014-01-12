@@ -1,5 +1,5 @@
 import sys
-from twisted.internet import protocol, reactor, defer
+from twisted.internet import protocol, reactor
 
 class MockClientProtocol(protocol.Protocol):
 
@@ -19,14 +19,11 @@ class MockClientProtocolFactory(protocol.ClientFactory):
         print "Connection failed : {}".format(reason)
 
     def clientConnectionLost(self, connector, reason):
-        #print "Connection lost : {}".format(reason)
-        pass
-
-def foo():
-    print "foo"
+        print "Connection lost"
+        reactor.stop()
 
 # How to use it:
-#  python ./mock_client [port=8000]
+#  python ./mock_client.py [port=8000]
 if __name__ == '__main__':
 
     port = 8000

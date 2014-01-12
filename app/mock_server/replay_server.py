@@ -55,7 +55,7 @@ class ReplayServerProtocolFactory(protocol.Factory):
 
 
 # How to use it:
-#  python ./replay_server [port=8000]
+#  python ./replay_server.py [port=8000]
 if __name__ == '__main__':
 
     port = 8000
