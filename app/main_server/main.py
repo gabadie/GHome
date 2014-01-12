@@ -6,7 +6,13 @@
 # udp : 4500
 #
 
-from server import MainServer
+import sys
 
-server = MainServer()
+sys.path.insert(0, '..')
+
+from server import MainServer
+from config import GlobalConfig
+
+configuration = GlobalConfig()
+server = MainServer(configuration)
 server.run()
