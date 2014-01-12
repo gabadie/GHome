@@ -42,14 +42,3 @@ class GlobalConfig:
             return config
 
         return None
-
-if __name__ == "__main__":
-
-    config = GlobalConfig.from_json('insa_config.json')
-
-    assert config.mongo_db == "ghome_database"
-    assert config.enocean.ip == "134.214.106.23"
-    assert config.enocean.port == 5000
-    assert config.main_server.ip == "127.0.0.1"
-    assert config.main_server.rpc_port == 8001
-

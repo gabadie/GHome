@@ -7,7 +7,6 @@ import mongoengine
 class Device(mongoengine.Document):
     device_id = mongoengine.StringField(required=True, unique=True)
     name = mongoengine.StringField()
-    ignored = mongoengine.BooleanField(default=True)
 
     meta = {'allow_inheritance': True}
 
