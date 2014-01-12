@@ -35,7 +35,28 @@ class Lamp(model.core.Actuator):
         self.turned_on = not self.turned_on
         self.save()
 
+class WindowContact(model.devices.WindowContact):
+
+    @staticmethod
+    def reading_from_data_bytes(thermometer, data_bytes):
+        contact = self.data_bytes[3] & 0x01
+        if contact == 0:
+            contact = True
+        else:
+            contact = False
+        return model.devices.WindowContact.Reading(device=windowContact, open=contact)
+
+    def proceed_telegram(self, telegram, server):
+        reading = WindowContact.reading_from_data_bytes(self, telegram.data_bytes)
+        reading.save()
+
+        logger.info("EnOcean window contact reading: open=" + str(reading.open))
+
 
 def from_telegram(self, telegram):
-    #TODO: code all other devices
-    return Thermometer(device_id=telegram.sensor_id)
+    if telegram.device_type == Telegram.SRW01:
+        return WindowContact(device_id=telegram.sensor_id)
+    elif telegram.device_type == Telegram.SR04RH:
+        return Thermometer(device_id=telegram.sensor_id)
+    
+    raise NotImplemented

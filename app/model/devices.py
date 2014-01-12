@@ -9,3 +9,8 @@ class Thermometer(object):
     class Reading(core.Reading):
         temperature = mongoengine.FloatField(required=True)
         humidity = mongoengine.FloatField(required=True)
+        
+        
+class WindowContact(core.Sensor):
+    class Reading(core.Reading):
+        open = mongoengine.BooleanField(required=True)

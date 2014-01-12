@@ -29,7 +29,7 @@ class ClientProtocol(protocol.Protocol):
             device = devices.from_telegram(t)
 
             if len(model.core.Device.objects(device_id=device.device_id)) != 0:
-                logger.info("Device " + str(telegram_device_id) + " alreadu known")
+                logger.info("Device " + str(telegram_device_id) + " already known")
 
             device.save()
 

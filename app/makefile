@@ -20,10 +20,9 @@ tests: $(python_tests) $(shell_tests)
 .PHONY: $(python_tests)
 $(python_tests): %:
 	@echo "# testing <$@>..."
-	@python $@
+	@cd $(dir $@) ; python $(notdir $@)
 
 .PHONY: $(shell_tests)
 $(shell_tests): %:
 	@echo "# testing <$@>"
-	@sh $@
-
+	@cd $(dir $@) ; sh $(notdir $@)
