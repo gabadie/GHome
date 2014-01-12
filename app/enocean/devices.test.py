@@ -36,6 +36,13 @@ def test_thermometer():
     assert reading.humidity == 52.8
     assert reading.temperature == 24.48
 
+def test_lamp():
+    lamp = devices.Lamp(device_id='lamp101')
+    assert not lamp.turned_on
+    lamp.activate(sensor=None)
+    assert lamp.turned_on
+
 if __name__ == "__main__":
     test_mongoengine()
     test_thermometer()
+    test_lamp()

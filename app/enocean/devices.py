@@ -28,6 +28,14 @@ class Thermometer(Sensor, model.devices.Thermometer):
         logger.info("EnOcean thermometer reading: temperature=" + str(reading.temperature) + "C, humidity=" + str(reading.humidity) + "%")
 
 
+class Lamp(model.core.Actuator):
+    turned_on = mongoengine.BooleanField(default=False)
+
+    def activate(self, sensor):
+        self.turned_on = not self.turned_on
+        self.save()
+
+
 def from_telegram(self, telegram):
     #TODO: code all other devices
     return Thermometer(device_id=telegram.sensor_id)
