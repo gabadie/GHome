@@ -12,6 +12,9 @@ sys.path.insert(0, '..')
 
 from server import MainServer
 from config import GlobalConfig
+import logger
+
+logger.add_file('log/main_server')
 
 configuration = GlobalConfig()
 server = MainServer(configuration)
