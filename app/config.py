@@ -15,9 +15,12 @@ class GlobalConfig:
             self.ip = "127.0.0.1"
             self.rpc_port = 8001
 
-    """ Construct with the development configuration """
     def __init__(self):
+        """ Construct with the development configuration """
+
         self.mongo_db = "ghome_development"
+        self.api_8tracks =  "cd7a9189d060c79845828dc26471dbd6397cdb31"
+
         self.enocean = GlobalConfig.EnOcean()
         self.main_server = GlobalConfig.MainServer()
 
@@ -50,7 +53,3 @@ if __name__ == "__main__":
     assert config.main_server.ip == "127.0.0.1"
     assert config.main_server.rpc_port == 8001
 
-gateway_ip = "127.0.0.1"
-gateway_port = 5000
-db_name = "ghome_development"
-api_8tracks =  "cd7a9189d060c79845828dc26471dbd6397cdb31"

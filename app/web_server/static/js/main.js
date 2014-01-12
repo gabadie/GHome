@@ -3,19 +3,18 @@ $(document).ready(function() {
 		var currently_ignored = $(this).hasClass('ignored');
 		var data = {ignored: !currently_ignored};
 
-	    $.ajax({
-	      url: "/device/ignored",
-	      type: 'POST',
-	      async: true,
-	      dataType: "json",
-		  data: JSON.stringify(data),
-		  contentType: 'application/json;charset=UTF-8',
-	      success: function (data) {
-  	      	$('#loading').hide(100);
-	      	$('#overlay').hide(100);
-      	  	downloadURL('static/slide.pptx');
-	      }
-	  	});
+		// $.ajax({
+		//   url: "/device/ignored",
+		//   type: 'POST',
+		//   async: true,
+		//   dataType: "json",
+		//   data: JSON.stringify(data),
+		//   contentType: 'application/json;charset=UTF-8',
+		//   success: function (data) {
+		//       	//
+		//   }
+		// });
+		
 	});
 
 });

@@ -10,15 +10,19 @@ import mongoengine
 import sys
 sys.path.insert(0, '..')
 
-import config
 from model import core
 from enocean.devices import Thermometer
 
+from config import GlobalConfig
+
+config = GlobalConfig()
+
 app = Flask(__name__)
 app.debug = True
-db = mongoengine.connect(config.db_name)
+
+db = mongoengine.connect(config.mongo_db)
 # TODO : remove this, for testing only
-db.drop_database(config.db_name)
+db.drop_database(config.mongo_db)
 
 @app.route('/')
 def index():
