@@ -44,13 +44,13 @@ class RpcServer(xmlrpc.XMLRPC):
         if not isinstance(device_name, str):
             return xmlrpc.Fault(2002, "Invalid parameter <device_name>: must be a string.")
 
-        if not isinstance(device_type, class):
+        if not isinstance(device_type, classobj):
             return xmlrpc.Fault(2003, "Invalid parameter <device_type>: must be a class.")
 
         if device_id == "":
             return xmlrpc.Fault(2101, "Invalid parameter <device_id> value: must have at least one character.")
 
-        if not issubclass(device_type, model.core.Device)
+        if not issubclass(device_type, model.core.Device):
             return xmlrpc.Fault(2102, "Invalid parameter <device_type> value: must be a subclass of model.core.Device.")
 
         if len(model.core.Device.objects(device_id=device_id)) > 0:
