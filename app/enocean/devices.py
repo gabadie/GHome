@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import mongoengine
 from twisted.internet import protocol
 
 sys.path.insert(0, '..')
@@ -10,7 +11,11 @@ import model
 import logger
 
 
-class Thermometer(model.devices.Thermometer):
+class Sensor(model.core.Device):
+    ignored = mongoengine.BooleanField(default=True)
+
+
+class Thermometer(Sensor, model.devices.Thermometer):
 
     @staticmethod
     def reading_from_data_bytes(thermometer, data_bytes):
