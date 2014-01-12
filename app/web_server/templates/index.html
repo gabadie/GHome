@@ -17,7 +17,7 @@
 <body>
 	<div class="container">
 		<div class="row header">
-			<h1 class="logo">GHome</h1>
+			<h1 class="logo"><span class="glyphicon glyphicon-cog"></span> GHome</h1>
 		</div>
 
 
@@ -28,9 +28,12 @@
 				<h2>This is a title</h2>
 				<p>This is a paragraph, in a column</p>
 
-				<ul>
+				<p>List of all devices in the database:</p>
+				<ul class="devices">
 				{% for device in devices %}
-					<li>{{ device.id }}</li>
+					<li {% if device.ignored %}class="ignored"{% endif %}>
+						<span class="device_id">{{ device.device_id }}</span>: <span class="name">{{device.name}}</span>
+					</li>
 				{% endfor %}
 				</ul>
 

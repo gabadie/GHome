@@ -33,6 +33,8 @@ if __name__ == "__main__":
 	# Creating a couple devices to test the DB
 	Thermometer(device_id='1337', name='Living room thermometer', ignored=False).save()
 	Thermometer(device_id='4242', name='Bedroom thermometer', ignored=True).save()
+	Thermometer(device_id='89351', name='Another thermometer', ignored=False).save()
+	Thermometer(device_id='34210', name='And yet another thermometer', ignored=False).save()
 
 	app.run(host="localhost", port=5000, debug=True)
 

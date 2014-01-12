@@ -1,12 +1,11 @@
 body {
-	background: #6B33A7;
+	background: #7B2F9A;
 }
 
 .container {
-	width: 900px;
+	width: 1024px;
 	margin: 40px auto;
 	background: #FFF;
-	border: 1px solid #512580;
 	box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.3);
 }
 
@@ -17,6 +16,33 @@ body {
 }
 
 .header .logo {
+	margin: 10px;
 	font-size: 24px;
 	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.devices {
+	list-style: none;
+}
+
+.devices {
+	padding: 5px 10px;
+}
+
+.devices li{
+	padding: 6px;
+	background: #27ae60;
+	border: 1px solid #2ecc71;
+	border-bottom: none;
+	color: #FFF;
+}
+
+.devices .ignored {
+	background-color: #c0392b;
+	border-color: #e74c3c;
+	color: #e74c3c;
+}
+
+.devices .device_id {
+	font-weight: bold;
 }
