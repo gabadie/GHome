@@ -8,6 +8,7 @@ sys.path.insert(0, '..')
 
 import logger
 import model
+import enocean
 
 
 class RpcServer(xmlrpc.XMLRPC):
@@ -20,22 +21,47 @@ class RpcServer(xmlrpc.XMLRPC):
         logger.info("RpcServer.xmlrpc_ping(\"" + str(msg) + "\")")
         return msg
 
-    def xmlrpc_activate_device(self, device_id, activate):
+    def xmlrpc_ignore_sensor(self, device_id, ignored):
         if not isinstance(device_id, str):
             return xmlrpc.Fault(1001, "Invalid parameter <device_id>: must be a string.")
 
-        if not isinstance(activate, bool):
+        if not isinstance(ignored, bool):
             return xmlrpc.Fault(1002, "Invalid parameter <activate>: must be a boolean.")
 
-        devices = model.core.Device.objects(device_id=device_id)
+        sensor = enocean.devices.Sensor.objects(device_id=device_id).first()
 
-        if len(devices) == 0:
+        if not sensor:
             return xmlrpc.Fault(1201, "Invalid operation: Unknown device id.")
 
-        for d in devices:
-            d.ignored = not activate
+        sensor.ignored = ignored
+        sensor.save()
 
         return True
+
+    # TODO : integrate this to create_device ? add tests ?
+    def xmlrpc_create_sensor(self, sensor_id, sensor_name, sensor_type, actuators=None):
+        if not actuators:
+            actuators = []
+        actuators = model.core.Actuator.objects(device_id__in=actuators)
+
+        # Finding the sensor class
+        SensorClass = [s_class for s_class in enocean.devices.Sensor.__subclasses__() if s_class.__name__ == sensor_type][0]
+
+        # Creating the new device
+        s = SensorClass(device_id=sensor_id, name=sensor_name, actuators=actuators, ignored=False)
+        s.save()
+
+        return True
+
+    def xmlrpc_remove_device(self, device_id):
+        device = model.Device.objects(device_id=device_id).first()
+        if device:
+            device.delete()
+            return True
+        else:
+            return xmlrpc.Fault(2001, "Incorrect <device_id> value: no device with that id was found.")
+
+
 
     def xmlrpc_create_device(self, device_id, device_name, device_type):
         if not isinstance(device_id, str):
@@ -56,7 +82,10 @@ class RpcServer(xmlrpc.XMLRPC):
         if len(model.core.Device.objects(device_id=device_id)) > 0:
             return xmlrpc.Fault(2201, "Invalid operation: {} already exists.".format(device_id))
 
-        d = device_type(device_id=device_id, name=device_name)
+        # Finding the device class
+        DeviceClass = [d_class for d_class in model.core.Device.__subclasses__() if d_class.__name__ == device_type][0]
+
+        d = DeviceClass(device_id=device_id, name=device_name, ignored=False)
         d.save()
 
         return True

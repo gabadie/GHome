@@ -21,15 +21,12 @@ body {
 	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
 }
 
-.devices {
+.sensors {
 	list-style: none;
-}
-
-.devices {
 	padding: 5px 10px;
 }
 
-.devices li{
+.sensors li{
 	padding: 6px;
 	background: #27ae60;
 	border: 1px solid #2ecc71;
@@ -37,12 +34,23 @@ body {
 	color: #FFF;
 }
 
-.devices .ignored {
+.sensors .ignored {
 	background-color: #c0392b;
 	border-color: #e74c3c;
-	color: #e74c3c;
+	color: #FF9388;
 }
 
-.devices .device_id {
+.sensors .device_id {
 	font-weight: bold;
+}
+
+.sensors li .delete {
+	float: right;
+	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+	opacity: 0.5;
+	color: #FFF;
+}
+
+.sensors li .delete:hover {
+	opacity: 1;
 }

@@ -125,10 +125,19 @@ class Telegram(object):
         else:
             return Telegram.UNKNOWN
 
+    @property
+    def teach_in(self):
+        return self.mode == Telegram.TEACH_IN
+
+    @property
+    def normal(self):
+        return self.mode == Telegram.NORMAL
+    
+
     def requires_teach_in(function):
         """ A decorator for function that require the teach in mode """
         def wrapped(self, *args, **kwargs):
-            if self.mode != Telegram.TEACH_IN:
+            if not self.teach_in:
                 raise NotImplementedError("Accessing teach-in attributes for a telegram that isn't in this mode.")
             return function(self, *args, **kwargs)
         return wrapped
