@@ -42,7 +42,23 @@ def test_lamp():
     lamp.activate(sensor=None)
     assert lamp.turned_on
 
+def test_switch_lamp():
+    lamp = devices.Lamp(device_id='lamp202')
+    other_lamp = devices.Lamp(device_id='lamp303', turned_on=True)
+
+    switch = devices.Switch(device_id='switch202', actuators=[lamp, other_lamp])
+
+    assert not lamp.turned_on
+    assert other_lamp.turned_on
+
+    switch.activated()
+
+    assert lamp.turned_on
+    assert not other_lamp.turned_on
+
+
 if __name__ == "__main__":
     test_mongoengine()
     test_thermometer()
     test_lamp()
+    test_switch_lamp()
