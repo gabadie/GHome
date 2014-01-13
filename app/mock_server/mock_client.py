@@ -20,7 +20,7 @@ class MockClientProtocolFactory(protocol.ClientFactory):
 
     def clientConnectionLost(self, connector, reason):
         print "Connection lost"
-        reactor.stop()
+        if reactor.running: reactor.stop()
 
 # How to use it:
 #  python ./mock_client.py [port=8000]
