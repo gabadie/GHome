@@ -43,7 +43,7 @@ var sensorLi = function(sensor) {
 	if (sensor.ignored) {
 		res += 'class="ignored"';
 	}
-	res += '><span class="device_id">' + sensor.device_id + '</span>: <span class="name">' + sensor.name + '</span>';
+	res += '><span class="device_id">' + sensor.device_id + '</span> <span class="name">' + sensor.name + '</span>';
     res += '<span class="delete glyphicon glyphicon-remove"></span>';
     res += '</li>'
 

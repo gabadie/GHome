@@ -25,15 +25,14 @@
 
 
 			<div class="col-md-10">
-				<h2>This is a title</h2>
-				<p>This is a paragraph, in a column</p>
+				<h2>EnOcean sensors</h2>
 
 				<p>List of all devices in the database:</p>
 				<ul class="sensors">
 <!-- 
 				{% for sensor in sensors %}
 					<li {% if sensor.ignored %}class="ignored"{% endif %} data-sensor-id="{{sensor.device_id}}">
-						<span class="device_id">{{ sensor.device_id }}</span>: <span class="name">{{sensor.name}}</span>
+						<span class="device_id">{{ sensor.device_id }}</span> - <span class="name">{{sensor.name}}</span>
 						<span class="delete glyphicon glyphicon-remove"></span>
 					</li>
 				{% endfor %}
@@ -45,11 +44,11 @@
 					<h4>Add a sensor</h4>
 
 					<div class="form-group">
-						<input type="text" class="form-control input-sm" name="id" placeholder="Sensor ID">
+						<input type="text" class="form-control" name="id" placeholder="Sensor ID">
 					</div>
 
 					<div class="form-group">
-						<input type="text" class="form-control input-sm" name="name" placeholder="Sensor name">
+						<input type="text" class="form-control" name="name" placeholder="Sensor name">
 					</div>
 
 					<div class="form-group">
@@ -80,17 +79,14 @@
 
 			<div class="col-md-2">
 				<h2>Lamps</h2>
-				<h3>Shiny lamps...</h3>
 
 				<ul class="lamps">
-
-<!--
- 					{% for lamp in lamps %}
+					{% for lamp in lamps %}
 					<li {% if lamp.turned_on %}class="turned_on"{% endif %} data-sensor-id="{{lamp.device_id}}">
-						<span class="device_id">{{ lamp.device_id }}</span>: <span class="name">{{lamp.name}}</span>
+						<span class="device_id">{{ lamp.device_id }}</span><br />
+						<span class="name">{{lamp.name}}</span>
 					</li>
 					{% endfor %}
- -->
 				</ul>
 
 			</div>

@@ -18,7 +18,7 @@ class ClientProtocol(protocol.Protocol):
     def __init__(self, main_server):
         self.main_server = main_server
 
-    def proceed_telegram(self, t):
+    def process_telegram(self, t):
         addr = self.transport.getPeer()
         logger.info("EnOcean receive telegram from {}:{}: {}".format(addr.host, addr.port, t))
 
@@ -49,7 +49,7 @@ class ClientProtocol(protocol.Protocol):
                 logger.info("Unknown device id " + telegram_device_id)
                 return
 
-            device.proceed_telegram(t)
+            device.process_telegram(t, self)
 
         else:
             logger.info("Unknown telegram mode")
@@ -58,7 +58,7 @@ class ClientProtocol(protocol.Protocol):
 
     def dataReceived(self, data):
         t = telegram.from_str(data)
-        self.proceed_telegram(t)
+        self.process_telegram(t)
 
 
 class ClientProtocolFactory(protocol.ReconnectingClientFactory):

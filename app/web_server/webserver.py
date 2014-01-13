@@ -25,28 +25,33 @@ app.debug = True
 rpc = xmlrpclib.Server('http://{}:{}/'.format(config.main_server.ip, config.main_server.rpc_port))
 db = mongoengine.connect(config.mongo_db)
 
-# TODO : remove this, for testing only
-db.drop_database(config.mongo_db)
-Thermometer(device_id='1337', name='Living room thermometer', ignored=False).save()
-Thermometer(device_id='4242', name='Bedroom thermometer', ignored=False).save()
-Thermometer(device_id='34210', name='A thermometer we\'ll ignore', ignored=True).save()
 
-Switch(device_id='13548', name='A random switch', ignored=False).save()
-Switch(device_id='82596', name='An ignored switch', ignored=True).save()
+def init_db():
+    """ For testing only """
+    db.drop_database(config.mongo_db)
 
-WindowContact(device_id='3311', name='A window contact sensor', open=False, ignored=True).save()
+    # Actuators
+    l1 = Lamp(device_id='889977', name='The main lamp', turned_on=True).save()
+    l2 = Lamp(device_id='85654', name='Another lamp').save()
 
-Lamp(device_id='889977', name='The main lamp').save()
-Lamp(device_id='85654', name='Another lamp').save()
+    # Sensors
+    Thermometer(device_id='1337', name='Living room thermometer', ignored=False).save()
+    Thermometer(device_id='4242', name='Bedroom thermometer', ignored=False).save()
+    Thermometer(device_id='233232', name='A thermometer that should work', ignored=False).save()
 
+    Switch(device_id='343830', name='A switch that should work', ignored=False, actuators=[l1, l2]).save()
+    Switch(device_id='939400', name='An ignored switch', ignored=True).save()
 
+    WindowContact(device_id='3311', name='A window contact sensor', open=False, ignored=True).save()
 
 @app.route('/')
 def index():
     actuators = core.Actuator.objects()
     sensor_types = Sensor.__subclasses__()
 
-    return render_template('index.html', sensor_types=sensor_types, actuators=actuators)
+    lamps = Lamp.objects()
+
+    return render_template('index.html', sensor_types=sensor_types, actuators=actuators, lamps=lamps)
 
 @app.route('/sensor', methods=['POST', 'GET'])
 def all_sensors():
@@ -60,17 +65,20 @@ def all_sensors():
             actuators = []
         print s_id, s_name, s_type, actuators
         rpc.create_sensor(s_id, s_name, s_type, actuators)
-        sensor = json.loads(Sensor.objects(device_id=s_id).to_json())[0]
-        
-        resp = dict(ok=True, result=sensor)
+        sensors = json.loads(Sensor.objects(device_id=s_id).to_json())
+        if sensors:
+            resp = dict(ok=True, result=sensors[0])
+        else:
+            resp = dict(ok=False)
 
     return json.dumps(resp)
 
 @app.route('/sensor/<device_id>', methods=['GET', 'DELETE'])
 def sensor(device_id):
     if request.method == 'GET':
-        sensor = Sensor.objects(device_id=device_id)
-        resp = dict(ok=True, result=sensor.to_mongo())
+        sensor = json.loads(Sensor.objects(device_id=device_id).to_json())[0]
+        print sensor
+        resp = dict(ok=True, result=sensor)
     elif request.method == 'DELETE':
         sensor = Sensor.objects(device_id=device_id)
         sensor.delete()
@@ -91,6 +99,7 @@ def sensor_ignored(device_id):
 
 
 if __name__ == "__main__":
+    # init_db()
     app.run(host="localhost", port=5000, debug=True)
 
     # resource = WSGIResource(reactor, reactor.getThreadPool(), app)
