@@ -7,6 +7,7 @@ from twisted.internet import protocol
 
 sys.path.insert(0, '..')
 
+from telegram import Telegram
 import model
 import logger
 
@@ -86,12 +87,14 @@ class Lamp(model.core.Actuator, model.devices.Lamp):
         self.save()
 
 
-def from_telegram(self, telegram):
+def from_telegram(telegram):
     if telegram.device_type == Telegram.SRW01:
         return WindowContactor(device_id=telegram.sensor_id)
-    elif telegram.device_type == Telegram.SR04RH:
+    
+    if telegram.device_type == Telegram.SR04RH:
         return Thermometer(device_id=telegram.sensor_id)
-    elif telegram.device_type == Telegram.SR_MDS:
+    
+    if telegram.device_type == Telegram.SR_MDS:
         return LightMovementSensor(device_id=telegram.sensor_id)
     
-    raise NotImplemented
+    return None

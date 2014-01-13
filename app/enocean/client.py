@@ -20,35 +20,41 @@ class ClientProtocol(protocol.Protocol):
 
     def proceed_telegram(self, t):
         addr = self.transport.getPeer()
-
         logger.info("EnOcean receive telegram from {}:{}: {}".format(addr.host, addr.port, t))
 
-        if t.mode == telegram.Telegram.TEACH_IN:
+
+
+        if t.teach_in:
             telegram_device_id = str(t.sensor_id)
 
             device = devices.from_telegram(t)
 
-            if len(model.core.Device.objects(device_id=device.device_id)) != 0:
+            if device is None:
+                logger.info("Couldn't create device from teach-in telegram")
+                return
+
+            if model.core.Device.objects(device_id=device.device_id):
                 logger.info("Device " + str(telegram_device_id) + " already known")
 
             device.save()
 
             logger.info("EnOcean create device " + device)
 
-        elif t.mode == telegram.Telegram.NORMAL:
+        elif t.normal:
             telegram_device_id = str(t.sensor_id)
 
-            res = model.core.Device.objects(device_id=telegram_device_id)
+            device = model.core.Device.objects(device_id=telegram_device_id).first()
 
-            if len(res) == 0:
+            if not device:
                 logger.info("Unknown device id " + telegram_device_id)
                 return
 
-            for device in res:
-                device.proceed_telegram(t)
+            device.proceed_telegram(t)
 
         else:
             logger.info("Unknown telegram mode")
+            return
+
 
     def dataReceived(self, data):
         t = telegram.from_str(data)

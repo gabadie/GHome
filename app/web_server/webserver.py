@@ -36,30 +36,58 @@ Switch(device_id='82596', name='An ignored switch', ignored=True).save()
 
 WindowContact(device_id='3311', name='A window contact sensor', open=False, ignored=True).save()
 
-Lamp(device_id='889977', name='The main lamp', ignored=False).save()
+Lamp(device_id='889977', name='The main lamp').save()
+Lamp(device_id='85654', name='Another lamp').save()
 
 
 
 @app.route('/')
 def index():
-    sensors = Sensor.objects()
     actuators = core.Actuator.objects()
     sensor_types = Sensor.__subclasses__()
 
-    return render_template('index.html', sensors=sensors, sensor_types=sensor_types, actuators=actuators)
+    return render_template('index.html', sensor_types=sensor_types, actuators=actuators)
 
 @app.route('/sensor', methods=['POST', 'GET'])
-def add_sensor():
+def all_sensors():
     if request.method == 'GET':
-        resp = dict()
-        return json_util.dumps(core.Device.objects())
-    else:
+        result = json.loads(Sensor.objects.to_json())
+        resp = dict(ok=True, result=result)
+    elif request.method == 'POST':
         form = request.form
-        sensor_id, sensor_name, sensor_type = form.get('id'), form.get('name'), form.get('type')
+        s_id, s_name, s_type, actuators = [form.get(val) for val in ['id', 'name', 'type', 'actuators']]
+        if actuators is None:
+            actuators = []
+        print s_id, s_name, s_type, actuators
+        rpc.create_sensor(s_id, s_name, s_type, actuators)
+        sensor = json.loads(Sensor.objects(device_id=s_id).to_json())[0]
+        
+        resp = dict(ok=True, result=sensor)
 
-        print sensor_id, sensor_name, sensor_type
+    return json.dumps(resp)
 
-        return json.dumps(dict(status="ok"))
+@app.route('/sensor/<device_id>', methods=['GET', 'DELETE'])
+def sensor(device_id):
+    if request.method == 'GET':
+        sensor = Sensor.objects(device_id=device_id)
+        resp = dict(ok=True, result=sensor.to_mongo())
+    elif request.method == 'DELETE':
+        sensor = Sensor.objects(device_id=device_id)
+        sensor.delete()
+        resp = dict(ok=True, device_id=device_id)
+
+    return json.dumps(resp)
+
+@app.route('/sensor/<device_id>/ignored', methods=['POST', 'GET'])
+def sensor_ignored(device_id):
+    if request.method == 'GET':
+        ignored = Sensor.first(device_id=device_id).ignored
+        resp = dict(ok=True, result=ignored)
+    elif request.method == 'POST':
+        rpc.ignore_sensor(device_id, request.json['ignored'])
+        resp = dict(ok=True)
+
+    return json.dumps(resp)
 
 
 if __name__ == "__main__":
