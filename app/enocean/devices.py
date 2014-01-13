@@ -41,8 +41,7 @@ class Switch(Sensor, model.devices.Switch):
         reading = Switch.reading_from_data_bytes(self, telegram.data_bytes)
         reading.save()
 
-        self.activate()
-
+        self.activated()
         self.save()
 
         logger.info("EnOcean switch #{} activated".format(self.device_id))
@@ -58,11 +57,23 @@ class WindowContact(Sensor, model.devices.WindowContact):
         # TODO : Isn't it "open = not contact" instead?
         return model.devices.WindowContact.Reading(device=windowContact, open=self.open)
 
-    def proceed_telegram(self, telegram, server):
-        reading = WindowContact.reading_from_data_bytes(self, telegram.data_bytes)
-        reading.save()
 
-        logger.info("EnOcean Window contact #{}: open={}".format(self.device_id, reading.open))
+class LightMovementSensor(model.devices.LightMovementSensor):
+
+    @staticmethod
+    def reading_from_data_bytes(lightMovementSensor, data_bytes):
+        movement = (self.data_bytes[3] & 0x02) >> 1
+        if movement == 0:
+            movement = True
+        else:
+            movement = False
+        return model.devices.LightMovementSensor.Reading(device=lightMovementSensor, 
+            voltage=data_bytes[0] * 5.12 / 255.0, brightness=data_bytes[1] * 512 / 255.0, movement=movement)
+
+    def proceed_telegram(self, telegram, server):
+        reading = LightMovementSensor.reading_from_data_bytes(self, telegram.data_bytes)
+        reading.save()
+        logger.info("EnOcean light and movement sensor reading: voltage=" + str(reading.voltage) + "V, brightness=" + str(reading.brightness) + "Lux, movement=" + str(reading.movement))
 
 
 # Actuators
@@ -77,8 +88,10 @@ class Lamp(model.core.Actuator, model.devices.Lamp):
 
 def from_telegram(self, telegram):
     if telegram.device_type == Telegram.SRW01:
-        return WindowContact(device_id=telegram.sensor_id)
+        return WindowContactor(device_id=telegram.sensor_id)
     elif telegram.device_type == Telegram.SR04RH:
         return Thermometer(device_id=telegram.sensor_id)
+    elif telegram.device_type == Telegram.SR_MDS:
+        return LightMovementSensor(device_id=telegram.sensor_id)
     
     raise NotImplemented

@@ -27,3 +27,9 @@ class Switch(object):
 
 class Lamp(object):
     turned_on = mongoengine.BooleanField(required=True, default=False)
+        
+class LightMovementSensor(object):
+    class Reading(core.Reading):
+        voltage = mongoengine.FloatField(required=True)
+        brightness = mongoengine.FloatField(required=True)
+        movement = mongoengine.BooleanField(required=True)

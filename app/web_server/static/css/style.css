@@ -40,7 +40,7 @@ body {
 .devices .ignored {
 	background-color: #c0392b;
 	border-color: #e74c3c;
-	color: #e74c3c;
+	color: #FF9388;
 }
 
 .devices .device_id {
