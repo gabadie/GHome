@@ -4,7 +4,7 @@
 	<title>GHome web interface</title>
 
 
-    <!-- Bootstrap core CSS -->
+    <!-- Bootstrap related CSS -->
     <link href="static/css/bootstrap.css" rel="stylesheet">
     <link href="static/css/bootstrap-select.css" rel="stylesheet">
 
@@ -24,28 +24,74 @@
 		<div class="row">
 
 
-			<div class="col-md-6">
+			<div class="col-md-10">
 				<h2>This is a title</h2>
 				<p>This is a paragraph, in a column</p>
 
 				<p>List of all devices in the database:</p>
-				<ul class="devices">
-				{% for device in devices %}
-					<li {% if device.ignored %}class="ignored"{% endif %}>
-						<span class="device_id">{{ device.device_id }}</span>: <span class="name">{{device.name}}</span>
+				<ul class="sensors">
+<!-- 
+				{% for sensor in sensors %}
+					<li {% if sensor.ignored %}class="ignored"{% endif %} data-sensor-id="{{sensor.device_id}}">
+						<span class="device_id">{{ sensor.device_id }}</span>: <span class="name">{{sensor.name}}</span>
+						<span class="delete glyphicon glyphicon-remove"></span>
 					</li>
 				{% endfor %}
+ -->
 				</ul>
+
+
+				<form id="add-sensor" class="form-inline" action="/sensor" method="POST">
+					<h4>Add a sensor</h4>
+
+					<div class="form-group">
+						<input type="text" class="form-control input-sm" name="id" placeholder="Sensor ID">
+					</div>
+
+					<div class="form-group">
+						<input type="text" class="form-control input-sm" name="name" placeholder="Sensor name">
+					</div>
+
+					<div class="form-group">
+			            <select class="selectpicker" data-width="auto" data-title="Actuators" name="actuators"
+			                    placeholder="Linked actuators" multiple>
+			            	{% for actuator in actuators %}
+			            	<option value="{{actuator.device_id}}">{{actuator.name}}</option>
+			            	{% endfor %}
+			            </select>
+		            </div>
+
+
+					<div class="form-group">
+			            <select class="selectpicker" data-width="auto" data-title="Sensor type" name="type"
+			                    placeholder="Sensor type">
+			            	{% for sensor_type in sensor_types %}
+			            	<option value="{{sensor_type.__name__}}">{{sensor_type.__name__}}</option>
+			            	{% endfor %}
+			            </select>
+		            </div>
+
+					<button type="submit" class="btn btn-primary btn-sm">Add device</button>
+				</form>
 
 			</div>
 
 
 
-			<div class="col-md-6">
-				<h2>This is a title</h2>
-				<h3>And this is a subtitle</h3>
+			<div class="col-md-2">
+				<h2>Lamps</h2>
+				<h3>Shiny lamps...</h3>
 
-				<p>... and another paragraph in another column !</p>
+				<ul class="lamps">
+
+<!--
+ 					{% for lamp in lamps %}
+					<li {% if lamp.turned_on %}class="turned_on"{% endif %} data-sensor-id="{{lamp.device_id}}">
+						<span class="device_id">{{ lamp.device_id }}</span>: <span class="name">{{lamp.name}}</span>
+					</li>
+					{% endfor %}
+ -->
+				</ul>
 
 			</div>
 
@@ -53,10 +99,14 @@
 	</div>
 
 	<!-- JS files, placed at the end for faster page loading -->
-    <script src="static/js/main.js"></script>
     <script src="static/js/jquery-1.10.2.js"></script>
     <script src="static/js/bootstrap.min.js"></script>
+    <script src="static/js/jquery.form.min.js"></script>
     <script src="static/js/bootstrap-select.js"></script>
+
+    <script src="static/js/main.js"></script>
+
+
 </body>
 
 </html>

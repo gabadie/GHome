@@ -24,6 +24,26 @@ class GlobalConfig:
         self.enocean = GlobalConfig.EnOcean()
         self.main_server = GlobalConfig.MainServer()
 
+    def save_json(self, path):
+        with open(path, 'w') as outfile:
+            json_data = {
+                'mongo_db': self.mongo_db,
+                'enocean': {
+                    'ip': self.enocean.ip,
+                    'port': self.enocean.port
+                },
+                'main_server': {
+                    'ip': self.main_server.ip,
+                    'rpc_port': self.main_server.rpc_port
+                }
+            }
+
+            json.dump(json_data, outfile)
+
+            return True
+
+        return False
+
     @staticmethod
     def from_json(path):
         config = GlobalConfig()
@@ -42,14 +62,3 @@ class GlobalConfig:
             return config
 
         return None
-
-if __name__ == "__main__":
-
-    config = GlobalConfig.from_json('insa_config.json')
-
-    assert config.mongo_db == "ghome_database"
-    assert config.enocean.ip == "134.214.106.23"
-    assert config.enocean.port == 5000
-    assert config.main_server.ip == "127.0.0.1"
-    assert config.main_server.rpc_port == 8001
-
