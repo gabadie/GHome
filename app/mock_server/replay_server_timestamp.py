@@ -1,10 +1,10 @@
-import sys, time
-from twisted.internet import protocol, reactor, threads, task
+import sys, time, argparse
+from twisted.internet import protocol, reactor, threads
 
 class Frame:
-    def __init__(self, data, timestamp):
-        self.data = data
+    def __init__(self, timestamp, data):
         self.timestamp = timestamp
+        self.data = data
 
     @property
     def data(self):
@@ -52,7 +52,7 @@ class ReplayServerProtocolFactory(protocol.Factory):
         self.index   = 0
 
         # Parses frames from file
-        self.frames = [Frame(f[0], int(f[1])) 
+        self.frames = [Frame(int(f[0]), f[1]) 
             for f in (frame.strip().split(" ") 
                 for frame in open(filename)) if len(f) == 2]
 
@@ -103,18 +103,30 @@ class ReplayServerProtocolFactory(protocol.Factory):
 #  python ./replay_server_timestamp.py [port=8000]
 if __name__ == '__main__':
 
+
+    # Available args
+    parser = argparse.ArgumentParser(description='Replay server of EnOcean frames.')
+    parser.add_argument('-p', dest='port', type=int, nargs=1, help='Gateway\'s port')
+    parser.add_argument('-f', dest='framesfile', type=str, nargs=1, help='Frames file')
+    parser.add_argument('--port', dest='port', type=int, nargs=1, help='Gateway\'s port')
+    parser.add_argument('--frames', dest='framesfile', type=str, nargs=1, help='Frames file')
+
+    # Parse args
+    args = parser.parse_args()
+
+    print args
+
+    # Default ag:s
     port = 8000
-    framesFilename = "./frames_with_timestamp.txt"
+    framesfile = "./frames_with_timestamp.txt"
 
-    if len(sys.argv) > 1:
-        try:
-            port = int(sys.argv[1])
-        except:
-            print "Invalid port {} : using default ({})\n".format(sys.argv[1], port)
+    # Retrieve parsed args
+    if args.port != None: port = args.port[0]
+    if args.framesfile != None: framesfile = args.framesfile[0]
 
-    print "Replay server sending frames from \"{}\" on port {}\n".format(framesFilename, port)
+    print "Replay server sending frames from \"{}\" on port {}\n".format(framesfile, port)
 
-    replayServer = ReplayServerProtocolFactory(framesFilename)
+    replayServer = ReplayServerProtocolFactory(framesfile)
     reactor.listenTCP(port, replayServer)
     reactor.addSystemEventTrigger('before', 'shutdown', replayServer.stop)
     reactor.run()
