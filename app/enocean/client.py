@@ -18,47 +18,53 @@ class ClientProtocol(protocol.Protocol):
     def __init__(self, main_server):
         self.main_server = main_server
 
-    def proceed_telegram(self, t):
+    def process_telegram(self, t):
         addr = self.transport.getPeer()
         logger.info("EnOcean receive telegram from {}:{}: {}".format(addr.host, addr.port, t))
 
+        # if t.teach_in:
+        #     telegram_device_id = str(t.sensor_id)
 
+        #     device = devices.from_telegram(t)
 
-        if t.teach_in:
-            telegram_device_id = str(t.sensor_id)
+        #     if device is None:
+        #         logger.info("Couldn't create device from teach-in telegram")
+        #         return
 
-            device = devices.from_telegram(t)
+        #     if model.core.Device.objects(device_id=device.device_id):
+        #         logger.info("Device " + str(telegram_device_id) + " already known")
 
-            if device is None:
-                logger.info("Couldn't create device from teach-in telegram")
-                return
+        #     device.save()
 
-            if model.core.Device.objects(device_id=device.device_id):
-                logger.info("Device " + str(telegram_device_id) + " already known")
+        #     logger.info("EnOcean create device " + device)
 
-            device.save()
+        #if t.normal:
+        telegram_device_id = str(t.sensor_id)
 
-            logger.info("EnOcean create device " + device)
-
-        elif t.normal:
-            telegram_device_id = str(t.sensor_id)
-
-            device = model.core.Device.objects(device_id=telegram_device_id).first()
-
-            if not device:
-                logger.info("Unknown device id " + telegram_device_id)
-                return
-
-            device.proceed_telegram(t)
-
-        else:
-            logger.info("Unknown telegram mode")
+        device = model.core.Device.objects(device_id=telegram_device_id).first()
+        if not device:
+            logger.info("Unknown device id " + telegram_device_id)
             return
+
+        device.process_telegram(t, self)
+
+        # else:
+        #     logger.info("Unknown telegram mode")
+        #     return
 
 
     def dataReceived(self, data):
-        t = telegram.from_str(data)
-        self.proceed_telegram(t)
+        logger.info("EnOcean received data: {}".format(data))
+
+
+        data_packets = [data[i:i + 28] for i in xrange(0, len(data), 28)]
+        if len(data_packets[-1]) < 28:
+            del data_packets[-1]
+        logger.info(data_packets)
+
+        for packet in data_packets:
+            t = telegram.from_str(packet)
+            self.process_telegram(t)
 
 
 class ClientProtocolFactory(protocol.ReconnectingClientFactory):

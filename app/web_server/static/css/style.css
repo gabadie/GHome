@@ -41,7 +41,9 @@ body {
 }
 
 .sensors .device_id {
+	font-size: 11px;
 	font-weight: bold;
+	margin-right: 10px;
 }
 
 .sensors li .delete {
@@ -53,4 +55,31 @@ body {
 
 .sensors li .delete:hover {
 	opacity: 1;
+}
+
+
+.lamps {
+	list-style: none;
+	padding: 0;
+}
+
+.lamps li {
+	padding: 10px;
+	color: #FFF;
+	background: #2c3e50;
+	border: 1px solid #34495e;
+	border-bottom: none;
+	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.lamps li .device_id {
+	font-size: 11px;
+	font-weight: bold;
+	opacity: 0.5;
+}
+
+.lamps li.turned_on {
+	background-color: #f39c12;
+	border-color: #f1c40f;
+	box-shadow: 0 0 20px #f39c12;
 }

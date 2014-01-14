@@ -15,7 +15,7 @@ import logger
 class Sensor(model.core.Sensor):
     ignored = mongoengine.BooleanField(default=True)
 
-    def proceed_telegram(self, telegram, server):
+    def process_telegram(self, telegram, server):
         raise NotImplementedError
 
 # Sensors
@@ -25,7 +25,7 @@ class Thermometer(Sensor, model.devices.Thermometer):
     def reading_from_data_bytes(thermometer, data_bytes):
         return model.devices.Thermometer.Reading(device=thermometer, temperature=data_bytes[2] * 40 / 250.0, humidity=data_bytes[1] * 100 / 250.0)
 
-    def proceed_telegram(self, telegram, server):
+    def process_telegram(self, telegram, server):
         reading = Thermometer.reading_from_data_bytes(self, telegram.data_bytes)
         reading.save()
 
@@ -35,9 +35,9 @@ class Switch(Sensor, model.devices.Switch):
 
     @staticmethod
     def reading_from_data_bytes(switch, data_bytes):
-        return model.devices.Switch.Reading(turned_on=switch.on)
+        return model.devices.Switch.Reading(device=switch, turned_on=switch.on)
 
-    def proceed_telegram(self, telegram, server):
+    def process_telegram(self, telegram, server):
         self.on = not self.on
         reading = Switch.reading_from_data_bytes(self, telegram.data_bytes)
         reading.save()
@@ -71,7 +71,7 @@ class LightMovementSensor(model.devices.LightMovementSensor):
         return model.devices.LightMovementSensor.Reading(device=lightMovementSensor, 
             voltage=data_bytes[0] * 5.12 / 255.0, brightness=data_bytes[1] * 512 / 255.0, movement=movement)
 
-    def proceed_telegram(self, telegram, server):
+    def process_telegram(self, telegram, server):
         reading = LightMovementSensor.reading_from_data_bytes(self, telegram.data_bytes)
         reading.save()
         logger.info("EnOcean light and movement sensor reading: voltage=" + str(reading.voltage) + "V, brightness=" + str(reading.brightness) + "Lux, movement=" + str(reading.movement))
