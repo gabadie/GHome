@@ -23,7 +23,7 @@ config = GlobalConfig()
 app = Flask(__name__)
 app.debug = True
 rpc = xmlrpclib.Server('http://{}:{}/'.format(config.main_server.ip, config.main_server.rpc_port))
-db = mongoengine.connect(config.mongo_db)
+db = None
 
 
 def init_db():
@@ -113,6 +113,7 @@ if __name__ == "__main__":
         config = GlobalConfig.from_json(sys.argv[1])
 
     # init_db()
+    db = mongoengine.connect(config.mongo_db)
     app.run(host="localhost", port=5000, debug=True)
 
     # resource = WSGIResource(reactor, reactor.getThreadPool(), app)
