@@ -13,7 +13,7 @@ import mongoengine
 from bson import json_util
 import xmlrpclib
 
-from model import devices, core
+from model import devices
 from enocean.devices import Sensor, Thermometer, Switch, Lamp, WindowContact
 
 from config import GlobalConfig
@@ -46,7 +46,7 @@ def init_db():
 
 @app.route('/')
 def index():
-    actuators = core.Actuator.objects()
+    actuators = devices.Actuator.objects()
     sensor_types = Sensor.__subclasses__()
 
     lamps = Lamp.objects()
@@ -70,7 +70,7 @@ def all_sensors():
 
 
         # Finding the actuators
-        actuators = core.Actuator.objects(device_id__in=actuator_ids)
+        actuators = devices.Actuator.objects(device_id__in=actuator_ids)
         if actuators is None:
             actuators = []
 

@@ -8,7 +8,7 @@ from twisted.internet import protocol
 sys.path.insert(0, '..')
 
 from telegram import Telegram
-import model
+import model.devices
 import logger
 
 
