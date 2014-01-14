@@ -1,5 +1,5 @@
 {
-    "mongo_db": "ghome_development",
+    "mongo_db": "ghome_database",
 
     "enocean": {
         "ip": "134.214.106.23",

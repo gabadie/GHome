@@ -60,7 +60,9 @@ def all_sensors():
         resp = dict(ok=True, result=result)
     elif request.method == 'POST':
         form = request.form
-        s_id, s_name, s_type, actuator_ids = [form.get(val, None) for val in ['id', 'name', 'type', 'actuators']]
+        s_id, s_name, s_type, actuator_ids = [form.get(val) for val in ['id', 'name', 'type', 'actuators']]
+
+        print s_id, s_name, s_type, actuator_ids
 
         print "ACTUATORS ID = ", actuator_ids
 
@@ -115,9 +117,9 @@ if __name__ == "__main__":
 
     if len(sys.argv) > 1:
         config = GlobalConfig.from_json(sys.argv[1])
-
-    # init_db()
     db = mongoengine.connect(config.mongo_db)
+
+    init_db()
     app.run(host="localhost", port=5000, debug=True)
 
     # resource = WSGIResource(reactor, reactor.getThreadPool(), app)
