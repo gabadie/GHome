@@ -98,8 +98,9 @@ def sensor(device_id):
         print sensor
         resp = dict(ok=True, result=sensor)
     elif request.method == 'DELETE':
-        sensor = Sensor.objects(device_id=device_id)
-        sensor.delete()
+        device = Sensor.objects(device_id=device_id).first()
+        if device:
+            device.delete()
         resp = dict(ok=True, device_id=device_id)
 
     return json.dumps(resp)
@@ -110,10 +111,19 @@ def sensor_ignored(device_id):
         ignored = Sensor.first(device_id=device_id).ignored
         resp = dict(ok=True, result=ignored)
     elif request.method == 'POST':
-        rpc.ignore_sensor(device_id, request.json['ignored'])
-        resp = dict(ok=True)
+        sensor = Sensor.objects(device_id=device_id).first()
+        sensor.ignored = request.json['value']
+        sensor.save()
+        resp = dict(ok=True, sensor_id=device_id)
 
     return json.dumps(resp)
+
+
+@app.route('/lamp/', methods=['GET'])
+def lamps():
+    if request.method == 'GET':
+        lamps = json.loads(Lamp.objects().to_json())
+        return dict(ok=True, result=lamps)
 
 
 if __name__ == "__main__":
