@@ -64,7 +64,10 @@ def all_sensors():
 
         print s_id, s_name, s_type, actuator_ids
 
+        # DIRTY BUGFIX
+        actuator_ids = [actuator_ids]
         print "ACTUATORS ID = ", actuator_ids
+
 
         # Finding the actuators
         actuators = core.Actuator.objects(device_id__in=actuator_ids)
