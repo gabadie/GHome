@@ -1,4 +1,4 @@
-import sys, time, argparse
+import argparse, calendar, datetime, sys, time
 from twisted.internet import protocol, reactor
 
 class SnifferProtocol(protocol.Protocol):
@@ -10,8 +10,7 @@ class SnifferProtocol(protocol.Protocol):
         print "Connection made"
 
     def dataReceived(self, data):
-        timestamp = int(time.time())
-        self.factory.addFrame(data, timestamp)
+        self.factory.addFrame(data, datetime.datetime.now())
 
 
 class SnifferProtocolFactory(protocol.ClientFactory):
@@ -25,7 +24,8 @@ class SnifferProtocolFactory(protocol.ClientFactory):
         print "Dumping {} remaining frames in {}...".format(len(self.frames), self.dumpfile)
         self.dump()
 
-    def addFrame(self, data, timestamp):
+    def addFrame(self, data, date):
+
         FRAME_LENGTH = 28
         
         # Split into atomic frames of length FRAME_LENGTH
@@ -36,9 +36,12 @@ class SnifferProtocolFactory(protocol.ClientFactory):
             print "Incomplete frame received : {}".format(atomic_frames[-1])
             del atomic_frames[-1]
 
+        timestamp = calendar.timegm(date.utctimetuple())
+
         # Save frames
         for frame in atomic_frames:
-            print "Received data : {} {}".format(timestamp, frame)
+            print "{} {}".format(datetime.datetime.strftime(date, "[%Y-%m-%d %Hh%Mm%Ss]"), frame)
+            #dest_log = "{}.{}.log".format(logname, 
             self.frames.append((timestamp, frame))
             if len(self.frames) % self.dumpFreq == 0:
                 print "Dumping {} frames in \"{}\"".format(self.dumpFreq, self.dumpfile)
