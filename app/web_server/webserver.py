@@ -62,10 +62,14 @@ def all_sensors():
         form = request.form
         s_id, s_name, s_type, actuator_ids = [form.get(val, None) for val in ['id', 'name', 'type', 'actuators']]
 
+        print "ACTUATORS ID = ", actuator_ids
+
         # Finding the actuators
         actuators = core.Actuator.objects(device_id__in=actuator_ids)
         if actuators is None:
             actuators = []
+
+        print "ACTUATORS = ", actuators
 
         # Finding the sensor class
         SensorClass = [s_cls for s_cls in Sensor.__subclasses__() if s_cls.__name__ == s_type][0]
