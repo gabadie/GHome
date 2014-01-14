@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import mongoengine
+import datetime
 
 
 class Device(mongoengine.Document):
@@ -12,6 +13,7 @@ class Device(mongoengine.Document):
 
 class Reading(mongoengine.Document):
     device = mongoengine.ReferenceField(Device, required=True)
+    date = mongoengine.ComplexDateTimeField(default=datetime.datetime.now().strftime("%Y,%m,%d,%H,%M,%S,%f"))
 
     meta = {'allow_inheritance': True}
 
@@ -26,4 +28,4 @@ class Sensor(Device):
 
     def activated(self):
     	for actuator in self.actuators:
-    		actuator.activate(self)
+            actuator.activate(self)
