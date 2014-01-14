@@ -13,7 +13,7 @@ import mongoengine
 from bson import json_util
 import xmlrpclib
 
-from model import core
+from model import devices, core
 from enocean.devices import Sensor, Thermometer, Switch, Lamp, WindowContact
 
 from config import GlobalConfig
@@ -123,8 +123,9 @@ def sensor_ignored(device_id):
 def lamps():
     if request.method == 'GET':
         lamps = json.loads(Lamp.objects().to_json())
-        return dict(ok=True, result=lamps)
+        resp = dict(ok=True, result=lamps)
 
+    return json.dumps(resp)
 
 if __name__ == "__main__":
 
@@ -132,7 +133,7 @@ if __name__ == "__main__":
         config = GlobalConfig.from_json(sys.argv[1])
     db = mongoengine.connect(config.mongo_db)
 
-    init_db()
+    # init_db()
     app.run(host="localhost", port=5000, debug=True)
 
     # resource = WSGIResource(reactor, reactor.getThreadPool(), app)
