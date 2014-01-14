@@ -1,6 +1,5 @@
 $(document).ready(function() {
 	$('.selectpicker').selectpicker();
-
 	updateSensors();
 	bindSensors();
 
@@ -54,7 +53,7 @@ var bindSensors = function() {
 	$('.sensors li').click(function(e) {
 		var currently_ignored = $(this).hasClass('ignored');
 		var sensor_id = $(this).attr('data-sensor-id');
-		var data = {ignored: !currently_ignored};
+		var data = {value: !currently_ignored};
 
 		apiCall('sensor/' + sensor_id + '/ignored', 'POST', data, function(data) {
 			updateSensors();
