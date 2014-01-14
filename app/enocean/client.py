@@ -7,9 +7,8 @@ from twisted.internet import protocol, task
 
 sys.path.insert(0, '..')
 
-import model
 import telegram
-import devices
+from model import devices
 import logger
 
 
@@ -24,7 +23,7 @@ class ClientProtocol(protocol.Protocol):
 
         telegram_device_id = str(t.sensor_id)
 
-        device = model.core.Device.objects(device_id=telegram_device_id).first()
+        device = devices.Device.objects(device_id=telegram_device_id).first()
         if not device:
             logger.info("Unknown device ID: {}".format(telegram_device_id))
             return

@@ -4,15 +4,17 @@
 import sys
 sys.path.insert(0, '..')
 
+TELEGRAM_SIZE = 14
+
 def from_str(string, strict=False):
-    if len(string) != 28:
+    if len(string) != TELEGRAM_SIZE * 2:
         raise InvalidTelegram("Invalid telegram string: {} characters (expected 28)".format(len(string)))
 
     bytes = bytearray.fromhex(string)
     return from_bytes(bytes, strict)
 
 def from_bytes(bytes, strict=False):
-    if len(bytes) != 14:
+    if len(bytes) != TELEGRAM_SIZE:
         raise InvalidTelegram("Invalid telegram length: {} (expected 14)".format(len(bytes)))
 
     sync_bytes = bytes[0:2]

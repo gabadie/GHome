@@ -24,7 +24,7 @@ class RpcServer(xmlrpc.XMLRPC):
     # TODO : Remove this? (can't create a generic device, needs args)
     def xmlrpc_create_device(self, device_id, device_name, device_type):
         # Finding the device class
-        DeviceClass = [d_class for d_class in model.core.Device.__subclasses__() if d_class.__name__ == device_type][0]
+        DeviceClass = [d_class for d_class in model.devices.Device.__subclasses__() if d_class.__name__ == device_type][0]
 
         d = DeviceClass(device_id=device_id, name=device_name, ignored=False)
         d.save()
