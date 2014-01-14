@@ -60,11 +60,20 @@ def all_sensors():
         resp = dict(ok=True, result=result)
     elif request.method == 'POST':
         form = request.form
-        s_id, s_name, s_type, actuators = [form.get(val) for val in ['id', 'name', 'type', 'actuators']]
+        s_id, s_name, s_type, actuator_ids = [form.get(val, None) for val in ['id', 'name', 'type', 'actuators']]
+
+        # Finding the actuators
+        actuators = core.Actuator.objects(device_id__in=actuator_ids)
         if actuators is None:
             actuators = []
-        print s_id, s_name, s_type, actuators
-        rpc.create_sensor(s_id, s_name, s_type, actuators)
+
+        # Finding the sensor class
+        SensorClass = [s_cls for s_cls in Sensor.__subclasses__() if s_cls.__name__ == s_type][0]
+
+        # Creating the new device
+        s = SensorClass(device_id=s_id, name=s_name, actuators=actuators, ignored=False)
+        s.save()
+
         sensors = json.loads(Sensor.objects(device_id=s_id).to_json())
         if sensors:
             resp = dict(ok=True, result=sensors[0])
@@ -99,6 +108,10 @@ def sensor_ignored(device_id):
 
 
 if __name__ == "__main__":
+
+    if len(sys.argv) > 1:
+        config = GlobalConfig.from_json(sys.argv[1])
+
     # init_db()
     app.run(host="localhost", port=5000, debug=True)
 

@@ -38,21 +38,6 @@ class RpcServer(xmlrpc.XMLRPC):
 
         return True
 
-    # TODO : integrate this to create_device ? add tests ?
-    def xmlrpc_create_sensor(self, sensor_id, sensor_name, sensor_type, actuators=None):
-        if not actuators:
-            actuators = []
-        actuators = model.core.Actuator.objects(device_id__in=actuators)
-
-        # Finding the sensor class
-        SensorClass = [s_class for s_class in enocean.devices.Sensor.__subclasses__() if s_class.__name__ == sensor_type][0]
-
-        # Creating the new device
-        s = SensorClass(device_id=sensor_id, name=sensor_name, actuators=actuators, ignored=False)
-        s.save()
-
-        return True
-
     def xmlrpc_remove_device(self, device_id):
         device = model.Device.objects(device_id=device_id).first()
         if device:
