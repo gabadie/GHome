@@ -11,14 +11,13 @@ class SnifferProtocol(protocol.Protocol):
 
     def dataReceived(self, data):
         timestamp = int(time.time())
-        print "Received data : {} {}".format(data, timestamp)
         self.factory.addFrame(data, timestamp)
 
 
-class ServerProtocolFactory(protocol.ClientFactory):
+class SnifferProtocolFactory(protocol.ClientFactory):
 
     def __init__(self, dumpfile = "dump.txt", dumpFreq = 10):
-        self.frames = {}
+        self.frames = []
         self.dumpfile = dumpfile
         self.dumpFreq = dumpFreq
 
@@ -27,16 +26,31 @@ class ServerProtocolFactory(protocol.ClientFactory):
         self.dump()
 
     def addFrame(self, data, timestamp):
-        self.frames[timestamp] = data
-        if len(self.frames) % self.dumpFreq == 0:
-            print "Dumping {} frames in \"{}\"".format(self.dumpFreq, self.dumpfile)
-            self.dump()
+        FRAME_LENGTH = 28
+        
+        # Split into atomic frames of length FRAME_LENGTH
+        atomic_frames = [data[i:i+FRAME_LENGTH] for i in xrange(0, len(data), FRAME_LENGTH)]
+
+        # Remove potential incomplete last frame
+        if len(atomic_frames[-1]) < FRAME_LENGTH:
+            print "Incomplete frame received : {}".format(atomic_frames[-1])
+            del atomic_frames[-1]
+
+        # Save frames
+        for frame in atomic_frames:
+            print "Received data : {} {}".format(timestamp, frame)
+            self.frames.append((timestamp, frame))
+            if len(self.frames) % self.dumpFreq == 0:
+                print "Dumping {} frames in \"{}\"".format(self.dumpFreq, self.dumpfile)
+                self.dump()
+
 
     def buildProtocol(self, addr):
         return SnifferProtocol(self)
 
     def clientConnectionFailed(self, connector, reason):
         print "Connection failed : {}".format(reason)
+        if reactor.running: reactor.stop()
 
     def clientConnectionLost(self, connector, reason):
         print "Connection lost"
@@ -44,12 +58,12 @@ class ServerProtocolFactory(protocol.ClientFactory):
     
     def dump(self):
         with open(self.dumpfile, 'a') as f:
-            for ts, data in self.frames.iteritems():
+            for (ts, data) in self.frames:
                 f.write("{} {}\n".format(ts, data))
-            self.frames.clear()
+            self.frames = []
 
 # How to use it:
-#  python ./sniffer.py [port=8000]
+#  python ./sniffer.py -h
 if __name__ == '__main__':
 
     # Available args
@@ -64,9 +78,7 @@ if __name__ == '__main__':
     # Parse args
     args = parser.parse_args()
 
-    print args
-
-    # Default ag:s
+    # Default args
     address = "127.0.0.1"
     port = 8000
     dumpfile = "dump.txt"
@@ -78,6 +90,6 @@ if __name__ == '__main__':
 
     print "Sniffing frames from {}:{} and dumping them in \"{}\"\n".format(address, port, dumpfile)
 
-    reactor.connectTCP(address, port, ServerProtocolFactory(dumpfile))
-    #reactor.connectTCP("134.214.106.23", 5000, ServerProtocolFactory(dumpfile))
+    reactor.connectTCP(address, port, SnifferProtocolFactory(dumpfile))
+    #reactor.connectTCP("134.214.106.23", 5000, SnifferProtocolFactory(dumpfile))
     reactor.run()
