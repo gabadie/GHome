@@ -49,9 +49,8 @@ def index():
     actuators = devices.Actuator.objects()
     sensor_types = Sensor.__subclasses__()
 
-    lamps = Lamp.objects()
 
-    return render_template('index.html', sensor_types=sensor_types, actuators=actuators, lamps=lamps)
+    return render_template('index.html', sensor_types=sensor_types, actuators=actuators)
 
 @app.route('/sensor', methods=['POST', 'GET'])
 def all_sensors():
