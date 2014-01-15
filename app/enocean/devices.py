@@ -40,6 +40,24 @@ class Thermometer(Sensor, model.devices.Thermometer):
 
 class Switch(Sensor, model.devices.Switch):
     UNKNOWN, UP, DOWN, RIGHT, LEFT = range(5)
+    
+    @staticmethod
+    def generate_telegram(sensor_id, side, direction, pressed):
+        data_bytes = [0x0 for i in xrange(4)]
+        
+        if not pressed:
+            side = UNKNOWN
+            direction = UNKNOWN
+        else:
+            data_bytes[0] = data_bytes[0] | 0x01
+            
+        if side == Switch.RIGHT:
+            data_bytes[0] = data_bytes[0] | 0x04
+            
+        if direction == Switch.UP:
+            data_bytes[0] = data_bytes[0] | 0x02
+        
+        return telegram.from_sensor_data_bytes(sensor_id=sensor_id, data_bytes=data_bytes)
 
     @staticmethod
     def reading_from_data_bytes(switch, data_bytes):
@@ -94,6 +112,15 @@ class WindowContact(Sensor, model.devices.WindowContact):
 
 
 class LightMovementSensor(model.devices.LightMovementSensor):
+    
+    @staticmethod
+    def generate_telegram(sensor_id, voltage, brightness, movement):
+        data_bytes = [0x0 for i in xrange(4)]
+        data_bytes[0] = voltage * 255 / 5.12
+        data_bytes[1] = brightness * 255 / 512.0
+        if movement:
+            data_bytes[3] = 0x02
+        return telegram.from_sensor_data_bytes(sensor_id=sensor_id, data_bytes=data_bytes)
 
     @staticmethod
     def reading_from_data_bytes(lightMovementSensor, data_bytes):
