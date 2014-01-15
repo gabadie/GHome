@@ -8,11 +8,11 @@ from twisted.internet import protocol
 sys.path.insert(0, '..')
 
 from telegram import Telegram
-import model
+import model.devices
 import logger
 
 
-class Sensor(model.core.Sensor):
+class Sensor(model.devices.Sensor):
     ignored = mongoengine.BooleanField(default=True)
 
     def process_telegram(self, telegram, server):
@@ -78,7 +78,7 @@ class LightMovementSensor(model.devices.LightMovementSensor):
 
 
 # Actuators
-class Lamp(model.core.Actuator, model.devices.Lamp):
+class Lamp(model.devices.Actuator, model.devices.Lamp):
 
     def activate(self, sensor):
         self.turned_on = not self.turned_on

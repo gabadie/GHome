@@ -13,7 +13,7 @@ import mongoengine
 from bson import json_util
 import xmlrpclib
 
-from model import core
+from model import devices
 from enocean.devices import Sensor, Thermometer, Switch, Lamp, WindowContact
 
 from config import GlobalConfig
@@ -23,7 +23,7 @@ config = GlobalConfig()
 app = Flask(__name__)
 app.debug = True
 rpc = xmlrpclib.Server('http://{}:{}/'.format(config.main_server.ip, config.main_server.rpc_port))
-db = mongoengine.connect(config.mongo_db)
+db = None
 
 
 def init_db():
@@ -46,7 +46,7 @@ def init_db():
 
 @app.route('/')
 def index():
-    actuators = core.Actuator.objects()
+    actuators = devices.Actuator.objects()
     sensor_types = Sensor.__subclasses__()
 
     lamps = Lamp.objects()
@@ -60,11 +60,29 @@ def all_sensors():
         resp = dict(ok=True, result=result)
     elif request.method == 'POST':
         form = request.form
-        s_id, s_name, s_type, actuators = [form.get(val) for val in ['id', 'name', 'type', 'actuators']]
+        s_id, s_name, s_type, actuator_ids = [form.get(val) for val in ['id', 'name', 'type', 'actuators']]
+
+        print s_id, s_name, s_type, actuator_ids
+
+        # DIRTY BUGFIX
+        actuator_ids = [actuator_ids]
+        print "ACTUATORS ID = ", actuator_ids
+
+
+        # Finding the actuators
+        actuators = devices.Actuator.objects(device_id__in=actuator_ids)
         if actuators is None:
             actuators = []
-        print s_id, s_name, s_type, actuators
-        rpc.create_sensor(s_id, s_name, s_type, actuators)
+
+        print "ACTUATORS = ", actuators
+
+        # Finding the sensor class
+        SensorClass = [s_cls for s_cls in Sensor.__subclasses__() if s_cls.__name__ == s_type][0]
+
+        # Creating the new device
+        s = SensorClass(device_id=s_id, name=s_name, actuators=actuators, ignored=False)
+        s.save()
+
         sensors = json.loads(Sensor.objects(device_id=s_id).to_json())
         if sensors:
             resp = dict(ok=True, result=sensors[0])
@@ -80,8 +98,9 @@ def sensor(device_id):
         print sensor
         resp = dict(ok=True, result=sensor)
     elif request.method == 'DELETE':
-        sensor = Sensor.objects(device_id=device_id)
-        sensor.delete()
+        device = Sensor.objects(device_id=device_id).first()
+        if device:
+            device.delete()
         resp = dict(ok=True, device_id=device_id)
 
     return json.dumps(resp)
@@ -92,14 +111,29 @@ def sensor_ignored(device_id):
         ignored = Sensor.first(device_id=device_id).ignored
         resp = dict(ok=True, result=ignored)
     elif request.method == 'POST':
-        rpc.ignore_sensor(device_id, request.json['ignored'])
-        resp = dict(ok=True)
+        sensor = Sensor.objects(device_id=device_id).first()
+        sensor.ignored = request.json['value']
+        sensor.save()
+        resp = dict(ok=True, sensor_id=device_id)
 
     return json.dumps(resp)
 
 
+@app.route('/lamp/', methods=['GET'])
+def lamps():
+    if request.method == 'GET':
+        lamps = json.loads(Lamp.objects().to_json())
+        resp = dict(ok=True, result=lamps)
+
+    return json.dumps(resp)
+
 if __name__ == "__main__":
-    # init_db()
+
+    if len(sys.argv) > 1:
+        config = GlobalConfig.from_json(sys.argv[1])
+    db = mongoengine.connect(config.mongo_db)
+
+    # init_db()
     app.run(host="localhost", port=5000, debug=True)
 
     # resource = WSGIResource(reactor, reactor.getThreadPool(), app)

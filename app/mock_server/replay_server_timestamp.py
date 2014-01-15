@@ -52,9 +52,7 @@ class ReplayServerProtocolFactory(protocol.Factory):
         self.index   = 0
 
         # Parses frames from file
-        self.frames = [Frame(int(f[0]), f[1]) 
-            for f in (frame.strip().split(" ") 
-                for frame in open(filename)) if len(f) == 2]
+        self.frames = [Frame(int(f[0]), f[1]) for f in (frame.strip().split(" ") for frame in open(filename)) if len(f) == 2]
 
         # Start frames replay in a thread
         if len(self.frames) > 0:
@@ -100,9 +98,8 @@ class ReplayServerProtocolFactory(protocol.Factory):
                 dt -= 1
 
 # How to use it:
-#  python ./replay_server_timestamp.py [port=8000]
+#  python ./replay_server_timestamp.py -h
 if __name__ == '__main__':
-
 
     # Available args
     parser = argparse.ArgumentParser(description='Replay server of EnOcean frames.')

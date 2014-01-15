@@ -7,9 +7,8 @@ from twisted.internet import protocol, task
 
 sys.path.insert(0, '..')
 
-import model
 import telegram
-import devices
+from model import devices
 import logger
 
 
@@ -20,45 +19,34 @@ class ClientProtocol(protocol.Protocol):
 
     def process_telegram(self, t):
         addr = self.transport.getPeer()
-        logger.info("EnOcean receive telegram from {}:{}: {}".format(addr.host, addr.port, t))
+        logger.info("EnOcean received telegram from '{}:{}': {}".format(addr.host, addr.port, t))
 
+        telegram_device_id = str(t.sensor_id)
 
-
-        if t.teach_in:
-            telegram_device_id = str(t.sensor_id)
-
-            device = devices.from_telegram(t)
-
-            if device is None:
-                logger.info("Couldn't create device from teach-in telegram")
-                return
-
-            if model.core.Device.objects(device_id=device.device_id):
-                logger.info("Device " + str(telegram_device_id) + " already known")
-
-            device.save()
-
-            logger.info("EnOcean create device " + device)
-
-        elif t.normal:
-            telegram_device_id = str(t.sensor_id)
-
-            device = model.core.Device.objects(device_id=telegram_device_id).first()
-
-            if not device:
-                logger.info("Unknown device id " + telegram_device_id)
-                return
-
-            device.process_telegram(t, self)
-
-        else:
-            logger.info("Unknown telegram mode")
+        device = devices.Device.objects(device_id=telegram_device_id).first()
+        if not device:
+            logger.info("Unknown device ID: {}".format(telegram_device_id))
             return
+        if device.ignored:
+            logger.info("The device ({} - {}) is currently ignored".format(t.sensor_id, t.name))
+            return
+
+        device.process_telegram(t, self)
 
 
     def dataReceived(self, data):
-        t = telegram.from_str(data)
-        self.process_telegram(t)
+        logger.info("EnOcean received data: {}".format(data))
+
+        # Splicing data into 28 characters long packets
+        data_packets = [data[i:i + 28] for i in xrange(0, len(data), 28)]
+        if len(data_packets[-1]) < 28:
+            logger.info('Ignoring incomplete packet: {}'.format(data_packets[-1]))
+            del data_packets[-1]
+        logger.info(data_packets)
+
+        for packet in data_packets:
+            t = telegram.from_str(packet)
+            self.process_telegram(t)
 
 
 class ClientProtocolFactory(protocol.ReconnectingClientFactory):

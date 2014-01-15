@@ -16,13 +16,13 @@ def test_mongoengine():
 
     thermometer = devices.Thermometer(device_id="Hello")
 
-    assert not thermometer in model.core.Device.objects
+    assert not thermometer in model.devices.Device.objects
 
     thermometer.save()
 
-    assert thermometer in model.core.Device.objects
-    assert thermometer in model.core.Device.objects(device_id="Hello")
-    assert not thermometer in model.core.Device.objects(device_id="World")
+    assert thermometer in model.devices.Device.objects
+    assert thermometer in model.devices.Device.objects(device_id="Hello")
+    assert not thermometer in model.devices.Device.objects(device_id="World")
 
     thermometerValue = model.devices.Thermometer.Reading(device=thermometer, temperature=0.0, humidity=0.0)
     thermometerValue.save()
