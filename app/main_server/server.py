@@ -13,7 +13,7 @@ import time
 sys.path.insert(0, '..')
 
 import enocean.client
-from rpc_server import RpcServer
+from rpc_server import RpcServer, Raspi
 
 
 class MainServer(object):
@@ -21,6 +21,7 @@ class MainServer(object):
     def __init__(self, config):
         self.config = config
         self.db = mongoengine.connect(config.mongo_db)
+        print config.mongo_db
         self.rpc_server = None
 
         logger.info('main server initialized')
@@ -33,6 +34,8 @@ class MainServer(object):
 
         """ Launchs XML RPC server """
         self.rpc_server = RpcServer(self)
+        raspi=Raspi()
+        self.rpc_server.putSubHandler('raspi',raspi)
         reactor.listenTCP(self.config.main_server.rpc_port, twisted.web.server.Site(self.rpc_server))
 
         """ Main loop """
