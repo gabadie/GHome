@@ -23,7 +23,7 @@ if __name__=='__main__':
 	rpiServer=RpiServer()
 	#launch client call to add this raspi to the main server
 	proxy = Proxy('http://'+rpiServer.config.mainServerRpi.ip + ':' + str(rpiServer.config.mainServerRpi.port))
-	proxy.callRemote('add_raspi',str(rpiServer.config.rpiServer.ip),rpiServer.config.rpiServer.port,str(get_mac()))
+	proxy.callRemote('raspi.add_raspi',str(rpiServer.config.rpiServer.ip),rpiServer.config.rpiServer.port,str(get_mac()))
 	#launch server 
 	reactor.listenTCP(rpiServer.config.rpiServer.port,server.Site(rpiServer))
 	reactor.run()
