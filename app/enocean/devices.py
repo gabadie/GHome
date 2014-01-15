@@ -20,6 +20,13 @@ class Sensor(model.devices.Sensor):
 
 # Sensors
 class Thermometer(Sensor, model.devices.Thermometer):
+    
+    @staticmethod
+    def generate_telegram(sensor_id, temperature, humidity):
+        data_bytes = [0x0 for i in xrange(4)]
+        data_bytes[1] = humidity * 250 / 100.0
+        data_bytes[2] = temperature * 250 / 40.0
+        return telegram.from_sensor_data_bytes(sensor_id=sensor_id, data_bytes=data_bytes)
 
     @staticmethod
     def reading_from_data_bytes(thermometer, data_bytes):
@@ -32,30 +39,57 @@ class Thermometer(Sensor, model.devices.Thermometer):
         logger.info("EnOcean thermometer reading: temperature=" + str(reading.temperature) + "C, humidity=" + str(reading.humidity) + "%")
 
 class Switch(Sensor, model.devices.Switch):
+    UNKNOWN, UP, DOWN, RIGHT, LEFT = range(5)
 
     @staticmethod
     def reading_from_data_bytes(switch, data_bytes):
-        return model.devices.Switch.Reading(device=switch, turned_on=switch.on)
+        if data_bytes[0] & 0x01 == 0:
+            side = Switch.UNKNOWN
+            direction = Switch.UNKNOWN
+            pressed = False
+        else:
+            if (data_bytes[0] & 0x04) >> 1 == 1:
+                side = Switch.RIGHT
+            else:
+                side = Switch.LEFT
+                
+            if (data_bytes[0] & 0x02) >> 1 == 1:
+                direction = Switch.UP
+                if side == Switch.RIGHT:
+                    switch.topRight = not switch.topRight
+                else:
+                    switch.topLeft = not switch.topLeft
+            else:
+                direction = Switch.DOWN
+                if side == Switch.RIGHT:
+                    switch.bottomRight = not switch.bottomRight
+                else:
+                    switch.bottomLeft = not switch.bottomLeft
+                
+            pressed = True
+            
+        return model.devices.Switch.Reading(device=switch, side=self.side, direction=self.direction, pressed=self.pressed)
 
     def process_telegram(self, telegram, server):
-        self.on = not self.on
         reading = Switch.reading_from_data_bytes(self, telegram.data_bytes)
         reading.save()
-
-        self.activated()
+        
         self.save()
-
-        logger.info("EnOcean switch #{} activated".format(self.device_id))
 
 
 class WindowContact(Sensor, model.devices.WindowContact):
+    
+    @staticmethod
+    def generate_telegram(sensor_id, open):
+        data_bytes = [0x0 for i in xrange(4)]
+        if not open:
+            data_bytes[3] = 0x01
+        return telegram.from_sensor_data_bytes(sensor_id=sensor_id, data_bytes=data_bytes)
 
     @staticmethod
     def reading_from_data_bytes(thermometer, data_bytes):
-        contact = (self.data_bytes[3] & 0x01) == 0
-        self.open = contact
+        self.open = (self.data_bytes[3] & 0x01) == 0
 
-        # TODO : Isn't it "open = not contact" instead?
         return model.devices.WindowContact.Reading(device=windowContact, open=self.open)
 
 

@@ -46,10 +46,15 @@ class WindowContact(object):
         opened = mongoengine.BooleanField(required=True)
 
 class Switch(object):
-    on = mongoengine.BooleanField(required=True, default=False)
+    top_right = mongoengine.BooleanField(required=True, default=False)
+    bottom_right = mongoengine.BooleanField(required=True, default=False)
+    top_left = mongoengine.BooleanField(required=True, default=False)
+    bottom_right = mongoengine.BooleanField(required=True, default=False)
 
     class Reading(Reading):
-        turned_on = mongoengine.BooleanField(required=True)
+        side = mongoengine.IntField(required=True)
+        direction = mongoengine.IntField(required=True)
+        pressed = mongoengine.BooleanField(required=True)
         
 class LightMovementSensor(object):
     class Reading(Reading):
