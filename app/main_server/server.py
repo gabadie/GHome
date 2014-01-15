@@ -21,6 +21,7 @@ class MainServer(object):
     def __init__(self, config):
         self.config = config
         self.db = mongoengine.connect(config.mongo_db)
+        print config.mongo_db
         self.rpc_server = None
 
         logger.info('main server initialized')
