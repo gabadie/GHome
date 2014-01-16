@@ -76,12 +76,10 @@ def test_window_contactor():
 def test_light_movement_sensor():
     lms = devices.LightMovementSensor(device_id=407, ignored=False)
     lms.save()
-    t = lms.generate_telegram(sensor_id=407, voltage=12.5, brightness=48, movement=True)
-    print t.data_bytes[0]
+    t = lms.generate_telegram(sensor_id=407, voltage=4.5, brightness=48, movement=True)
     lms.process_telegram(t, None)
     reading = devices.LightMovementSensor.reading_from_data_bytes(lms, t.data_bytes)
-    print reading.voltage
-    assert reading.voltage == 12.5
+    assert reading.voltage == 4.5
     assert reading.brightness == 48
     assert reading.movement
 
@@ -92,4 +90,5 @@ if __name__ == "__main__":
     test_switch()
     test_window_contactor()
     test_light_movement_sensor()
+    print "Tests passed !"
     

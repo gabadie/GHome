@@ -127,18 +127,17 @@ class LightMovementSensor(model.devices.LightMovementSensor):
     @staticmethod
     def generate_telegram(sensor_id, voltage, brightness, movement):
         data_bytes = [0x0 for i in xrange(4)]
-        data_bytes[0] = int(voltage * 255 / 5.12)
-        data_bytes[1] = int(brightness * 255 / 512)
-        if movement:
+        data_bytes[0] = int(voltage * 255 / 5.1)
+        data_bytes[1] = int(brightness * 255 / 510)
+        if not movement:
             data_bytes[3] = 0x01
-        print data_bytes[0]
         return telegram.from_sensor_data_bytes(sensor_id=sensor_id, data_bytes=data_bytes)
 
     @staticmethod
     def reading_from_data_bytes(lightMovementSensor, data_bytes):
         movement = ((data_bytes[3] & 0x01) == 0x00)
         return model.devices.LightMovementSensor.Reading(device=lightMovementSensor, 
-            voltage=(data_bytes[0] * 5.12 / 255.0), brightness=data_bytes[1] * 512 / 255.0, movement=movement)
+            voltage=(data_bytes[0] * 5.1 / 255.0), brightness=data_bytes[1] * 510 / 255.0, movement=movement)
 
     def process_telegram(self, telegram, server):
         reading = LightMovementSensor.reading_from_data_bytes(self, telegram.data_bytes)
