@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
  
 import mongoengine
 import datetime
@@ -8,7 +7,7 @@ import datetime
 # Generic classes
 
 class Device(mongoengine.Document):
-    device_id = mongoengine.StringField(required=True, unique=True)
+    device_id = mongoengine.IntField(required=True, unique=True)
     name = mongoengine.StringField()
 
     meta = {'allow_inheritance': True}
@@ -26,6 +25,7 @@ class Actuator(Device):
         raise NotImplementedError
 
 class Sensor(Device):
+    ignored = mongoengine.BooleanField(required=True, default=False)
     actuators = mongoengine.ListField(mongoengine.ReferenceField(Actuator), default=[])
 
     def activated(self):
@@ -34,29 +34,29 @@ class Sensor(Device):
 
 # Sensors
 
-class Thermometer(object):
+class Thermometer(Sensor):
     class Reading(Reading):
         temperature = mongoengine.FloatField(required=True)
-        humidity = mongoengine.FloatField(required=True) 
+        humidity = mongoengine.FloatField(required=True)
         
-class WindowContact(object):
+class WindowContact(Sensor):
     open = mongoengine.BooleanField(required=True)
 
     class Reading(Reading):
-        opened = mongoengine.BooleanField(required=True)
+        open = mongoengine.BooleanField(required=True)
 
-class Switch(object):
-    top_right = mongoengine.BooleanField(required=True, default=False)
-    bottom_right = mongoengine.BooleanField(required=True, default=False)
-    top_left = mongoengine.BooleanField(required=True, default=False)
-    bottom_right = mongoengine.BooleanField(required=True, default=False)
+class Switch(Sensor):
+    top_right = mongoengine.BooleanField(default=False)
+    bottom_right = mongoengine.BooleanField(default=False)
+    top_left = mongoengine.BooleanField(default=False)
+    bottom_left = mongoengine.BooleanField(default=False)
 
     class Reading(Reading):
         side = mongoengine.IntField(required=True)
         direction = mongoengine.IntField(required=True)
         pressed = mongoengine.BooleanField(required=True)
         
-class LightMovementSensor(object):
+class LightMovementSensor(Sensor):
     class Reading(Reading):
         voltage = mongoengine.FloatField(required=True)
         brightness = mongoengine.FloatField(required=True)
@@ -64,7 +64,5 @@ class LightMovementSensor(object):
 
 # Actuators
 
-class Lamp(object):
+class Lamp(Actuator):
     turned_on = mongoengine.BooleanField(required=True, default=False)
-        
-

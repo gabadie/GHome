@@ -7,7 +7,7 @@ from twisted.internet import protocol
 
 sys.path.insert(0, '..')
 
-from telegram import Telegram
+import telegram
 import model.devices
 import logger
 
@@ -18,14 +18,15 @@ class Sensor(model.devices.Sensor):
     def process_telegram(self, telegram, server):
         raise NotImplementedError
 
+
 # Sensors
-class Thermometer(Sensor, model.devices.Thermometer):
+class Thermometer(model.devices.Thermometer):
     
     @staticmethod
     def generate_telegram(sensor_id, temperature, humidity):
         data_bytes = [0x0 for i in xrange(4)]
-        data_bytes[1] = humidity * 250 / 100.0
-        data_bytes[2] = temperature * 250 / 40.0
+        data_bytes[1] = int(humidity * 250 / 100)
+        data_bytes[2] = int(temperature * 250 / 40)
         return telegram.from_sensor_data_bytes(sensor_id=sensor_id, data_bytes=data_bytes)
 
     @staticmethod
@@ -38,8 +39,9 @@ class Thermometer(Sensor, model.devices.Thermometer):
 
         logger.info("EnOcean thermometer reading: temperature=" + str(reading.temperature) + "C, humidity=" + str(reading.humidity) + "%")
 
-class Switch(Sensor, model.devices.Switch):
-    UNKNOWN, UP, DOWN, RIGHT, LEFT = range(5)
+        
+class Switch(model.devices.Switch):
+    UNKNOWN, TOP, BOTTOM, RIGHT, LEFT = range(5)
     
     @staticmethod
     def generate_telegram(sensor_id, side, direction, pressed):
@@ -54,7 +56,7 @@ class Switch(Sensor, model.devices.Switch):
         if side == Switch.RIGHT:
             data_bytes[0] = data_bytes[0] | 0x04
             
-        if direction == Switch.UP:
+        if direction == Switch.TOP:
             data_bytes[0] = data_bytes[0] | 0x02
         
         return telegram.from_sensor_data_bytes(sensor_id=sensor_id, data_bytes=data_bytes)
@@ -65,28 +67,32 @@ class Switch(Sensor, model.devices.Switch):
             side = Switch.UNKNOWN
             direction = Switch.UNKNOWN
             pressed = False
+            switch.top_right = False
+            switch.top_left = False
+            switch.bottom_right = False
+            switch.bottom_left = False
         else:
-            if (data_bytes[0] & 0x04) >> 1 == 1:
+            if (data_bytes[0] & 0x04) == 0x04:
                 side = Switch.RIGHT
             else:
                 side = Switch.LEFT
                 
-            if (data_bytes[0] & 0x02) >> 1 == 1:
-                direction = Switch.UP
+            if (data_bytes[0] & 0x02) == 0x02:
+                direction = Switch.TOP
                 if side == Switch.RIGHT:
-                    switch.topRight = not switch.topRight
+                    switch.top_right = not switch.top_right
                 else:
-                    switch.topLeft = not switch.topLeft
+                    switch.top_left = not switch.top_left
             else:
-                direction = Switch.DOWN
+                direction = Switch.BOTTOM
                 if side == Switch.RIGHT:
-                    switch.bottomRight = not switch.bottomRight
+                    switch.bottom_right = not switch.bottom_right
                 else:
-                    switch.bottomLeft = not switch.bottomLeft
+                    switch.bottom_left = not switch.bottom_left
                 
             pressed = True
             
-        return model.devices.Switch.Reading(device=switch, side=self.side, direction=self.direction, pressed=self.pressed)
+        return model.devices.Switch.Reading(device=switch, side=side, direction=direction, pressed=pressed)
 
     def process_telegram(self, telegram, server):
         reading = Switch.reading_from_data_bytes(self, telegram.data_bytes)
@@ -95,7 +101,7 @@ class Switch(Sensor, model.devices.Switch):
         self.save()
 
 
-class WindowContact(Sensor, model.devices.WindowContact):
+class WindowContact(model.devices.WindowContact):
     
     @staticmethod
     def generate_telegram(sensor_id, open):
@@ -105,32 +111,34 @@ class WindowContact(Sensor, model.devices.WindowContact):
         return telegram.from_sensor_data_bytes(sensor_id=sensor_id, data_bytes=data_bytes)
 
     @staticmethod
-    def reading_from_data_bytes(thermometer, data_bytes):
-        self.open = (self.data_bytes[3] & 0x01) == 0
+    def reading_from_data_bytes(windowContact, data_bytes):
+        windowContact.open = ((data_bytes[3] & 0x01) == 0)
 
-        return model.devices.WindowContact.Reading(device=windowContact, open=self.open)
+        return model.devices.WindowContact.Reading(device=windowContact, open=windowContact.open)
+        
+    def process_telegram(self, telegram, server):
+        reading = WindowContact.reading_from_data_bytes(self, telegram.data_bytes)
+        reading.save()
+        logger.info("EnOcean window contactor reading: open=" + str(reading.open))
 
-
+        
 class LightMovementSensor(model.devices.LightMovementSensor):
     
     @staticmethod
     def generate_telegram(sensor_id, voltage, brightness, movement):
         data_bytes = [0x0 for i in xrange(4)]
-        data_bytes[0] = voltage * 255 / 5.12
-        data_bytes[1] = brightness * 255 / 512.0
+        data_bytes[0] = int(voltage * 255 / 5.12)
+        data_bytes[1] = int(brightness * 255 / 512)
         if movement:
-            data_bytes[3] = 0x02
+            data_bytes[3] = 0x01
+        print data_bytes[0]
         return telegram.from_sensor_data_bytes(sensor_id=sensor_id, data_bytes=data_bytes)
 
     @staticmethod
     def reading_from_data_bytes(lightMovementSensor, data_bytes):
-        movement = (self.data_bytes[3] & 0x02) >> 1
-        if movement == 0:
-            movement = True
-        else:
-            movement = False
+        movement = ((data_bytes[3] & 0x01) == 0x00)
         return model.devices.LightMovementSensor.Reading(device=lightMovementSensor, 
-            voltage=data_bytes[0] * 5.12 / 255.0, brightness=data_bytes[1] * 512 / 255.0, movement=movement)
+            voltage=(data_bytes[0] * 5.12 / 255.0), brightness=data_bytes[1] * 512 / 255.0, movement=movement)
 
     def process_telegram(self, telegram, server):
         reading = LightMovementSensor.reading_from_data_bytes(self, telegram.data_bytes)
@@ -139,7 +147,7 @@ class LightMovementSensor(model.devices.LightMovementSensor):
 
 
 # Actuators
-class Lamp(model.devices.Actuator, model.devices.Lamp):
+class Lamp(model.devices.Lamp):
 
     def activate(self, sensor):
         self.turned_on = not self.turned_on
@@ -149,13 +157,13 @@ class Lamp(model.devices.Actuator, model.devices.Lamp):
 
 
 def from_telegram(telegram):
-    if telegram.device_type == Telegram.SRW01:
+    if telegram.device_type == telegram.Telegram.SRW01:
         return WindowContactor(device_id=telegram.sensor_id)
     
-    if telegram.device_type == Telegram.SR04RH:
+    if telegram.device_type == telegram.Telegram.SR04RH:
         return Thermometer(device_id=telegram.sensor_id)
     
-    if telegram.device_type == Telegram.SR_MDS:
+    if telegram.device_type == telegram.Telegram.SR_MDS:
         return LightMovementSensor(device_id=telegram.sensor_id)
     
     return None
