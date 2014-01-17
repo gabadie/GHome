@@ -28,6 +28,11 @@ def from_bytes(bytes, strict=False):
 
     return Telegram(sync_bytes, h_seq, length, org, data, sensor_id, status, checksum, strict)
 
+def from_sensor_data_bytes(sensor_id, data_bytes):
+    data = sum(d << 8 * (3 - i) for i, d in enumerate(data_bytes))
+    return Telegram([0xA5, 0x5A], h_seq=3, length=12, org=5, data=data,
+                 sensor_id=sensor_id, status=0, checksum=0)
+    
 
 class InvalidTelegram(Exception):
     pass

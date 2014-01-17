@@ -8,7 +8,7 @@ from twisted.internet import protocol, task
 sys.path.insert(0, '..')
 
 import telegram
-from model import devices
+import devices
 import logger
 
 
@@ -23,9 +23,10 @@ class ClientProtocol(protocol.Protocol):
 
         telegram_device_id = str(t.sensor_id)
 
-        device = devices.Device.objects(device_id=telegram_device_id).first()
+        device = devices.Sensor.objects(device_id=telegram_device_id).first()
+        
         if not device:
-            logger.info("Unknown device ID: {}".format(telegram_device_id))
+            #logger.info("Unknown device ID: {}".format(telegram_device_id))
             return
         if device.ignored:
             logger.info("The device ({} - {}) is currently ignored".format(t.sensor_id, t.name))
@@ -35,14 +36,14 @@ class ClientProtocol(protocol.Protocol):
 
 
     def dataReceived(self, data):
-        logger.info("EnOcean received data: {}".format(data))
+        #logger.info("EnOcean received data: {}".format(data))
 
         # Splicing data into 28 characters long packets
         data_packets = [data[i:i + 28] for i in xrange(0, len(data), 28)]
         if len(data_packets[-1]) < 28:
             logger.info('Ignoring incomplete packet: {}'.format(data_packets[-1]))
             del data_packets[-1]
-        logger.info(data_packets)
+        #logger.info(data_packets)
 
         for packet in data_packets:
             t = telegram.from_str(packet)

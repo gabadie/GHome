@@ -25,7 +25,6 @@ class SnifferProtocolFactory(protocol.ClientFactory):
         self.dump()
 
     def addFrame(self, data, date):
-
         FRAME_LENGTH = 28
         
         # Split into atomic frames of length FRAME_LENGTH
@@ -41,7 +40,6 @@ class SnifferProtocolFactory(protocol.ClientFactory):
         # Save frames
         for frame in atomic_frames:
             print "{} {}".format(datetime.datetime.strftime(date, "[%Y-%m-%d %Hh%Mm%Ss]"), frame)
-            #dest_log = "{}.{}.log".format(logname, 
             self.frames.append((timestamp, frame))
             if len(self.frames) % self.dumpFreq == 0:
                 print "Dumping {} frames in \"{}\"".format(self.dumpFreq, self.dumpfile)

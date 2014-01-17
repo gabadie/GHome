@@ -43,21 +43,21 @@ class SampleListener(Leap.Listener):
 		m=PyMouse()
 		x_dim, y_dim = m.screen_size()
 		frame = controller.frame()
-		print"Frame id: {}, timestamp: {}, hand: {}, fingers{}, tools: {}".format(frame.id, frame.timestamp,len(frame.hands),len(frame.fingers),len(frame.tools))
+		#print"Frame id: {}, timestamp: {}, hand: {}, fingers{}, tools: {}".format(frame.id, frame.timestamp,len(frame.hands),len(frame.fingers),len(frame.tools))
 
 		if not frame.hands.is_empty:
 			hand=frame.hands[0]
 			fingers=hand.fingers
 			if not fingers.is_empty:
-				print fingers[0].tip_position.x
-				print fingers[0].tip_position.y
+				#print fingers[0].tip_position.x
+				#print fingers[0].tip_position.y
 				m.move(((fingers[0].tip_position.x)+160)*x_dim/320,y_dim-((fingers[0].tip_position.y)-200)*y_dim/200)
 				#alculate avg position
 				avg_pos = Leap.Vector()
 				for finger in fingers:
 					avg_pos+=finger.tip_position
 				avg_pos /= len(fingers)
-				print "Hand has ablablabl"
+				#print "Hand has ablablabl"
 
 				# can get radius and palm position print "Hand sphere radius: %f mm, palm position: %s" % (hand.sphere_radius, hand.palm_position)
 

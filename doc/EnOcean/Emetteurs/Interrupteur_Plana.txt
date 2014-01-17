@@ -1,0 +1,19 @@
+A55A0B05 50000000 0021CBE53061 => droite bas pressed	=> 4 et 1
+A55A0B05 00000000 0021CBE52001 => droite bas released	=> osef
+A55A0B05 70000000 0021CBE53081 => droite haut pressed	=> 4 et 2 et 1
+A55A0B05 00000000 0021CBE52001 => droite haut released	=> osef
+A55A0B05 10000000 0021CBE53021 => gauche bas pressed	=> 1
+A55A0B05 00000000 0021CBE52001 => gauche bas released	=> osef
+A55A0B05 30000000 0021CBE53041 => gauche haut pressed	=> 2 et 1
+A55A0B05 00000000 0021CBE52001 => gauche haut released	=> osef
+
+1 => pressed
+0 => released ANY
+
+2 => haut
+0 => bas
+
+4 => droite
+0 => gauche
+
+Note : il n'est pas possible de connaître le bouton qui a été relâché
