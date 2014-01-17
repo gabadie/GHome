@@ -12,32 +12,42 @@ import logger
 import model
 import enocean
 
-class Raspi(xmlrpc.XMLRPC):
+
+class RaspiUnit(object):
     def __init__(self):
         self.ip="127.0.0.1"
-        self.port=7080
         self.macAddress=""
+        self.port = 7080
+
+class Raspi(xmlrpc.XMLRPC):
+    def __init__(self):
+        self.rpi= list() 
 
 
     ##############Functions added to communicate with the raspi
     #TODO to be completed/modified
     def xmlrpc_add_raspi(self,ip,port,macAddress):
-        print "Adding raspi"
-        self.ip=ip
-        self.port=int(port)
-        self.macAddress=macAddress
-        return "Added raspi "+str(macAddress)
+        print "Adding raspi ip: " + str(ip) + "port: "+ str(port) + "Mac Address: " + macAddress
+        self.rpi.append(RaspiUnit())
+        id=len(self.rpi)-1
+        self.rpi[id].ip=ip
+        self.rpi[id].port=int(port)
+        self.rpi[id].macAddress=macAddress
+        return id
 
 
 
     #play music with raspby. Here the function is called, url to the music must be generated, and passed to the rasbpi
     # trought play_music(url). On the other side, music will be played. 
     #TODO to be completed
-    def xmlrpc_find_music_url(self):
-        if self.macAddress=="":
-            return "Failed, no raspi registered"
-        proxy = Proxy('http://'+ self.ip+':' + str(self.port))
-        proxy.callRemote('play_music', ' http://mamusic.mp3')
+    def xmlrpc_find_music_url(self, id, url ):
+        if len(self.rpi)>id-2:
+            if self.rpi[id].macAddress=="":
+                return "Failed, no raspi registered at this ID"
+            proxy = Proxy('http://'+ self.rpi[0].ip+':' + str(self.rpi[id].port))
+        else :
+            return "Failed, no raspi get this ID"
+        proxy.callRemote('play_music', url)
         reactor.run
         return "Url sent"
 
