@@ -61,7 +61,7 @@ def test_callbacks():
     assert a.received_event == False
     assert b.received_event == False
 
-    a.event0.trigger()
+    a.event0()
 
     assert a.received_event == False
     assert b.received_event == False

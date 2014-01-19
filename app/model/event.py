@@ -41,7 +41,7 @@ class Object(mongoengine.Document):
 
 
 class Event(mongoengine.Document):
-    def trigger(self):
+    def __call__(self):
         for callback in Connection.objects(triggering_event=self):
             callback.trigger()
 
