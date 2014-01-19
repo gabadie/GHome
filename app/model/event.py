@@ -15,6 +15,13 @@ class Object(mongoengine.Document):
         for c in Connection.objects(event_object=self):
             c.delete()
 
+        self_attrs_map = self._data
+        for key in self_attrs_map:
+            value = self_attrs_map[key]
+
+            if isinstance(value, Event):
+                value.delete()
+
         mongoengine.Document.delete(self)
 
     @property
@@ -54,6 +61,12 @@ class Event(mongoengine.Document):
 
         connection = Connection(triggering_event=self, receiving_object=obj, method_name=method_name)
         connection.save()
+
+    def delete():
+        for c in Connection.objects(triggering_event=self):
+            c.delete()
+
+        mongoengine.Document.delete(self)
 
 
 class Connection(mongoengine.Document):
