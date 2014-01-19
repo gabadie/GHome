@@ -58,12 +58,3 @@ class Connection(mongoengine.Document):
 
     def trigger(self):
         self.receiving_object.__class__.__dict__[self.method_name](self.receiving_object)
-
-
-def callback(func):
-    def wrapped(self):
-        return func()
-
-
-
-    return wrapped
