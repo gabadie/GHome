@@ -7,7 +7,7 @@ class Object(mongoengine.Document):
     meta = {'allow_inheritance': True}
 
     def delete():
-        for c in Callback.objects(event_object=self):
+        for c in Connection.objects(event_object=self):
             c.delete()
 
         mongoengine.Document.delete(self)
@@ -37,18 +37,30 @@ class Object(mongoengine.Document):
 
 class Event(mongoengine.Document):
     def trigger(self):
-        for callback in Callback.objects(trigger_event=self):
-            callback.call()
+        for callback in Connection.objects(triggering_event=self):
+            callback.trigger()
 
     def connect(self, obj, callback):
-        if len(Callback.objects(triggering_event=self, receiving_object=obj, function_name=callback)) > 0:
+        if len(Connection.objects(triggering_event=self, receiving_object=obj, function_name=callback)) > 0:
             return
 
-        callback = Callback(triggering_event=self, receiving_object=obj, function_name=callback)
-        callback.save()
+        connection = Connection(triggering_event=self, receiving_object=obj, function_name=str(callback))
+        connection.save()
 
 
-class Callback(mongoengine.Document):
+class Connection(mongoengine.Document):
     triggering_event = mongoengine.ReferenceField(Event, required=True)
     receiving_object = mongoengine.ReferenceField(Object, required=True)
     function_name = mongoengine.StringField()
+
+    def trigger(self):
+        self.receiving_object.__class__.__dict__[self.function_name](self.receiving_object)
+
+
+def callback(func):
+    def wrapped(self):
+        return func()
+
+
+
+    return wrapped
