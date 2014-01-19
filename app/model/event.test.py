@@ -6,7 +6,7 @@ import mongoengine
 
 
 class FakeDevice0(event.Object):
-    event0 = mongoengine.ReferenceField(event.Event, required=True)
+    event0 = event.slot
     name = mongoengine.StringField()
     received_event = mongoengine.BooleanField(default=False)
 

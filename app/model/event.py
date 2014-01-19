@@ -82,3 +82,5 @@ class Connection(mongoengine.Document):
             raise NotImplemented
 
         class_content[self.method_name](self.receiving_object)
+
+slot = mongoengine.ReferenceField(Event, required=True)
