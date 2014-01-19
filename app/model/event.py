@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import sys
 import mongoengine
+
+sys.path.insert(0, '..')
+
+import logger
 
 class Object(mongoengine.Document):
     meta = {'allow_inheritance': True}
@@ -57,4 +62,10 @@ class Connection(mongoengine.Document):
     method_name = mongoengine.StringField()
 
     def trigger(self):
-        self.receiving_object.__class__.__dict__[self.method_name](self.receiving_object)
+        class_content = self.receiving_object.__class__.__dict__
+
+        if self.method_name not in class_content:
+            logger.error("Can not trigger event connection: {}.{} have been removed...".format(self.receiving_object.__class__.__name__, self.method_name))
+            raise NotImplemented
+
+        class_content[self.method_name](self.receiving_object)
