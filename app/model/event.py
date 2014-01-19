@@ -40,21 +40,24 @@ class Event(mongoengine.Document):
         for callback in Connection.objects(triggering_event=self):
             callback.trigger()
 
-    def connect(self, obj, callback):
-        if len(Connection.objects(triggering_event=self, receiving_object=obj, function_name=callback)) > 0:
+    def connect(self, bound_callback):
+        obj = bound_callback.__self__
+        method_name = bound_callback.__name__
+
+        if len(Connection.objects(triggering_event=self, receiving_object=obj, method_name=method_name)) > 0:
             return
 
-        connection = Connection(triggering_event=self, receiving_object=obj, function_name=str(callback))
+        connection = Connection(triggering_event=self, receiving_object=obj, method_name=method_name)
         connection.save()
 
 
 class Connection(mongoengine.Document):
     triggering_event = mongoengine.ReferenceField(Event, required=True)
     receiving_object = mongoengine.ReferenceField(Object, required=True)
-    function_name = mongoengine.StringField()
+    method_name = mongoengine.StringField()
 
     def trigger(self):
-        self.receiving_object.__class__.__dict__[self.function_name](self.receiving_object)
+        self.receiving_object.__class__.__dict__[self.method_name](self.receiving_object)
 
 
 def callback(func):

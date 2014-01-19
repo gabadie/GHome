@@ -56,7 +56,7 @@ def test_callbacks():
     assert a.received_event == False
     assert b.received_event == False
 
-    a.event0.connect(b, 'event_callback')
+    a.event0.connect(b.event_callback)
 
     assert a.received_event == False
     assert b.received_event == False
