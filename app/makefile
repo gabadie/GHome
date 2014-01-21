@@ -20,7 +20,13 @@ tests: $(python_tests) $(shell_tests)
 .PHONY: $(python_tests)
 $(python_tests): %:
 	@echo "# testing <$@>..."
-	@cd $(dir $@) ; python $(notdir $@)
+	@cd $(dir $@) ;\
+        python $(notdir $@) &> $(notdir $@).log ;\
+        RETURN=$$? ;\
+        if [ "$$RETURN" -ne 0 ]; then \
+            cat $(notdir $@).log ;\
+            exit $$RETURN ;\
+        fi;
 
 .PHONY: $(shell_tests)
 $(shell_tests): %:

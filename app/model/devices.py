@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
 import mongoengine
 import datetime
 
 # Generic classes
 
 class Device(mongoengine.Document):
-    device_id = mongoengine.StringField(required=True, unique=True)
+    device_id = mongoengine.IntField(required=True, unique=True)
     name = mongoengine.StringField()
 
     meta = {'allow_inheritance': True}
@@ -35,6 +34,7 @@ class Actuator(Device):
         raise NotImplementedError
 
 class Sensor(Device):
+    ignored = mongoengine.BooleanField(required=True, default=False)
     actuators = mongoengine.ListField(mongoengine.ReferenceField(Actuator), default=[])
 
     def activated(self):
@@ -49,16 +49,15 @@ class Thermometer(object):
 class WindowContact(object):
     open = mongoengine.BooleanField(required=True)
 
-
 class Switch(object):
-    on = mongoengine.BooleanField(required=True, default=False)
+    pass
 
 class LightMovementSensor(object):
     pass
 
 # Actuators
 
-class Lamp(object):
+class Lamp(Actuator):
     turned_on = mongoengine.BooleanField(required=True, default=False)
 
 # Numeric reading
@@ -83,10 +82,15 @@ class Voltage(NumericReading):
 class SwitchTriggered(BooleanReading):
     pass
 
-
-class SwitchState(BooleanReading):
-    pass
-
-
 class WindowState(BooleanReading):
     pass
+
+class Movement(BooleanReading):
+    pass
+
+
+# Other readings
+class SwitchState(Reading):
+    side = mongoengine.IntField(required=True)
+    direction = mongoengine.IntField(required=True)
+    pressed = mongoengine.IntField(required=True)

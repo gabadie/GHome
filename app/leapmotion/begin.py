@@ -1,7 +1,16 @@
-import Leap, sys
+import sys
+
+if (len(sys.argv) > 1 and sys.argv[1]=='x64'):
+	sys.path.insert(0, './x64')
+else :
+	sys.path.insert(0, './x86')
+
+import Leap
 import threading
 from pymouse import PyMouse
 from Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
+
+
 
 def timer_Disable(controller):
 	controller.enable_gesture(Leap.Gesture.TYPE_CIRCLE)

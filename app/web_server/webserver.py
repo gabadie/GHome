@@ -31,18 +31,18 @@ def init_test_db():
     db.drop_database(config.mongo_db)
 
     # Actuators
-    l1 = Lamp(device_id='889977', name='The main lamp', turned_on=True).save()
-    l2 = Lamp(device_id='85654', name='Another lamp').save()
+    l1 = Lamp(device_id=889977, name='The main lamp', turned_on=True).save()
+    l2 = Lamp(device_id=85654, name='Another lamp').save()
 
     # Sensors
-    Thermometer(device_id='1337', name='Living room thermometer', ignored=False).save()
-    Thermometer(device_id='4242', name='Bedroom thermometer', ignored=False).save()
-    Thermometer(device_id='233232', name='A thermometer that should work', ignored=False).save()
+    Thermometer(device_id=1337, name='Living room thermometer', ignored=False).save()
+    Thermometer(device_id=4242, name='Bedroom thermometer', ignored=False).save()
+    Thermometer(device_id=233232, name='A thermometer that should work', ignored=False).save()
 
-    Switch(device_id='343830', name='A switch that should work', ignored=False, actuators=[l1, l2]).save()
-    Switch(device_id='939400', name='An ignored switch', ignored=True).save()
+    Switch(device_id=343830, name='A switch that should work', ignored=False, actuators=[l1, l2]).save()
+    Switch(device_id=939400, name='An ignored switch', ignored=True).save()
 
-    WindowContact(device_id='3311', name='A window contact sensor', open=False, ignored=True).save()
+    WindowContact(device_id=3311, name='A window contact sensor', open=False, ignored=True).save()
 
 @app.route('/')
 def index():

@@ -3,7 +3,6 @@
 
 import telegram
 
-
 if __name__ == '__main__':
     # A 'random' telegram, created only to test parsing and such
     t = telegram.Telegram([0xA5, 0x5A], h_seq=3, length=12, org=5, data=0x10080287,
@@ -32,3 +31,5 @@ if __name__ == '__main__':
     assert t.type == 1
     assert t.manufacturer_id == 0
     assert t.eep == (7, 4, 1)
+
+    print "Tests passed !"
