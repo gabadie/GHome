@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
-import mongoengine
-from twisted.internet import protocol, task
+from twisted.internet import protocol
 
 sys.path.insert(0, '..')
 
@@ -32,7 +31,6 @@ class ClientProtocol(protocol.Protocol):
             return
 
         device.process_telegram(t, self)
-
 
     def dataReceived(self, data):
         logger.info("EnOcean received data: {}".format(data))

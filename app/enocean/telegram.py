@@ -134,7 +134,7 @@ class Telegram(object):
     @property
     def normal(self):
         return self.mode == Telegram.NORMAL
-    
+
 
     def requires_teach_in(function):
         """ A decorator for function that require the teach in mode """
@@ -163,7 +163,7 @@ class Telegram(object):
     @requires_teach_in
     def eep(self):
         return (self.org, self.func, self.type)
-        
+
     @property
     @requires_teach_in
     def device_type(self):
@@ -173,7 +173,7 @@ class Telegram(object):
             return Telegram.SR04RH
         #TODO => SR-MDS Solar
         else:
-            return Telegram.UNKNOWN_DEVICE        
+            return Telegram.UNKNOWN_DEVICE
 
     # Standard operators
     def __str__(self):

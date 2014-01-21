@@ -3,7 +3,6 @@
 
 import sys
 import mongoengine
-from twisted.internet import protocol
 
 sys.path.insert(0, '..')
 
@@ -13,6 +12,7 @@ import logger
 
 
 class Sensor(model.devices.Sensor):
+
     ignored = mongoengine.BooleanField(default=True)
 
     def process_telegram(self, telegram, server):
@@ -21,60 +21,73 @@ class Sensor(model.devices.Sensor):
 # Sensors
 class Thermometer(Sensor, model.devices.Thermometer):
 
-    @staticmethod
-    def reading_from_data_bytes(thermometer, data_bytes):
-        return model.devices.Thermometer.Reading(device=thermometer, temperature=data_bytes[2] * 40 / 250.0, humidity=data_bytes[1] * 100 / 250.0)
+    def parse_readings(thermometer, data_bytes):
+        temperature = data_bytes[2] * 40 / 250.0
+        humidity = data_bytes[1] * 100 / 250.0
+        temp_r = model.devices.Temperature(device=thermometer, value=temperature)
+        humidity_r = model.devices.Humidity(device=thermometer, value=humidity)
+
+        logger.info("EnOcean thermometer reading: Temperature={}°C, Humidity={}%".format(temperature, humidity))
+
+        return temp_r, humidity_r
+
 
     def process_telegram(self, telegram, server):
-        reading = Thermometer.reading_from_data_bytes(self, telegram.data_bytes)
-        reading.save()
+        temperature, humidity = self.parse_readings(self, telegram.data_bytes)
 
-        logger.info("EnOcean thermometer reading: temperature=" + str(reading.temperature) + "C, humidity=" + str(reading.humidity) + "%")
+        temperature.save()
+        humidity.save()
 
 class Switch(Sensor, model.devices.Switch):
 
-    @staticmethod
-    def reading_from_data_bytes(switch, data_bytes):
-        return model.devices.Switch.Reading(device=switch, turned_on=switch.on)
+    def parse_readings(self, data_bytes):
+        return model.devices.SwitchState(device=self, value=self.on)
 
     def process_telegram(self, telegram, server):
         self.on = not self.on
-        reading = Switch.reading_from_data_bytes(self, telegram.data_bytes)
-        reading.save()
+        switch_state = self.parse_readings(self, telegram.data_bytes)
 
-        self.activated()
+        switch_state.save()
         self.save()
 
+        self.activated()
         logger.info("EnOcean switch #{} activated".format(self.device_id))
 
 
 class WindowContact(Sensor, model.devices.WindowContact):
 
-    @staticmethod
-    def reading_from_data_bytes(thermometer, data_bytes):
-        contact = (self.data_bytes[3] & 0x01) == 0
-        self.open = contact
+    def parse_readings(self, data_bytes):
+        self.open  = (self.data_bytes[3] & 0x01) == 0
 
         # TODO : Isn't it "open = not contact" instead?
-        return model.devices.WindowContact.Reading(device=windowContact, open=self.open)
+        return model.devices.WindowState(device=self, value=self.open)
+
+    def process_telegram(self, telegram, server):
+        window_state = self.parse_readings(telegram)
+        window_state.save()
 
 
 class LightMovementSensor(model.devices.LightMovementSensor):
 
-    @staticmethod
-    def reading_from_data_bytes(lightMovementSensor, data_bytes):
-        movement = (self.data_bytes[3] & 0x02) >> 1
-        if movement == 0:
-            movement = True
-        else:
-            movement = False
-        return model.devices.LightMovementSensor.Reading(device=lightMovementSensor, 
-            voltage=data_bytes[0] * 5.12 / 255.0, brightness=data_bytes[1] * 512 / 255.0, movement=movement)
+    def parse_readings(self, data_bytes):
+        voltage = data_bytes[0] * 5.12 / 255.0
+        brightness = data_bytes[1] * 512 / 255.0
+        movement = ((data_bytes[3] & 0x02) >> 1) == 0
+
+        r_volt = model.devices.Voltage(device=self, value=voltage).save()
+        r_bright = model.devices.Brightness(device=self, value=brightness).save()
+        r_mov = model.devices.Movement(device=self, value=movement).save()
+
+        logger.info("EnOcean light/movement: Voltage = {}V, brightness = {}, movement = {}.".format(voltage, brightness, movement))
+
+        return r_volt, r_bright, r_mov
 
     def process_telegram(self, telegram, server):
-        reading = LightMovementSensor.reading_from_data_bytes(self, telegram.data_bytes)
-        reading.save()
-        logger.info("EnOcean light and movement sensor reading: voltage=" + str(reading.voltage) + "V, brightness=" + str(reading.brightness) + "Lux, movement=" + str(reading.movement))
+        voltage, brightness, movement = self.parse_readings(self, telegram.data_bytes)
+
+        voltage.save()
+        brightness.save()
+        movement.save()
 
 
 # Actuators
@@ -89,12 +102,12 @@ class Lamp(model.devices.Actuator, model.devices.Lamp):
 
 def from_telegram(telegram):
     if telegram.device_type == Telegram.SRW01:
-        return WindowContactor(device_id=telegram.sensor_id)
-    
+        return WindowContact(device_id=telegram.sensor_id)
+
     if telegram.device_type == Telegram.SR04RH:
         return Thermometer(device_id=telegram.sensor_id)
-    
+
     if telegram.device_type == Telegram.SR_MDS:
         return LightMovementSensor(device_id=telegram.sensor_id)
-    
+
     return None

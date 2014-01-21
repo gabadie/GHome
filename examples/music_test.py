@@ -3,6 +3,9 @@ from pymplb import pymplb
 from time import sleep
 import json
 
+import sys
+sys.path.insert('../libs')
+
 tags_input = raw_input("What type of music do you like? (tags separated by a comma) ")
 tags = tags_input.split(',')
 

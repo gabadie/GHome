@@ -24,17 +24,23 @@ def test_mongoengine():
     assert thermometer in model.devices.Device.objects(device_id="Hello")
     assert not thermometer in model.devices.Device.objects(device_id="World")
 
-    thermometerValue = model.devices.Thermometer.Reading(device=thermometer, temperature=0.0, humidity=0.0)
-    thermometerValue.save()
+    temp_reading = model.devices.Temperature(device=thermometer, value=1.337)
+    humidity_reading = model.devices.Humidity(device=thermometer, value=4.242)
 
-    assert thermometerValue in model.devices.Thermometer.Reading.objects(device=thermometer)
+    temp_reading.save()
+    humidity_reading.save()
+
+    assert temp_reading in model.devices.Temperature.objects(device=thermometer)
+    assert humidity_reading in model.devices.Humidity.objects(device=thermometer)
 
 def test_thermometer():
-    data_bytes = [0x00, 0x84, 0x99, 0x0F]
-    reading = devices.Thermometer.reading_from_data_bytes(None, data_bytes)
+    thermometer = devices.Thermometer(device_id="test_thermometer_1")
 
-    assert reading.humidity == 52.8
-    assert reading.temperature == 24.48
+    data_bytes = [0x00, 0x84, 0x99, 0x0F]
+    temperature, humidity = thermometer.parse_readings(data_bytes)
+
+    assert humidity.value == 52.8
+    assert temperature.value == 24.48
 
 def test_lamp():
     lamp = devices.Lamp(device_id='lamp101')
