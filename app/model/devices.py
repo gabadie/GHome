@@ -3,10 +3,11 @@
 
 import mongoengine
 import datetime
+import event
 
 # Generic classes
 
-class Device(mongoengine.Document):
+class Device(event.Object):
     device_id = mongoengine.IntField(required=True, unique=True)
     name = mongoengine.StringField()
 
@@ -40,25 +41,6 @@ class Sensor(Device):
     def activated(self):
         for actuator in self.actuators:
             actuator.activate(self)
-
-# Sensors
-
-class Thermometer(object):
-    pass
-
-class WindowContact(object):
-    open = mongoengine.BooleanField(required=True)
-
-class Switch(object):
-    pass
-
-class LightMovementSensor(object):
-    pass
-
-# Actuators
-
-class Lamp(Actuator):
-    turned_on = mongoengine.BooleanField(required=True, default=False)
 
 # Numeric reading
 
