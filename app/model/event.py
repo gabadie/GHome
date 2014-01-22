@@ -11,6 +11,15 @@ import logger
 class Object(mongoengine.Document):
     meta = {'allow_inheritance': True}
 
+    def save(self):
+        for key in self._data:
+            value = self._data[key]
+
+            if isinstance(value, Event):
+                value.save()
+
+        mongoengine.Document.save(self)
+
     def delete():
         for c in Connection.objects(event_object=self):
             c.delete()
@@ -83,4 +92,5 @@ class Connection(mongoengine.Document):
 
         class_content[self.method_name](self.receiving_object)
 
-slot = mongoengine.ReferenceField(Event, required=True)
+def slot():
+    return mongoengine.ReferenceField(Event, required=True, default=Event)

@@ -21,10 +21,10 @@ class RpiServer(xmlrpc.XMLRPC):
 		self.macAddress=str(get_mac())
 
 	def xmlrpc_play_music(self,url):
-		print "ok, music is playing"  + url
+		print "ok, music is playing"  + str(url)
 		mplayer=pymplb.MPlayer()	
 		mplayer.loadfile(url)
-		return "ok, music is playing "  + url
+		return "ok, music is playing "  + str(url)
 
 	def getAddress(self):
 	    try:
