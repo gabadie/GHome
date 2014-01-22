@@ -3,10 +3,11 @@
 
 import mongoengine
 import datetime
+import event
 
 # Generic classes
 
-class Device(mongoengine.Document):
+class Device(event.Object):
     device_id = mongoengine.IntField(required=True, unique=True)
     name = mongoengine.StringField()
 
