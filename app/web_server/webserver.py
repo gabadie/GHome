@@ -6,11 +6,7 @@ import sys
 sys.path.insert(0, '..')
 
 from flask import Flask, render_template, request
-from twisted.web.wsgi import WSGIResource
-from twisted.web.server import Site
-from twisted.internet import reactor
 import mongoengine
-from bson import json_util
 import xmlrpclib
 
 from model import devices
@@ -63,7 +59,10 @@ def all_sensors():
 
         print s_id, s_name, s_type, actuator_ids
 
-        # DIRTY BUGFIX
+        # Converting from hexa representation
+        s_id = int(s_id, 16)
+
+        # DIRTY FIX, doesn't capture all actuators (must change form submit in js)
         actuator_ids = [actuator_ids]
         print "ACTUATORS ID = ", actuator_ids
 
@@ -106,6 +105,7 @@ def sensor(device_id):
 
 @app.route('/sensor/<device_id>/ignored', methods=['POST', 'GET'])
 def sensor_ignored(device_id):
+    print device_id
     if request.method == 'GET':
         ignored = Sensor.first(device_id=device_id).ignored
         resp = dict(ok=True, result=ignored)
