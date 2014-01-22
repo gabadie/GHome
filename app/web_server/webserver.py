@@ -7,15 +7,9 @@ sys.path.insert(0, '..')
 sys.path.insert(0, '../../libs/py8tracks')
 
 from py8tracks import API8tracks
-from twisted.web.xmlrpc import Proxy,reactor
-from twisted.web import xmlrpc, server
 
 from flask import Flask, render_template, request
-from twisted.web.wsgi import WSGIResource
-from twisted.web.server import Site
-from twisted.internet import reactor
 import mongoengine
-from bson import json_util
 import xmlrpclib
 
 from model import devices
@@ -68,7 +62,10 @@ def all_sensors():
 
         print s_id, s_name, s_type, actuator_ids
 
-        # DIRTY BUGFIX
+        # Converting from hexa representation
+        s_id = int(s_id, 16)
+
+        # DIRTY FIX, doesn't capture all actuators (must change form submit in js)
         actuator_ids = [actuator_ids]
         print "ACTUATORS ID = ", actuator_ids
 
@@ -111,6 +108,7 @@ def sensor(device_id):
 
 @app.route('/sensor/<device_id>/ignored', methods=['POST', 'GET'])
 def sensor_ignored(device_id):
+    print device_id
     if request.method == 'GET':
         ignored = Sensor.first(device_id=device_id).ignored
         resp = dict(ok=True, result=ignored)
@@ -136,20 +134,17 @@ def lamps():
 @app.route('/player', methods=['POST','GET'])
 def playMusic():
     if request.method == 'POST':
-        form=request.form
-        tag =  [form.get(val) for val in ['tag']]
+        form = request.form
+        tag = [form.get(val) for val in ['tag']]
         print tag
 
-        api=API8tracks(config.api_8tracks)
+        api = API8tracks(config.api_8tracks)
 
         mixset = api.mixset(tags=tag, sort='popular')
-        url=search_music_generator(mixset)
+        url = search_music_generator(mixset)
 
-        #url= "http://streamTaMaman.wav" # [stream.data['track_file_stream_url'] for stream in mixset.mixes[0].tracks_cache]
-        server= xmlrpclib.Server("http://"+str(config.main_server.ip)+':'+str(config.main_server.rpc_port))
-        server.raspi.find_music_url(0,next(url))#callRemote('raspi.find_music_url',0,url).addCallbacks(return_value)
-        #reactor.run()
-        # TODO : this is blocking, warning!!
+        rpc.raspi.find_music_url(0, next(url))
+
     return json.dumps("haha")
 
 def return_value(mess):
@@ -159,7 +154,7 @@ def return_value(mess):
 def search_music_generator(mixset):
     for mix in mixset.mixes:
         for song in mix:
-            yield song.data['url']# ou track_file_stream_url
+            yield song.data['track_file_stream_url']# ou track_file_stream_url
 
 
 @app.route('/music')
