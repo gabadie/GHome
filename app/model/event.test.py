@@ -62,7 +62,17 @@ def test_callbacks():
     b.reload()
     assert b.received_event == True
 
+def test_remove_object():
+    db = mongoengine.connect('ghome_enocean_test')
+    db.drop_database('ghome_enocean_test')
+
+    a = FakeDevice0(name="A")
+    a.save()
+
+    a.delete()
+
 
 if __name__ == "__main__":
     test_events_list()
     test_callbacks()
+    test_remove_object()
