@@ -8,11 +8,7 @@ from twisted.web.xmlrpc import Proxy,reactor
 from twisted.web import xmlrpc, server
 
 from flask import Flask, render_template, request
-from twisted.web.wsgi import WSGIResource
-from twisted.web.server import Site
-from twisted.internet import reactor
 import mongoengine
-from bson import json_util
 import xmlrpclib
 
 from model import devices
@@ -65,7 +61,10 @@ def all_sensors():
 
         print s_id, s_name, s_type, actuator_ids
 
-        # DIRTY BUGFIX
+        # Converting from hexa representation
+        s_id = int(s_id, 16)
+
+        # DIRTY FIX, doesn't capture all actuators (must change form submit in js)
         actuator_ids = [actuator_ids]
         print "ACTUATORS ID = ", actuator_ids
 
@@ -108,6 +107,7 @@ def sensor(device_id):
 
 @app.route('/sensor/<device_id>/ignored', methods=['POST', 'GET'])
 def sensor_ignored(device_id):
+    print device_id
     if request.method == 'GET':
         ignored = Sensor.first(device_id=device_id).ignored
         resp = dict(ok=True, result=ignored)
@@ -133,14 +133,10 @@ def lamps():
 @app.route('/player', methods=['POST','GET'])
 def playMusic():
     if request.method == 'POST':
-        form=request.form
+        form = request.form
         tags =  [form.get(val) for val in ['tag']]
         print tags
-        #url= "http://streamTaMaman.wav" # [stream.data['track_file_stream_url'] for stream in mixset.mixes[0].tracks_cache]
-        server= xmlrpclib.Server("http://"+str(config.main_server.ip)+':'+str(config.main_server.rpc_port))
-        server.raspi.find_music_url(0,tags)#callRemote('raspi.find_music_url',0,url).addCallbacks(return_value)
-        #reactor.run()
-        # TODO : this is blocking, warning!!
+        rpc.raspi.find_music_url(0,tags)
     return json.dumps("haha")
 
 def return_value(mess):
