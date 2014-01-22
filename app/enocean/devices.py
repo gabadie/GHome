@@ -20,7 +20,7 @@ class Sensor(model.devices.Sensor):
 
 
 # Sensors
-class Thermometer(Sensor, model.devices.Thermometer):
+class Thermometer(Sensor):
 
     @staticmethod
     def generate_telegram(sensor_id, temperature, humidity):
@@ -46,7 +46,7 @@ class Thermometer(Sensor, model.devices.Thermometer):
         temperature.save()
         humidity.save()
 
-class Switch(Sensor, model.devices.Switch):
+class Switch(Sensor):
     UNKNOWN, TOP, BOTTOM, RIGHT, LEFT = range(5)
 
     top_right = mongoengine.BooleanField(default=False)
@@ -112,7 +112,8 @@ class Switch(Sensor, model.devices.Switch):
         logger.info("EnOcean switch #{} activated".format(self.device_id))
 
 
-class WindowContact(Sensor, model.devices.WindowContact):
+class WindowContact(Sensor):
+    open = mongoengine.BooleanField(required=True)
 
     @staticmethod
     def generate_telegram(sensor_id, open):
@@ -133,7 +134,7 @@ class WindowContact(Sensor, model.devices.WindowContact):
         logger.info("EnOcean window contactor reading: open =  {}".format(window_state.value))
 
 
-class LightMovementSensor(Sensor, model.devices.LightMovementSensor):
+class LightMovementSensor(Sensor):
 
     @staticmethod
     def generate_telegram(sensor_id, voltage, brightness, movement):
@@ -166,7 +167,8 @@ class LightMovementSensor(Sensor, model.devices.LightMovementSensor):
 
 
 # Actuators
-class Lamp(model.devices.Lamp):
+class Lamp(model.devices.Actuator):
+    turned_on = mongoengine.BooleanField(required=True, default=False)
 
     def activate(self, sensor):
         self.turned_on = not self.turned_on

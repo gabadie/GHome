@@ -41,25 +41,6 @@ class Sensor(Device):
         for actuator in self.actuators:
             actuator.activate(self)
 
-# Sensors
-
-class Thermometer(object):
-    pass
-
-class WindowContact(object):
-    open = mongoengine.BooleanField(required=True)
-
-class Switch(object):
-    pass
-
-class LightMovementSensor(object):
-    pass
-
-# Actuators
-
-class Lamp(Actuator):
-    turned_on = mongoengine.BooleanField(required=True, default=False)
-
 # Numeric reading
 
 class Temperature(NumericReading):
