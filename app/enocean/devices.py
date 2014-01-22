@@ -29,16 +29,15 @@ class Thermometer(Sensor):
         data_bytes[2] = int(temperature * 250 / 40)
         return telegram.sensor_telegram(sensor_id=sensor_id, data_bytes=data_bytes)
 
-    def parse_readings(thermometer, data_bytes):
+    def parse_readings(self, data_bytes):
         temperature = data_bytes[2] * 40 / 250.0
         humidity = data_bytes[1] * 100 / 250.0
-        temp_r = model.devices.Temperature(device=thermometer, value=temperature)
-        humidity_r = model.devices.Humidity(device=thermometer, value=humidity)
+        temp_r = model.devices.Temperature(device=self, value=temperature)
+        humidity_r = model.devices.Humidity(device=self, value=humidity)
 
-        logger.info("EnOcean thermometer reading: Temperature={}°C, Humidity={}%".format(temperature, humidity))
+        logger.info("EnOcean thermometer #{}'s reading: Temperature = {}°C, Humidity = {}%".format(hex(self.device_id), temperature, humidity))
 
         return temp_r, humidity_r
-
 
     def process_telegram(self, telegram, server):
         temperature, humidity = self.parse_readings(telegram.data_bytes)
@@ -72,7 +71,6 @@ class Switch(Sensor):
 
         return telegram.sensor_telegram(sensor_id=sensor_id, data_bytes=data_bytes)
 
-
     def parse_readings(self, data_bytes):
         if data_bytes[0] & 0x01 == 0:
             side = Switch.UNKNOWN
@@ -99,17 +97,15 @@ class Switch(Sensor):
                     self.bottom_left = not self.bottom_left
 
             pressed = True
+            
+        logger.info("EnOcean switch #{}'s state has changed: top_right = {}, bottom_right = {}, top_left = {}, bottom_left = {}".format(
+                                            hex(self.device_id), self.top_right, self.bottom_right, self.top_left, self.bottom_left))
 
         return model.devices.SwitchState(device=self, side=side, direction=direction, pressed=pressed)
-
 
     def process_telegram(self, telegram, server):
         switch_state = self.parse_readings(telegram.data_bytes)
         switch_state.save()
-
-        self.save()
-        self.activated()
-        logger.info("EnOcean switch #{} activated".format(self.device_id))
 
 
 class WindowContact(Sensor):
@@ -124,14 +120,13 @@ class WindowContact(Sensor):
 
     def parse_readings(self, data_bytes):
         self.open = ((data_bytes[3] & 0x01) == 0)
+        logger.info("EnOcean window contactor #{}'s reading: open = {}".format(hex(self.device_id), self.open))
 
-        # TODO : Isn't it "open = not contact" instead?
         return model.devices.WindowState(device=self, value=self.open)
 
     def process_telegram(self, telegram, server):
         window_state = self.parse_readings(telegram.data_bytes)
         window_state.save()
-        logger.info("EnOcean window contactor reading: open =  {}".format(window_state.value))
 
 
 class LightMovementSensor(Sensor):
@@ -154,7 +149,7 @@ class LightMovementSensor(Sensor):
         r_bright = model.devices.Brightness(device=self, value=brightness).save()
         r_mov = model.devices.Movement(device=self, value=movement).save()
 
-        logger.info("EnOcean light/movement: Voltage = {}V, brightness = {}, movement = {}.".format(voltage, brightness, movement))
+        logger.info("EnOcean light/movement sensor #{}'s reading: Voltage = {}V, brightness = {}, movement = {}.".format(hex(self.device_id), voltage, brightness, movement))
 
         return r_volt, r_bright, r_mov
 
