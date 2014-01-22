@@ -110,7 +110,7 @@ class Switch(Sensor):
 
 
 class WindowContact(Sensor):
-    open = mongoengine.BooleanField(required=True)
+    open = mongoengine.BooleanField(default=True)
 
     @staticmethod
     def generate_telegram(sensor_id, open):
