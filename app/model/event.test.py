@@ -6,19 +6,12 @@ import mongoengine
 
 
 class FakeDevice0(event.Object):
-    event0 = event.slot
+    event0 = event.slot()
     name = mongoengine.StringField()
     received_event = mongoengine.BooleanField(default=False)
 
     def __str__(self):
         return self.name
-
-    @staticmethod
-    def create(name):
-        o = FakeDevice0(name=name)
-        o.event0 = event.Event()
-        o.event0.save()
-        return o
 
     def event_callback(self):
         self.received_event = True
@@ -33,7 +26,7 @@ def test_events_list():
     db = mongoengine.connect('ghome_enocean_test')
     db.drop_database('ghome_enocean_test')
 
-    obj0 = FakeDevice0.create(name="hello")
+    obj0 = FakeDevice0(name="hello")
 
     obj1 = FakeDevice1()
     obj1.devices = [obj0]
@@ -47,10 +40,10 @@ def test_callbacks():
     db = mongoengine.connect('ghome_enocean_test')
     db.drop_database('ghome_enocean_test')
 
-    a = FakeDevice0.create(name="A")
+    a = FakeDevice0(name="A")
     a.save()
 
-    b = FakeDevice0.create(name="B")
+    b = FakeDevice0(name="B")
     b.save()
 
     assert a.received_event == False
