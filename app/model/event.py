@@ -21,7 +21,7 @@ class Object(mongoengine.Document):
         mongoengine.Document.save(self)
 
     def delete(self):
-        for c in Connection.objects(event_object=self):
+        for c in Connection.objects(receiving_object=self):
             c.delete()
 
         self_attrs_map = self._data
