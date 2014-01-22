@@ -20,7 +20,7 @@ class Object(mongoengine.Document):
 
         mongoengine.Document.save(self)
 
-    def delete():
+    def delete(self):
         for c in Connection.objects(event_object=self):
             c.delete()
 
@@ -71,7 +71,7 @@ class Event(mongoengine.Document):
         connection = Connection(triggering_event=self, receiving_object=obj, method_name=method_name)
         connection.save()
 
-    def delete():
+    def delete(self):
         for c in Connection.objects(triggering_event=self):
             c.delete()
 
