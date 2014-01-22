@@ -23,12 +23,12 @@ class ClientProtocol(protocol.Protocol):
         telegram_device_id = str(t.sensor_id)
 
         device = devices.Sensor.objects(device_id=telegram_device_id).first()
-        
+
         if not device:
             #logger.info("Unknown device ID: {}".format(telegram_device_id))
             return
         if device.ignored:
-            logger.info("The device ({} - {}) is currently ignored".format(t.sensor_id, t.name))
+            logger.info("The device ({}) is currently ignored".format(t.sensor_id))
             return
 
         device.process_telegram(t, self)
