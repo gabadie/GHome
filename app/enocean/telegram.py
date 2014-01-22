@@ -28,11 +28,11 @@ def from_bytes(bytes, strict=False):
 
     return Telegram(sync_bytes, h_seq, length, org, data, sensor_id, status, checksum, strict)
 
-def from_sensor_data_bytes(sensor_id, data_bytes):
+def sensor_telegram(sensor_id, data_bytes):
     data = sum(d << 8 * (3 - i) for i, d in enumerate(data_bytes))
     return Telegram([0xA5, 0x5A], h_seq=3, length=12, org=5, data=data,
                  sensor_id=sensor_id, status=0, checksum=0)
-    
+
 
 class InvalidTelegram(Exception):
     pass
@@ -139,7 +139,7 @@ class Telegram(object):
     @property
     def normal(self):
         return self.mode == Telegram.NORMAL
-    
+
 
     def requires_teach_in(function):
         """ A decorator for function that require the teach in mode """
@@ -168,7 +168,7 @@ class Telegram(object):
     @requires_teach_in
     def eep(self):
         return (self.org, self.func, self.type)
-        
+
     @property
     @requires_teach_in
     def device_type(self):
@@ -178,7 +178,7 @@ class Telegram(object):
             return Telegram.SR04RH
         #TODO => SR-MDS Solar
         else:
-            return Telegram.UNKNOWN_DEVICE        
+            return Telegram.UNKNOWN_DEVICE
 
     # Standard operators
     def __str__(self):

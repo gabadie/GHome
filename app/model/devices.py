@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
- 
+
 import mongoengine
 import datetime
 
@@ -12,11 +12,20 @@ class Device(mongoengine.Document):
 
     meta = {'allow_inheritance': True}
 
+
 class Reading(mongoengine.Document):
     device = mongoengine.ReferenceField(Device, required=True)
-    date = mongoengine.ComplexDateTimeField(default=datetime.datetime.now().strftime("%Y,%m,%d,%H,%M,%S,%f"))
+    date = mongoengine.DateTimeField(default=datetime.datetime.now)
 
     meta = {'allow_inheritance': True}
+
+
+class NumericReading(Reading):
+    value = mongoengine.FloatField(required=True)
+
+
+class BooleanReading(Reading):
+    value = mongoengine.BooleanField(required=True)
 
 
 class Actuator(Device):
@@ -34,35 +43,54 @@ class Sensor(Device):
 
 # Sensors
 
-class Thermometer(Sensor):
-    class Reading(Reading):
-        temperature = mongoengine.FloatField(required=True)
-        humidity = mongoengine.FloatField(required=True)
-        
-class WindowContact(Sensor):
+class Thermometer(object):
+    pass
+
+class WindowContact(object):
     open = mongoengine.BooleanField(required=True)
 
-    class Reading(Reading):
-        open = mongoengine.BooleanField(required=True)
+class Switch(object):
+    pass
 
-class Switch(Sensor):
-    top_right = mongoengine.BooleanField(default=False)
-    bottom_right = mongoengine.BooleanField(default=False)
-    top_left = mongoengine.BooleanField(default=False)
-    bottom_left = mongoengine.BooleanField(default=False)
-
-    class Reading(Reading):
-        side = mongoengine.IntField(required=True)
-        direction = mongoengine.IntField(required=True)
-        pressed = mongoengine.BooleanField(required=True)
-        
-class LightMovementSensor(Sensor):
-    class Reading(Reading):
-        voltage = mongoengine.FloatField(required=True)
-        brightness = mongoengine.FloatField(required=True)
-        movement = mongoengine.BooleanField(required=True)
+class LightMovementSensor(object):
+    pass
 
 # Actuators
 
 class Lamp(Actuator):
     turned_on = mongoengine.BooleanField(required=True, default=False)
+
+# Numeric reading
+
+class Temperature(NumericReading):
+    pass
+
+
+class Humidity(NumericReading):
+    pass
+
+
+class Brightness(NumericReading):
+    pass
+
+
+class Voltage(NumericReading):
+    pass
+
+# Boolean reading
+
+class SwitchTriggered(BooleanReading):
+    pass
+
+class WindowState(BooleanReading):
+    pass
+
+class Movement(BooleanReading):
+    pass
+
+
+# Other readings
+class SwitchState(Reading):
+    side = mongoengine.IntField(required=True)
+    direction = mongoengine.IntField(required=True)
+    pressed = mongoengine.IntField(required=True)

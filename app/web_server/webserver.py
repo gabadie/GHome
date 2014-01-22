@@ -31,7 +31,7 @@ rpc = xmlrpclib.Server('http://{}:{}/'.format(config.main_server.ip, config.main
 db = None
 
 
-def init_db():
+def init_test_db():
     """ For testing only """
     db.drop_database(config.mongo_db)
 
@@ -54,9 +54,8 @@ def index():
     actuators = devices.Actuator.objects()
     sensor_types = Sensor.__subclasses__()
 
-    lamps = Lamp.objects()
+    return render_template('index.html', sensor_types=sensor_types, actuators=actuators)
 
-    return render_template('index.html', sensor_types=sensor_types, actuators=actuators, lamps=lamps)
 
 @app.route('/sensor', methods=['POST', 'GET'])
 def all_sensors():
@@ -170,7 +169,7 @@ if __name__ == "__main__":
         config = GlobalConfig.from_json(sys.argv[1])
     db = mongoengine.connect(config.mongo_db)
 
-    # init_db()
+    # init_test_db()
     app.run(host="localhost", port=5000, debug=True)
 
     # resource = WSGIResource(reactor, reactor.getThreadPool(), app)
