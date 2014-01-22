@@ -69,6 +69,11 @@ def test_remove_object():
     a = FakeDevice0(name="A")
     a.save()
 
+    b = FakeDevice0(name="B")
+    b.save()
+
+    a.event0.connect(b.event_callback)
+
     a.delete()
 
 
