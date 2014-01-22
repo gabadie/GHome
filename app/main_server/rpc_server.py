@@ -41,7 +41,7 @@ class Raspi(xmlrpc.XMLRPC):
     # trought play_music(url). On the other side, music will be played. 
     #TODO to be completed
     def xmlrpc_find_music_url(self, id, url ):
-        if len(self.rpi)>id-2:
+        if len(self.rpi)>id:
             if self.rpi[id].macAddress=="":
                 return "Failed, no raspi registered at this ID"
             proxy = Proxy('http://'+ self.rpi[0].ip+':' + str(self.rpi[id].port))
