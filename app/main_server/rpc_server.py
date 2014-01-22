@@ -6,12 +6,18 @@ from twisted.web import xmlrpc
 from twisted.web.xmlrpc import Proxy
 from twisted.internet import reactor
 import xmlrpclib
+
+from config import GlobalConfig
+config = GlobalConfig()
+
 #from SimpleXMLRPCServer import SimpleXMLRPCServer
 #from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
 
 
 sys.path.insert(0, '..')
+sys.path.insert(0, '../../libs/py8tracks')
 
+from py8tracks import API8tracks
 import logger
 import model
 import enocean
@@ -44,17 +50,25 @@ class Raspi(xmlrpc.XMLRPC):
     #play music with raspby. Here the function is called, url to the music must be generated, and passed to the rasbpi
     # trought play_music(url). On the other side, music will be played. 
     #TODO to be completed
-    def xmlrpc_find_music_url(self, id, url ):
-        if len(self.rpi)>id:
+    def xmlrpc_find_music_url(self, id, tags ):
+        if id<len(self.rpi):
             if self.rpi[id].macAddress=="":
                 return "Failed, no raspi registered at this ID"
+
+            api=API8tracks(config.api_8tracks)
+            tags_low=[tag.lower() for tag in tags]
+            print tags
+            mixset = api.mixset(tags=tags_low, sort='popular')
+            url=search_music_generator(mixset)
+
+
             server = xmlrpclib.Server("http://"+ self.rpi[0].ip+':' + str(self.rpi[id].port))
-            server.play_music(url)
+            server.play_music(next(url))
             #proxy = Proxy('http://'+ self.rpi[0].ip+':' + str(self.rpi[id].port))
         else :
             return "Failed, no raspi get this ID"
         #proxy.callRemote('play_music', url)
-        reactor.run
+        #reactor.run
         return "Url sent"
     #server.register_function(adder_function, 'add')
 
@@ -82,3 +96,7 @@ class RpcServer(xmlrpc.XMLRPC):
         return True
 
  
+def search_music_generator(mixset):
+    for mix in mixset.mixes:
+        for song in mix:
+            yield song.data['url']# ou track_file_stream_url

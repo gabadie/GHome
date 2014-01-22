@@ -4,9 +4,8 @@
 import json
 import sys
 sys.path.insert(0, '..')
-sys.path.insert(0, '../../libs/py8tracks')
-
-from py8tracks import API8tracks
+from twisted.web.xmlrpc import Proxy,reactor
+from twisted.web import xmlrpc, server
 
 from flask import Flask, render_template, request
 import mongoengine
@@ -135,27 +134,14 @@ def lamps():
 def playMusic():
     if request.method == 'POST':
         form = request.form
-        tag = [form.get(val) for val in ['tag']]
-        print tag
-
-        api = API8tracks(config.api_8tracks)
-
-        mixset = api.mixset(tags=tag, sort='popular')
-        url = search_music_generator(mixset)
-
-        rpc.raspi.find_music_url(0, next(url))
-
+        tags =  [form.get(val) for val in ['tag']]
+        print tags
+        rpc.raspi.find_music_url(0,tags)
     return json.dumps("haha")
 
 def return_value(mess):
     print mess
     #reactor.stop()
-
-def search_music_generator(mixset):
-    for mix in mixset.mixes:
-        for song in mix:
-            yield song.data['track_file_stream_url']# ou track_file_stream_url
-
 
 @app.route('/music')
 def music():
