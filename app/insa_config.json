@@ -1,0 +1,13 @@
+{
+    "mongo_db": "ghome_database",
+
+    "enocean": {
+        "ip": "134.214.106.23",
+        "port": "5000"
+    },
+
+    "main_server": {
+        "ip": "127.0.0.1",
+        "rpc_port": "8001"
+    }
+}

@@ -1,0 +1,91 @@
+body {
+	background: #7B2F9A;
+}
+
+/* main structure */
+
+.container {
+	width: 1024px;
+	margin: 40px auto;
+	padding-bottom: 10px;
+	background: #FFF;
+	box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.3);
+	border-radius: 6px;
+}
+
+.header {
+	background: #222;
+	color: #FFF;
+	padding: 10px;
+}
+
+.header .logo {
+	margin: 10px;
+	font-size: 24px;
+	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.sensors {
+	list-style: none;
+	padding: 5px 10px;
+}
+
+.sensors li{
+	padding: 6px;
+	background: rgba(39, 174, 96, 1);
+	box-shadow: 0 0 80px rgba(0, 0, 0, 0.2);
+	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+	border: 1px solid #2ecc71;
+	border-bottom: none;
+	color: #FFF;
+}
+
+.sensors .ignored {
+	background-color: rgba(192, 57, 47, 1);
+	border-color: #DC4435;
+	color: #FF9388;
+}
+
+.sensors .device_id {
+	font-size: 11px;
+	font-weight: bold;
+	margin-right: 10px;
+}
+
+.sensors li .delete {
+	float: right;
+	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
+	opacity: 0.5;
+	color: #FFF;
+}
+
+.sensors li .delete:hover {
+	opacity: 1;
+}
+
+
+.lamps {
+	list-style: none;
+	padding: 0;
+}
+
+.lamps li {
+	padding: 10px;
+	color: #FFF;
+	background: #2c3e50;
+	border: 1px solid #34495e;
+	border-bottom: none;
+	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.lamps li .device_id {
+	font-size: 11px;
+	font-weight: bold;
+	opacity: 0.5;
+}
+
+.lamps li.turned_on {
+	background-color: #f39c12;
+	border-color: #f1c40f;
+	box-shadow: 0 0 20px #f39c12;
+}

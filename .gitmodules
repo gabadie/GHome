@@ -1,0 +1,9 @@
+[submodule "libs/py8tracks"]
+	path = libs/py8tracks
+	url = https://github.com/halflings/py8tracks
+[submodule "libs/pymplb"]
+	path = libs/pymplb
+	url = https://github.com/pafcu/pymplb
+[submodule "libs/shopsense"]
+	path = libs/shopsense
+	url = https://github.com/PopSugar/python-popsugar-shopping-api
