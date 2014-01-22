@@ -61,13 +61,13 @@ class Switch(Sensor):
             side = Switch.UNKNOWN
             direction = Switch.UNKNOWN
         else:
-            data_bytes[0] = data_bytes[0] | 0x01
+            data_bytes[0] = data_bytes[0] | 0x10
 
         if side == Switch.RIGHT:
-            data_bytes[0] = data_bytes[0] | 0x04
+            data_bytes[0] = data_bytes[0] | 0x40
 
         if direction == Switch.TOP:
-            data_bytes[0] = data_bytes[0] | 0x02
+            data_bytes[0] = data_bytes[0] | 0x20
 
         return telegram.sensor_telegram(sensor_id=sensor_id, data_bytes=data_bytes)
 
@@ -110,7 +110,7 @@ class Switch(Sensor):
 
 
 class WindowContact(Sensor):
-    open = mongoengine.BooleanField(required=True)
+    open = mongoengine.BooleanField(default=True)
 
     @staticmethod
     def generate_telegram(sensor_id, open):
