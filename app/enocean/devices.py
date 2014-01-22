@@ -72,7 +72,8 @@ class Switch(Sensor):
         return telegram.sensor_telegram(sensor_id=sensor_id, data_bytes=data_bytes)
 
     def parse_readings(self, data_bytes):
-        if data_bytes[0] & 0x01 == 0:
+        print "Data bytes = {}".format(data_bytes)
+        if data_bytes[0] & 0x10 == 0:
             side = Switch.UNKNOWN
             direction = Switch.UNKNOWN
             pressed = False
@@ -81,9 +82,9 @@ class Switch(Sensor):
             self.bottom_right = False
             self.bottom_left = False
         else:
-            side = Switch.RIGHT if (data_bytes[0] & 0x04) == 0x04 else Switch.LEFT
+            side = Switch.RIGHT if (data_bytes[0] & 0x40) == 0x40 else Switch.LEFT
 
-            if (data_bytes[0] & 0x02) == 0x02:
+            if (data_bytes[0] & 0x20) == 0x20:
                 direction = Switch.TOP
                 if side == Switch.RIGHT:
                     self.top_right = not self.top_right
