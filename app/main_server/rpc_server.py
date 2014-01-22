@@ -5,6 +5,10 @@ import sys
 from twisted.web import xmlrpc
 from twisted.web.xmlrpc import Proxy
 from twisted.internet import reactor
+import xmlrpclib
+#from SimpleXMLRPCServer import SimpleXMLRPCServer
+#from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
+
 
 sys.path.insert(0, '..')
 
@@ -44,12 +48,15 @@ class Raspi(xmlrpc.XMLRPC):
         if len(self.rpi)>id:
             if self.rpi[id].macAddress=="":
                 return "Failed, no raspi registered at this ID"
-            proxy = Proxy('http://'+ self.rpi[0].ip+':' + str(self.rpi[id].port))
+            server = xmlrpclib.Server("http://"+ self.rpi[0].ip+':' + str(self.rpi[id].port))
+            server.play_music(url)
+            #proxy = Proxy('http://'+ self.rpi[0].ip+':' + str(self.rpi[id].port))
         else :
             return "Failed, no raspi get this ID"
-        proxy.callRemote('play_music', url)
+        #proxy.callRemote('play_music', url)
         reactor.run
         return "Url sent"
+    #server.register_function(adder_function, 'add')
 
 
 

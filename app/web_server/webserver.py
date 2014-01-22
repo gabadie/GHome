@@ -133,7 +133,6 @@ def lamps():
 
 
 
-
 @app.route('/player', methods=['POST','GET'])
 def playMusic():
     if request.method == 'POST':
@@ -144,10 +143,11 @@ def playMusic():
         api=API8tracks(config.api_8tracks)
 
         mixset = api.mixset(tags=tag, sort='popular')
-        print mixset
-        url= "http://streamTaMaman.wav" # [stream.data['track_file_stream_url'] for stream in mixset.mixes[0].tracks_cache]
-        proxy = Proxy('http://'+str(config.main_server.ip)+':'+str(config.main_server.rpc_port))
-        proxy.callRemote('raspi.find_music_url',0,url).addCallbacks(return_value)
+        url=search_music_generator(mixset)
+
+        #url= "http://streamTaMaman.wav" # [stream.data['track_file_stream_url'] for stream in mixset.mixes[0].tracks_cache]
+        server= xmlrpclib.Server("http://"+str(config.main_server.ip)+':'+str(config.main_server.rpc_port))
+        server.raspi.find_music_url(0,next(url))#callRemote('raspi.find_music_url',0,url).addCallbacks(return_value)
         #reactor.run()
         # TODO : this is blocking, warning!!
     return json.dumps("haha")
@@ -155,6 +155,12 @@ def playMusic():
 def return_value(mess):
     print mess
     #reactor.stop()
+
+def search_music_generator(mixset):
+    for mix in mixset.mixes:
+        for song in mix:
+            yield song.data['url']# ou track_file_stream_url
+
 
 @app.route('/music')
 def music():
