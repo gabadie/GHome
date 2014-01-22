@@ -8,6 +8,7 @@ sys.path.insert(0, '..')
 
 import telegram
 import model.devices
+from model import event
 import logger
 
 
@@ -53,6 +54,12 @@ class Switch(Sensor):
     top_left = mongoengine.BooleanField(default=False)
     bottom_left = mongoengine.BooleanField(default=False)
 
+    onclick_top_right = event.slot()
+    onclick_bottom_right = event.slot()
+    onclick_top_left = event.slot()
+    onclick_bottom_left = event.slot()
+
+
     @staticmethod
     def generate_telegram(sensor_id, side, direction, pressed):
         data_bytes = [0x0 for i in xrange(4)]
@@ -88,17 +95,31 @@ class Switch(Sensor):
                 direction = Switch.TOP
                 if side == Switch.RIGHT:
                     self.top_right = not self.top_right
+
+                    if self.top_right:
+                        self.onclick_top_right()
+
                 else:
                     self.top_left = not self.top_left
+
+                    if self.top_left:
+                        self.onclick_top_left()
+
             else:
                 direction = Switch.BOTTOM
                 if side == Switch.RIGHT:
                     self.bottom_right = not self.bottom_right
+
+                    if self.bottom_right:
+                        self.onclick_bottom_right()
                 else:
                     self.bottom_left = not self.bottom_left
 
+                    if self.bottom_left:
+                        self.onclick_bottom_left()
+
             pressed = True
-            
+
         logger.info("EnOcean switch #{}'s state has changed: top_right = {}, bottom_right = {}, top_left = {}, bottom_left = {}".format(
                                             hex(self.device_id), self.top_right, self.bottom_right, self.top_left, self.bottom_left))
 
