@@ -94,12 +94,14 @@ def all_sensors():
 
 @app.route('/sensor/<device_id>', methods=['GET', 'DELETE'])
 def sensor(device_id):
+    device_id = int(device_id)
     if request.method == 'GET':
         sensor = json.loads(Sensor.objects(device_id=device_id).to_json())[0]
         print sensor
         resp = dict(ok=True, result=sensor)
     elif request.method == 'DELETE':
         device = Sensor.objects(device_id=device_id).first()
+        print device
         if device:
             device.delete()
         resp = dict(ok=True, device_id=device_id)
@@ -108,11 +110,14 @@ def sensor(device_id):
 
 @app.route('/sensor/<device_id>/ignored', methods=['POST', 'GET'])
 def sensor_ignored(device_id):
-    print device_id
+    device_id = int(device_id)
+
     if request.method == 'GET':
         ignored = Sensor.first(device_id=device_id).ignored
         resp = dict(ok=True, result=ignored)
     elif request.method == 'POST':
+        print Sensor.objects(device_id=device_id)
+        print Sensor.objects(device_id=int(device_id))
         sensor = Sensor.objects(device_id=device_id).first()
         sensor.ignored = request.json['value']
         sensor.save()
@@ -161,7 +166,7 @@ def search_music_generator(mixset):
 def music():
     user="Adrien"
     combo_options = ["jazzy", "happy", "sad", "worry"] #TODO this in the config file ?
-    return render_template("music.html", combo_options = combo_options,user=user )
+    return render_template("music.html", combo_options=combo_options, user=user)
 
 
 if __name__ == "__main__":
