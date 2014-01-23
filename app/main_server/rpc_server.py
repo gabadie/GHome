@@ -23,6 +23,7 @@ import model
 import enocean
 
 
+
 class RaspiUnit(object):
     def __init__(self):
         self.ip="127.0.0.1"
@@ -59,11 +60,11 @@ class Raspi(xmlrpc.XMLRPC):
             tags_low=[tag.lower() for tag in tags]
             print tags
             mixset = api.mixset(tags=tags_low, sort='popular')
-            url=search_music_generator(mixset)
+            urls=search_music_generator(mixset)
 
 
             server = xmlrpclib.Server("http://"+ self.rpi[0].ip+':' + str(self.rpi[id].port))
-            server.play_music(next(url))
+            server.play_music(urls)
             #proxy = Proxy('http://'+ self.rpi[0].ip+':' + str(self.rpi[id].port))
         else :
             return "Failed, no raspi get this ID"
@@ -80,6 +81,7 @@ class RpcServer(xmlrpc.XMLRPC):
         xmlrpc.XMLRPC.__init__(self)
         self.main_server = main_server
         self._add_raspi = Raspi()
+        self.putSubHandler('raspi',raspi)
 
     def xmlrpc_ping(self, msg):
         logger.info("RpcServer.xmlrpc_ping(\"" + str(msg) + "\")")
@@ -97,6 +99,8 @@ class RpcServer(xmlrpc.XMLRPC):
 
  
 def search_music_generator(mixset):
+    urls=[]
     for mix in mixset.mixes:
         for song in mix:
-            yield song.data['url']# ou track_file_stream_url
+            urls= song.data['url']# ou track_file_stream_url
+    return urls
