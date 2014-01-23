@@ -34,7 +34,7 @@ def test_mongoengine():
     assert humidity_reading in model.devices.Humidity.objects(device=thermometer)
 
 def test_thermometer():
-    thermometer = devices.Thermometer(device_id="test_thermometer_1")
+    thermometer = devices.Thermometer(device_id="50")
 
     # Test 1
     data_bytes = [0x00, 0x84, 0x99, 0x0F]
