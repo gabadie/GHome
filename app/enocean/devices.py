@@ -188,10 +188,22 @@ class Lamp(model.devices.Actuator):
     turned_on = mongoengine.BooleanField(required=True, default=False)
 
     def activate(self, sensor):
-        self.turned_on = not self.turned_on
+        return self.turn_on(not self.turned_on)
+
+    def turn_on(self, turned_on):
+        self.turned_on = turned_on
         logger.info("Lamp #{} state changed. turned_on = {}".format(self.device_id, self.turned_on))
 
         self.save()
+
+    def callback_turn_on(self):
+        return self.turn_on(True)
+
+    def callback_turn_off(self):
+        return self.turn_on(False)
+
+    def callback_toggle(self):
+        return self.turn_on(not self.turned_on)
 
 
 def from_telegram(telegram):

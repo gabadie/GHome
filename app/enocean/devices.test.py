@@ -59,6 +59,10 @@ def test_lamp():
     assert lamp.turned_on
     lamp.save()
 
+    assert 'callback_turn_on' in lamp.callbacks
+    assert 'callback_turn_off' in lamp.callbacks
+    assert 'callback_toggle' in lamp.callbacks
+
 def test_switch():
     switch = devices.Switch(device_id=405, ignored=False)
     assert not switch.top_right
