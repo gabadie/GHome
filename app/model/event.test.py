@@ -46,6 +46,8 @@ def test_callbacks_list():
     assert 'callback_receive_event' in a.callbacks
     assert 'callbacks' not in a.callbacks
 
+    assert a.callbacks['callback_receive_event'] == a.callback_receive_event
+
 def test_callbacks():
     db = mongoengine.connect('ghome_enocean_test')
     db.drop_database('ghome_enocean_test')
