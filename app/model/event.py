@@ -3,6 +3,7 @@
 
 import sys
 import mongoengine
+import types
 
 sys.path.insert(0, '..')
 
@@ -42,7 +43,8 @@ class Object(mongoengine.Document):
             if key[0:9] == "callback_":
                 value = getattr(self, key)
 
-                callbacks_map[key] = value
+                if isinstance(value, types.MethodType):
+                    callbacks_map[key] = value
 
         return callbacks_map
 
