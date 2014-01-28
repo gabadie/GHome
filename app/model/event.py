@@ -3,6 +3,7 @@
 
 import sys
 import mongoengine
+import types
 
 sys.path.insert(0, '..')
 
@@ -32,6 +33,20 @@ class Object(mongoengine.Document):
                 value.delete()
 
         mongoengine.Document.delete(self)
+
+    @property
+    def callbacks(self):
+        callbacks_map = {}
+        self_attrs_map = dir(self)
+
+        for key in self_attrs_map:
+            if key[0:9] == "callback_":
+                value = getattr(self, key)
+
+                if isinstance(value, types.MethodType):
+                    callbacks_map[key] = value
+
+        return callbacks_map
 
     @property
     def events(self):

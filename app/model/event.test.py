@@ -17,6 +17,10 @@ class FakeDevice0(event.Object):
         self.received_event = True
         self.save()
 
+    def callback_receive_event(self):
+        self.received_event = True
+        self.save()
+
 
 class FakeDevice1(event.Object):
     devices = mongoengine.ListField(mongoengine.ReferenceField(FakeDevice0))
@@ -36,6 +40,14 @@ def test_events_list():
 
     assert obj0.events['event0'] == obj0.event0
 
+def test_callbacks_list():
+    a = FakeDevice0(name="A")
+
+    assert 'callback_receive_event' in a.callbacks
+    assert 'callbacks' not in a.callbacks
+
+    assert a.callbacks['callback_receive_event'] == a.callback_receive_event
+
 def test_callbacks():
     db = mongoengine.connect('ghome_enocean_test')
     db.drop_database('ghome_enocean_test')
@@ -49,7 +61,7 @@ def test_callbacks():
     assert a.received_event == False
     assert b.received_event == False
 
-    a.event0.connect(b.event_callback)
+    a.event0.connect(b.callback_receive_event)
 
     assert a.received_event == False
     assert b.received_event == False
@@ -72,12 +84,13 @@ def test_remove_object():
     b = FakeDevice0(name="B")
     b.save()
 
-    a.event0.connect(b.event_callback)
+    a.event0.connect(b.callback_receive_event)
 
     a.delete()
 
 
 if __name__ == "__main__":
     test_events_list()
+    test_callbacks_list()
     test_callbacks()
     test_remove_object()
