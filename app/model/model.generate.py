@@ -52,7 +52,7 @@ class ModelGenerator:
         for i in range(0, readings_number):
             pressed = random.choice([True, False])
             if pressed:
-                model.devices.SwitchState(device=device, side=randrange(1)+1, direction=randrange(1)+3, pressed=pressed).save()
+                model.devices.SwitchState(device=device, side=randrange(2)+1, direction=randrange(2)+3, pressed=pressed).save()
             else:
                 model.devices.SwitchState(device=device, side=enocean.devices.Switch.UNKNOWN, direction=enocean.devices.Switch.UNKNOWN, pressed=pressed).save()
 
