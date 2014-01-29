@@ -9,5 +9,9 @@
     "main_server": {
         "ip": "127.0.0.1",
         "rpc_port": "8001"
+    },
+
+    "web_server": {
+        "port": "5000"
     }
 }

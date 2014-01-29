@@ -83,7 +83,7 @@ class WebServerProcess(AbstractServerProcess):
     def terminate(self):
         AbstractServerProcess.terminate(self)
 
-        os.system("kill $(lsof -t -i:5000)")
+        os.system("kill $(lsof -t -i:{})".format(self.config.web_server.port))
 
 if __name__ == "__main__":
     config = None
