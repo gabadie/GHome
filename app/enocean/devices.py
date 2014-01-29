@@ -185,7 +185,7 @@ class LightMovementSensor(Sensor):
 
 # Actuators
 class Lamp(model.devices.Actuator):
-    turned_on = mongoengine.BooleanField(required=True, default=False)
+    turned_on = mongoengine.BooleanField(default=False)
 
     def activate(self, sensor):
         return self.turn_on(not self.turned_on)
