@@ -4,8 +4,8 @@ from uuid import getnode as get_mac
 from twisted.web import xmlrpc, server
 from config_rpi_serv import RpiGlobalConfig
 import pymplb
-import socket   
- 
+import socket
+
 #from py8tracks import API8tracks
 
 DEFAULT_IP = "10.0.0.42"
@@ -14,7 +14,7 @@ DEFAULT_IP = "10.0.0.42"
 class MusicPlayer(object):
 
     def __init__(self):
-        self.mplayer=pymplb.MPlayer()    
+        self.mplayer=pymplb.MPlayer()
         self.musics=[]
         self.current_music=0
         self.is_pausing=False
@@ -25,7 +25,7 @@ class MusicPlayer(object):
             self.mplayer.stop()
             self.mplayer.loadfile(self.musics[self.current_music])
             return True
-        else: 
+        else:
             return False
 
     def previous(self):
@@ -34,7 +34,7 @@ class MusicPlayer(object):
             self.mplayer.stop()
             self.mplayer.loadfile(self.musics[self.current_music])
             return True
-        else : 
+        else :
             return False
 
 class RpiServer(xmlrpc.XMLRPC):
@@ -49,11 +49,12 @@ class RpiServer(xmlrpc.XMLRPC):
         self.music_player=MusicPlayer()
 
     def xmlrpc_init_play_music(self,urls):
-        print "ok, music is playing"  + str(urls[0])
-        self.music_player.musics=urls
-        if len(urls)>0:
-            self.music_player.mplayer.loadfile(urls[0])
-        return "ok, music is playing "  + str(urls[0])
+        urls_splitted=urls.split(',')
+        print "ok, music is playing"  + str(urls_splitted[0])
+        self.music_player.musics=urls_splitted
+        if len(urls_splitted)>0:
+            self.music_player.mplayer.loadfile(urls_splitted[0])
+        return "ok, music is playing "  + str(urls_splitted[0])
 
     def xmlrpc_next_music(self):
         self.music_player.next()
@@ -62,7 +63,7 @@ class RpiServer(xmlrpc.XMLRPC):
     def xmlrpc_previous_music(self):
         self.music_player.previous()
         return True
-        
+
     def xmlrpc_stop_music(self):
         self.music_player.mplayer.stop()
         return True
@@ -71,7 +72,7 @@ class RpiServer(xmlrpc.XMLRPC):
 
         if self.music_player.is_pausing == True:
             self.music_player.is_pausing=False
-            self.music_player.mplayer.pause() 
+            self.music_player.mplayer.pause()
             print "playing"
             return False
         else :
@@ -113,6 +114,6 @@ if __name__=='__main__':
     #launch client call to add this raspi to the main server
     proxy = Proxy('http://'+rpiServer.config.mainServerRpi.ip + ':' + str(rpiServer.config.mainServerRpi.port))
     proxy.callRemote('raspi.add_raspi',rpiServer.ip,rpiServer.port,rpiServer.macAddress)
-    #launch server 
+    #launch server
     reactor.listenTCP(rpiServer.config.rpiServer.port,server.Site(rpiServer))
     reactor.run()
