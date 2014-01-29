@@ -7,7 +7,7 @@ import json
 import sys
 sys.path.insert(0, '..')
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import mongoengine
 
 from model import devices
@@ -142,8 +142,35 @@ def playMusic():
         form = request.form
         tags =  [form.get(val) for val in ['tag']]
         print tags
-        rpc.raspi.find_music_url(0,tags)
-    return json.dumps("haha")
+        urls = rpc.raspi.find_music_url(0,tags)
+        print "qdsf"
+    return jsonify(name=urls)
+
+
+@app.route('/player/pause', methods=['POST','GET'])
+def pauseMusic():
+    if request.method == 'POST':
+        b_result = rpc.raspi.pause_music(0)
+        if b_result == True :
+            return jsonify( result="Play")
+        return jsonify("Pausing", result="Pause")
+
+@app.route('/player/next', methods=['POST','GET'])
+def nextMusic():
+    if request.method == 'POST':
+        b_result = rpc.raspi.next_music(0)
+        if b_result == True :
+            return jsonify( result="Play")
+        return jsonify("Pausing", result="Pause")
+
+@app.route('/player/previous', methods=['POST','GET'])
+def previousMusic():
+    if request.method == 'POST':
+        b_result = rpc.raspi.previous_music(0)
+        if b_result == True :
+            return jsonify( result="Play")
+        return jsonify("Pausing", result="Pause")
+
 
 @app.route('/music')
 def music():

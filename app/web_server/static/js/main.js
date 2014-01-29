@@ -1,3 +1,4 @@
+
 var apiCall = function(path, method, data, callback) {
 	$.ajax({
 	  url: path,
@@ -9,3 +10,9 @@ var apiCall = function(path, method, data, callback) {
 	  success: callback
 	});
 }
+
+Handlebars.registerHelper('if', function(conditional, options) {
+  if(conditional) {
+    return options.fn(this);
+  }
+});
