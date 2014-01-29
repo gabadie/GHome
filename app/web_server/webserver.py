@@ -1,18 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+from collections import defaultdict
+import xmlrpclib
+import calendar
 import json
 import sys
 sys.path.insert(0, '..')
-from twisted.web.xmlrpc import Proxy,reactor
-from twisted.web import xmlrpc, server
 
 from flask import Flask, render_template, request, jsonify
 import mongoengine
-import xmlrpclib
 
 from model import devices
-from enocean.devices import Sensor, Thermometer, Switch, Lamp, WindowContact
+from enocean.devices import Sensor, Lamp
 
 from config import GlobalConfig
 config = GlobalConfig()
@@ -21,26 +20,6 @@ config = GlobalConfig()
 app = Flask(__name__)
 app.debug = True
 rpc = xmlrpclib.Server('http://{}:{}/'.format(config.main_server.ip, config.main_server.rpc_port))
-db = None
-
-
-def init_test_db():
-    """ For testing only """
-    db.drop_database(config.mongo_db)
-
-    # Actuators
-    l1 = Lamp(device_id=889977, name='The main lamp', turned_on=True).save()
-    l2 = Lamp(device_id=85654, name='Another lamp').save()
-
-    # Sensors
-    Thermometer(device_id=1337, name='Living room thermometer', ignored=False).save()
-    Thermometer(device_id=4242, name='Bedroom thermometer', ignored=False).save()
-    Thermometer(device_id=233232, name='A thermometer that should work', ignored=False).save()
-
-    Switch(device_id=343830, name='A switch that should work', ignored=False, actuators=[l1, l2]).save()
-    Switch(device_id=939400, name='An ignored switch', ignored=True).save()
-
-    WindowContact(device_id=3311, name='A window contact sensor', open=False, ignored=True).save()
 
 @app.route('/')
 def index():
@@ -49,6 +28,29 @@ def index():
 
     return render_template('index.html', sensor_types=sensor_types, actuators=actuators)
 
+@app.route('/monitoring')
+def monitoring():
+    return render_template('monitoring.html')
+
+
+@app.route('/graph_data', methods=['GET'])
+def graph_data():
+    temp_map = defaultdict(list)
+    for temperature in devices.Temperature.objects():
+        device = temperature.device
+
+        key = '{} - {}'.format(device.device_id, device.name)
+        timestamp = calendar.timegm(temperature.date.utctimetuple()) * 1000
+        data = [timestamp, temperature.value]
+
+        temp_map[key].append(data)
+
+    res = [dict(key=k, values=v) for k, v in temp_map.iteritems()]
+
+    return json.dumps(res)
+
+
+# Devices
 
 @app.route('/sensor', methods=['POST', 'GET'])
 def all_sensors():
@@ -93,12 +95,14 @@ def all_sensors():
 
 @app.route('/sensor/<device_id>', methods=['GET', 'DELETE'])
 def sensor(device_id):
+    device_id = int(device_id)
     if request.method == 'GET':
         sensor = json.loads(Sensor.objects(device_id=device_id).to_json())[0]
         print sensor
         resp = dict(ok=True, result=sensor)
     elif request.method == 'DELETE':
         device = Sensor.objects(device_id=device_id).first()
+        print device
         if device:
             device.delete()
         resp = dict(ok=True, device_id=device_id)
@@ -107,18 +111,20 @@ def sensor(device_id):
 
 @app.route('/sensor/<device_id>/ignored', methods=['POST', 'GET'])
 def sensor_ignored(device_id):
-    print device_id
+    device_id = int(device_id)
+
     if request.method == 'GET':
         ignored = Sensor.first(device_id=device_id).ignored
         resp = dict(ok=True, result=ignored)
     elif request.method == 'POST':
+        print Sensor.objects(device_id=device_id)
+        print Sensor.objects(device_id=int(device_id))
         sensor = Sensor.objects(device_id=device_id).first()
         sensor.ignored = request.json['value']
         sensor.save()
         resp = dict(ok=True, sensor_id=device_id)
 
     return json.dumps(resp)
-
 
 @app.route('/lamp/', methods=['GET'])
 def lamps():
@@ -128,7 +134,7 @@ def lamps():
 
     return json.dumps(resp)
 
-
+# Music player
 
 @app.route('/player', methods=['POST','GET'])
 def playMusic():
@@ -166,15 +172,11 @@ def previousMusic():
         return jsonify("Pausing", result="Pause")
 
 
-def return_value(mess):
-    print mess
-    #reactor.stop()
-
 @app.route('/music')
 def music():
     user="Adrien"
     combo_options = ["jazzy", "happy", "sad", "worry"] #TODO this in the config file ?
-    return render_template("music.html", combo_options = combo_options,user=user )
+    return render_template("music.html", combo_options=combo_options, user=user)
 
 
 if __name__ == "__main__":
@@ -183,11 +185,4 @@ if __name__ == "__main__":
         config = GlobalConfig.from_json(sys.argv[1])
     db = mongoengine.connect(config.mongo_db)
 
-    # init_test_db()
     app.run(host="localhost", port=5000, debug=True)
-
-    # resource = WSGIResource(reactor, reactor.getThreadPool(), app)
-    # site = Site(resource)
-
-    # reactor.listenTCP(5000, site)
-    # reactor.run()

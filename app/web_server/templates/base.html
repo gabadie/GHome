@@ -1,0 +1,36 @@
+<html>
+
+<head>
+    <title>GHome web interface</title>
+
+
+    <!-- Bootstrap related CSS -->
+    <link href="static/css/bootstrap.css" rel="stylesheet">
+    <link href="static/css/bootstrap-select.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="static/css/style.css" rel="stylesheet">
+    {% block style %}
+    {% endblock %}
+
+</head>
+
+<body>
+
+    {% block body %}
+    {% endblock %}
+
+
+    <!-- JS files, placed at the end for faster page loading -->
+    <script src="static/js/jquery-1.10.2.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
+    <script src="static/js/jquery.form.min.js"></script>
+    <script src="static/js/bootstrap-select.js"></script>
+
+    <script src="static/js/main.js"></script>
+    {% block javascript %}
+    {% endblock %}
+
+</body>
+
+</html>

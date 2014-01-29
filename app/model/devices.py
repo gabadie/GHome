@@ -20,14 +20,21 @@ class Reading(mongoengine.Document):
 
     meta = {'allow_inheritance': True}
 
+    def __repr__(self):
+        return '<{Reading} device={}>'.format(self.device)
+
 
 class NumericReading(Reading):
     value = mongoengine.FloatField(required=True)
 
+    def __repr__(self):
+        return '<NumericReading value={} device={}>'.format(self.value, self.device)
 
 class BooleanReading(Reading):
     value = mongoengine.BooleanField(required=True)
 
+    def __repr__(self):
+        return '<BooleanReading value={} device={}>'.format(self.value, self.device)
 
 class Actuator(Device):
 
