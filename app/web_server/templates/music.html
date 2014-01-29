@@ -4,11 +4,11 @@
     </head>
     <body>
         <h1> Hello, {{ user}}, what do you want to listen to ? </h1>
-        <form id="play-music" class="form-music" action="/player" method="POST">
+        <form id="play-music" class="form-music" >
             <h4>Choose a category</h4>
 
             <div class="form-group">
-                <input type=text list=browsers name=tag>
+                <input id="tag" type=text list=browsers name=tag>
                 <datalist id=browsers >
                     {% for option in combo_options %}
                     <option> {{option}}
@@ -17,5 +17,16 @@
             </div>
             <button type="submit" class="btn btn-primary btn-sm">Search for music</button>
         </form>
+         <button id="pausing"> Pause </button>
+         <button id="next"> next </button>
+         <button id="previous"> previous </button>
+        <label> Music playing now is = </label>
+        <text id="fileName"> </text>
     </body>
 </html>
+
+    <!-- JS files, placed at the end for faster page loading -->
+    <script src="static/js/jquery-1.10.2.js"></script>
+    <script src="static/js/jquery.form.min.js"></script>
+
+    <script src="static/js/music.js"></script>
