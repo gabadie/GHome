@@ -32,6 +32,10 @@ def index():
 def monitoring():
     return render_template('monitoring.html')
 
+@app.route('/news')
+def news():
+    return render_template('news.html')
+
 
 @app.route('/graph_data', methods=['GET'])
 def graph_data():
