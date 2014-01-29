@@ -1,4 +1,13 @@
+loadTemplate = function(template_id) {
+    var source = $(template_id).html();
+    return Handlebars.compile(source);
+}
+
 $(document).ready(function() {
+    sensor_template = loadTemplate('#sensor-template');
+
+
+
     $('.selectpicker').selectpicker();
 
     updateSensors();
@@ -20,7 +29,7 @@ var updateSensors = function() {
     apiCall('/sensor', 'GET', {}, function(data) {
         $('.sensors').html('');
         $.each(data.result, function(i, s) {
-            $('.sensors').append(sensorLi(s));
+            $('.sensors').append(sensor_template(s));
         });
 
         bindSensors();
@@ -34,19 +43,6 @@ var updateLamps = function() {
             $('.lamps').append(lampLi(l));
         });
     });
-}
-var sensorLi = function(sensor) {
-    var res = '';
-
-    res += '<li data-sensor-id="' + sensor.device_id + '" ';
-    if (sensor.ignored) {
-        res += 'class="ignored"';
-    }
-    res += '><span class="device_id">' + sensor.device_id + '</span> <span class="name">' + sensor.name + '</span>';
-    res += '<span class="delete glyphicon glyphicon-remove"></span>';
-    res += '</li>'
-
-    return res;
 }
 
 var lampLi = function(lamp) {

@@ -14,14 +14,6 @@
 
 			<p>List of all devices in the database:</p>
 			<ul class="sensors">
-<!--
-			{% for sensor in sensors %}
-				<li {% if sensor.ignored %}class="ignored"{% endif %} data-sensor-id="{{sensor.device_id}}">
-					<span class="device_id">{{ sensor.device_id }}</span> - <span class="name">{{sensor.name}}</span>
-					<span class="delete glyphicon glyphicon-remove"></span>
-				</li>
-			{% endfor %}
--->
 			</ul>
 
 
@@ -84,5 +76,16 @@
 {% endblock body %}
 
 {% block javascript %}
+
+{% raw %}
+<script id="sensor-template" type="text/x-handlebars-template">
+	<li {{#if ignored}}class="ignored"{{/if}} data-sensor-id="{{device_id}}">
+
+		<span class="device_id">{{device_id}}</span> <span class="name">{{name}}</span>
+		<span class="delete glyphicon glyphicon-remove"></span>
+	</li>
+</script>
+{% endraw %}
+
 <script src="/static/js/sensors.js"></script>
 {% endblock %}
