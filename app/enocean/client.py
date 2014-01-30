@@ -49,8 +49,8 @@ class ClientProtocol(protocol.Protocol):
             t = telegram.from_str(packet)
             self.process_telegram(t)
 
-        self.main_server.rpc_server.xmlrpc_bind_devices(1341, 'onclick_top_right', 1348, 'callback_toggle')
-        self.main_server.rpc_server.xmlrcp_trigger_event(1341, 'onclick_top_right')
+        #self.main_server.rpc_server.xmlrpc_bind_devices(1341, 'onclick_top_right', 1348, 'callback_toggle')
+        #self.main_server.rpc_server.xmlrcp_trigger_event(1341, 'onclick_top_right')
 
     def send_data(self, data):
         addr = self.transport.getPeer()
