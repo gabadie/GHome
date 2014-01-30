@@ -61,10 +61,15 @@ class ClientProtocolFactory(protocol.ReconnectingClientFactory):
 
         self.resetDelay()
 
-        return ClientProtocol(self.main_server)
+        enocean_protocol = ClientProtocol(self.main_server)
+
+        self.main_server.enocean_protocol = enocean_protocol
+
+        return enocean_protocol
 
     def clientConnectionFailed(self, connector, reason):
         addr = connector.getDestination()
+        self.main_server.enocean_protocol = None
 
         logger.info("EnOcean connection to {}:{} failed: {}".format(addr.host, addr.port, reason))
 
