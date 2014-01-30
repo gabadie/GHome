@@ -40,6 +40,19 @@ def test_events_list():
 
     assert obj0.events['event0'] == obj0.event0
 
+def test_events_list_db():
+    db = mongoengine.connect('ghome_enocean_test')
+    db.drop_database('ghome_enocean_test')
+
+    obj0 = FakeDevice0(name="hello")
+    obj0.save()
+
+    assert 'event0' in obj0.events
+
+    obj1 = FakeDevice0.objects(name="hello").first()
+    assert isinstance(obj1, FakeDevice0)
+    assert 'event0' in obj1.events
+
 def test_callbacks_list():
     a = FakeDevice0(name="A")
 
@@ -91,6 +104,7 @@ def test_remove_object():
 
 if __name__ == "__main__":
     test_events_list()
+    test_events_list_db()
     test_callbacks_list()
     test_callbacks()
     test_remove_object()
