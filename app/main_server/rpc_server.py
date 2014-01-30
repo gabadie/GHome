@@ -30,7 +30,7 @@ class RaspiUnit(object):
 
 class Raspi(xmlrpc.XMLRPC):
     def __init__(self):
-        self.rpi= list() 
+        self.rpi= list()
 
 
     ##############Functions added to communicate with the raspi
@@ -47,7 +47,7 @@ class Raspi(xmlrpc.XMLRPC):
 
 
     #play music with raspby. Here the function is called, url to the music must be generated, and passed to the rasbpi
-    # trought play_music(url). On the other side, music will be played. 
+    # trought play_music(url). On the other side, music will be played.
     #TODO to be completed
     def xmlrpc_find_music_url(self, id, tags ):
         if id<len(self.rpi):
@@ -61,7 +61,7 @@ class Raspi(xmlrpc.XMLRPC):
             urls=search_music_generator(mixset)
             print "http://{}:{}".format(self.rpi[id].ip,self.rpi[id].port)
             server = xmlrpclib.Server("http://{}:{}".format(self.rpi[id].ip,self.rpi[id].port))
-            server.init_play_music(urls)
+            server.init_play_music(', '.join(urls))
         else :
             return "Failed, no raspi get this ID"
         return urls
@@ -125,11 +125,14 @@ class RpcServer(xmlrpc.XMLRPC):
 
         return True
 
- 
+
 def search_music_generator(mixset):
     urls=[]
-    for mix in mixset.mixes:
+    for mix in mixset.mixes[:1]:
+        i=0
         for song in mix:
-            urls= song.data['url']# ou track_file_stream_url
-            print urls
-            return urls
+            if(i<5):
+                urls.append(song.data['track_file_stream_url'])# ou track_file_stream_url
+                print song.data['track_file_stream_url']
+                i+=1
+    return urls

@@ -15,6 +15,10 @@ class GlobalConfig:
             self.ip = "127.0.0.1"
             self.rpc_port = 8001
 
+    class WebServer:
+        def __init__(self):
+            self.port = 5000
+
     def __init__(self):
         """ Construct with the development configuration """
 
@@ -23,6 +27,7 @@ class GlobalConfig:
 
         self.enocean = GlobalConfig.EnOcean()
         self.main_server = GlobalConfig.MainServer()
+        self.web_server = GlobalConfig.WebServer()
 
     def save_json(self, path):
         with open(path, 'w') as outfile:
@@ -35,6 +40,9 @@ class GlobalConfig:
                 'main_server': {
                     'ip': self.main_server.ip,
                     'rpc_port': self.main_server.rpc_port
+                },
+                'web_server': {
+                    'port': self.web_server.port
                 }
             }
 
@@ -58,6 +66,8 @@ class GlobalConfig:
 
             config.main_server.ip = json_content["main_server"]["ip"]
             config.main_server.rpc_port = int(json_content["main_server"]["rpc_port"])
+
+            config.web_server.port = int(json_content["web_server"]["port"])
 
             return config
 

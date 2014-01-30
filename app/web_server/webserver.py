@@ -32,6 +32,10 @@ def index():
 def monitoring():
     return render_template('monitoring.html')
 
+@app.route('/news')
+def news():
+    return render_template('news.html')
+
 
 @app.route('/graph_data', methods=['GET'])
 def graph_data():
@@ -185,4 +189,4 @@ if __name__ == "__main__":
         config = GlobalConfig.from_json(sys.argv[1])
     db = mongoengine.connect(config.mongo_db)
 
-    app.run(host="localhost", port=5000, debug=True)
+    app.run(host="localhost", port=config.web_server.port, debug=True)
