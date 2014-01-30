@@ -18,14 +18,12 @@ class ModelGenerator:
             self.config = config
             self.db = mongoengine.connect(config.mongo_db)
             self.db.drop_database(config.mongo_db)
-            self.id = 0
-        
-            enocean.devices.Thermometer(device_id=1337, name='Living room thermometer', ignored=False).save()
+            self.id = 1337
             
     def generate_devices(self, device_class, device_number):
         sensors = []
         for i in range(0, device_number):
-            device = device_class(device_id=self.unique_id, ignored=False)
+            device = device_class(device_id=self.unique_id, name="Generated{}".format(device_class.__name__), ignored=False)
             device.save()
             sensors.append(device)
         return sensors
@@ -119,3 +117,6 @@ if __name__ == "__main__":
     
     #Lamp
     devices = generator.generate_devices(enocean.devices.Lamp, 3)
+    
+    #Socket
+    devices = generator.generate_devices(enocean.devices.Socket, 1)

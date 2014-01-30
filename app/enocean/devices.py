@@ -205,6 +205,27 @@ class Lamp(model.devices.Actuator):
     def callback_toggle(self):
         return self.turn_on(not self.turned_on)
 
+class Socket(model.devices.Actuator):
+    activated = mongoengine.BooleanField(default=False)
+
+    def activate(self, sensor):
+        return self.activated(not self.activated)
+
+    def activated(self, activated):
+        self.activated = activated
+        logger.info("Socket #{} state changed. activated = {}".format(self.device_id, self.activated))
+
+        self.save()
+
+    def callback_activate(self):
+        return self.activated(True)
+
+    def callback_desactivate(self):
+        return self.activated(False)
+
+    def callback_toggle(self):
+        return self.activated(not self.activated)
+
 
 def from_telegram(telegram):
     if telegram.device_type == telegram.Telegram.SRW01:
