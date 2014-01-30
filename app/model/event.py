@@ -53,7 +53,10 @@ class Object(mongoengine.Document):
         events_map = {}
         self_attrs_map = self._data
 
-        for key, value in self_attrs_map.iteritems():
+        for key in self_attrs_map.keys():
+            # forces mongoengine to fetch the object from the database to test its type
+            value = self.__getattribute__(key)
+
             if isinstance(value, Event):
                 events_map[key] = value
 
