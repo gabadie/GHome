@@ -18,8 +18,7 @@ config = GlobalConfig()
 
 from py8tracks import API8tracks
 import logger
-import model
-
+from model import devices
 
 
 class RaspiUnit(object):
@@ -101,13 +100,12 @@ class Raspi(xmlrpc.XMLRPC):
         return result
 
 
-
-
 class RpcServer(xmlrpc.XMLRPC):
 
     def __init__(self, main_server):
         xmlrpc.XMLRPC.__init__(self)
         self.main_server = main_server
+
         raspi = Raspi()
         self.putSubHandler('raspi',raspi)
 
@@ -124,6 +122,33 @@ class RpcServer(xmlrpc.XMLRPC):
         d.save()
 
         return True
+
+    def xmlrpc_bind_devices(self, sensor_id, sensor_event, actuator_id, actuator_callback):
+        sensor = devices.Sensor.objects(device_id=sensor_id).first()
+        actuator = devices.Actuator.objects(device_id=actuator_id).first()
+
+        if not sensor or not actuator:
+            logger.error("Unknown device when binding {}.{} to {}.{}".format(sensor.__class__, sensor_event, actuator.__class__, actuator_callback))
+            return
+
+        print sensor
+        print sensor_event
+        print sensor.events
+        print sensor.events[sensor_event]
+        print actuator.callbacks[actuator_callback]
+        sensor.events[sensor_event].connect(actuator.callbacks[actuator_callback])
+
+    def xmlrcp_trigger_event(self, sensor_id, sensor_event):
+        sensor = devices.Sensor.objects(device_id=sensor_id).first()
+
+        if not sensor:
+            logger.error("Unknown device when triggering {}.{}".format(sensor_id, sensor_event))
+            return
+
+        try:
+            getattr(sensor, sensor_event)()
+        except AttributeError:
+            logger.error("Unknown event called : {}.{}".format(sensor.__class__, sensor_event))
 
 
 def search_music_generator(mixset):

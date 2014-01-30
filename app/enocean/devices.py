@@ -31,6 +31,10 @@ class Thermometer(Sensor):
         return telegram.sensor_telegram(sensor_id=sensor_id, data_bytes=data_bytes)
 
     def parse_readings(self, data_bytes):
+        if data_bytes[3] & 0x01 == 0:
+            logger.info("EnOcean thermometer #{}'s is no longer available".format(hex(self.device_id)))
+            return (False, 0, 0)
+
         temperature = data_bytes[2] * 40 / 250.0
         humidity = data_bytes[1] * 100 / 250.0
         temp_r = model.devices.Temperature(device=self, value=temperature)
@@ -38,13 +42,14 @@ class Thermometer(Sensor):
 
         logger.info("EnOcean thermometer #{}'s reading: Temperature = {}°C, Humidity = {}%".format(hex(self.device_id), temperature, humidity))
 
-        return temp_r, humidity_r
+        return (True, temp_r, humidity_r)
 
     def process_telegram(self, telegram, server):
-        temperature, humidity = self.parse_readings(telegram.data_bytes)
+        validity, temperature, humidity = self.parse_readings(telegram.data_bytes)
 
-        temperature.save()
-        humidity.save()
+        if validity:
+            temperature.save()
+            humidity.save()
 
 class Switch(Sensor):
     UNKNOWN, TOP, BOTTOM, RIGHT, LEFT = range(5)
@@ -58,7 +63,6 @@ class Switch(Sensor):
     onclick_bottom_right = event.slot()
     onclick_top_left = event.slot()
     onclick_bottom_left = event.slot()
-
 
     @staticmethod
     def generate_telegram(sensor_id, side, direction, pressed):
@@ -187,9 +191,6 @@ class LightMovementSensor(Sensor):
 class Lamp(model.devices.Actuator):
     turned_on = mongoengine.BooleanField(default=False)
 
-    def activate(self, sensor):
-        return self.turn_on(not self.turned_on)
-
     def turn_on(self, turned_on):
         self.turned_on = turned_on
         logger.info("Lamp #{} state changed. turned_on = {}".format(self.device_id, self.turned_on))
@@ -208,9 +209,6 @@ class Lamp(model.devices.Actuator):
 class Socket(model.devices.Actuator):
     activated = mongoengine.BooleanField(default=False)
 
-    def activate(self, sensor):
-        return self.activated(not self.activated)
-
     def activated(self, activated):
         self.activated = activated
         logger.info("Socket #{} state changed. activated = {}".format(self.device_id, self.activated))
@@ -218,12 +216,25 @@ class Socket(model.devices.Actuator):
         self.save()
 
     def callback_activate(self):
-        return self.activated(True)
+        if not self.activated:
+            return callback_toggle()
 
     def callback_desactivate(self):
-        return self.activated(False)
+        if self.activated:
+            return callback_toggle()
 
     def callback_toggle(self):
+        pressed = True
+        side = Switch.RIGHT
+        if self.activated:
+            direction = Switch.TOP
+        else:
+            direction = Switch.BOTTOM
+
+        telegram = Switch.generate_telegram(sensor_id=self.device_id, side=side, direction=direction, pressed=True)
+
+        main_server.enocean_protocol.send_data(telegram)
+
         return self.activated(not self.activated)
 
 
