@@ -131,11 +131,6 @@ class RpcServer(xmlrpc.XMLRPC):
             logger.error("Unknown device when binding {}.{} to {}.{}".format(sensor.__class__, sensor_event, actuator.__class__, actuator_callback))
             return
 
-        print sensor
-        print sensor_event
-        print sensor.events
-        print sensor.events[sensor_event]
-        print actuator.callbacks[actuator_callback]
         sensor.events[sensor_event].connect(actuator.callbacks[actuator_callback])
 
     def xmlrcp_trigger_event(self, sensor_id, sensor_event):
@@ -146,9 +141,10 @@ class RpcServer(xmlrpc.XMLRPC):
             return
 
         try:
-            getattr(sensor, sensor_event)()
-        except AttributeError:
-            logger.error("Unknown event called : {}.{}".format(sensor.__class__, sensor_event))
+            getattr(sensor, sensor_event)(self.main_server)
+        except AttributeError as ae:
+            logger.error("An error occurred when triggering event {}.{} ".format(sensor.__class__.__name__, sensor_event))
+            logger.exception(ae)
 
 
 def search_music_generator(mixset):
