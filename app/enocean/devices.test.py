@@ -38,7 +38,7 @@ def test_thermometer():
 
     # Test 1
     data_bytes = [0x00, 0x84, 0x99, 0x0F]
-    temperature, humidity = thermometer.parse_readings(data_bytes)
+    validity, temperature, humidity = thermometer.parse_readings(data_bytes)
 
     assert humidity.value == 52.8
     assert temperature.value == 24.48
@@ -48,14 +48,15 @@ def test_thermometer():
     thermometer.save()
     t = thermometer.generate_telegram(sensor_id=407, temperature=24.48, humidity=52.8)
     thermometer.process_telegram(t, None)
-    temperature, humidity = thermometer.parse_readings(t.data_bytes)
+    validity, temperature, humidity = thermometer.parse_readings(t.data_bytes)
+    print temperature
     assert temperature.value == 24.48
     assert humidity.value == 52.8
 
 def test_lamp():
     lamp = devices.Lamp(device_id=404)
     assert not lamp.turned_on
-    lamp.activate(sensor=None)
+    lamp.callback_turn_on()
     assert lamp.turned_on
     lamp.save()
 

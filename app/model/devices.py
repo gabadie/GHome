@@ -37,9 +37,7 @@ class BooleanReading(Reading):
         return '<BooleanReading value={} device={}>'.format(self.value, self.device)
 
 class Actuator(Device):
-
-    def activate(self, sensor):
-        raise NotImplementedError
+    pass
 
 class Sensor(Device):
     ignored = mongoengine.BooleanField(required=True, default=False)
@@ -50,7 +48,6 @@ class Sensor(Device):
             actuator.activate(self)
 
 # Numeric reading
-
 class Temperature(NumericReading):
     pass
 

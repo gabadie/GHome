@@ -28,6 +28,7 @@ class Thermometer(Sensor):
         data_bytes = [0x0 for i in xrange(4)]
         data_bytes[1] = int(humidity * 250 / 100)
         data_bytes[2] = int(temperature * 250 / 40)
+        data_bytes[3] = 0x01
         return telegram.sensor_telegram(sensor_id=sensor_id, data_bytes=data_bytes)
 
     def parse_readings(self, data_bytes):
