@@ -50,7 +50,7 @@ class ClientProtocol(protocol.Protocol):
 
     def send_data(self, data):
         addr = self.transport.getPeer()
-        logger.info("EnOcean sends telegram to '{}:{}': {}".format(addr.host, addr.port, t))
+        logger.info("EnOceanProtocol sends data to '{}:{}': {}".format(addr.host, addr.port, data))
 
         self.transport.write(data)
 
