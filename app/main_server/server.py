@@ -11,11 +11,10 @@ sys.path.insert(0, '..')
 
 import enocean.client
 from rpc_server import RpcServer, Raspi
-
+import logger
+from config import GlobalConfig
 
 class MainServer(object):
-
-    instance = None
 
     def __init__(self, config):
         self.config = config
@@ -24,8 +23,6 @@ class MainServer(object):
         self.enocean_protocol = None
 
         logger.info('main server initialized')
-
-        MainServer.instance = self
 
     def run(self):
         logger.info('running main server...')
@@ -45,8 +42,6 @@ class MainServer(object):
 
 
 if __name__ == "__main__":
-    import logger
-    from config import GlobalConfig
 
     logger.add_file('log/main_server')
 
