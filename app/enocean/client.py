@@ -10,7 +10,6 @@ import telegram
 import devices
 import logger
 import enocean
-from main_server.server import MainServer
 
 
 class ClientProtocol(protocol.Protocol):
