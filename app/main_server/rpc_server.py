@@ -122,7 +122,8 @@ class RpcServer(xmlrpc.XMLRPC):
 
         return True
 
-    def xmlrpc_bind_devices(self, sensor_id, sensor_event, actuator_id, actuator_callback):
+    @staticmethod
+    def xmlrpc_bind_devices(sensor_id, sensor_event, actuator_id, actuator_callback):
         sensor = devices.Sensor.objects(device_id=sensor_id).first()
         actuator = devices.Actuator.objects(device_id=actuator_id).first()
 
@@ -131,6 +132,7 @@ class RpcServer(xmlrpc.XMLRPC):
             return
 
         sensor.events[sensor_event].connect(actuator.callbacks[actuator_callback])
+
 
     def xmlrcp_trigger_event(self, sensor_id, sensor_event):
         sensor = devices.Sensor.objects(device_id=sensor_id).first()

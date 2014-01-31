@@ -34,7 +34,6 @@ class MainServer(object):
         self.rpc_server = RpcServer(self)
         raspi=Raspi()
         self.rpc_server.putSubHandler('raspi',raspi)
-        self.rpc_server.xmlrpc_bind_devices(1341, 'onclick_top_right', 1348, 'callback_toggle')
         reactor.listenTCP(self.config.main_server.rpc_port, twisted.web.server.Site(self.rpc_server))
 
         """ Main loop """
