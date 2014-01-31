@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="container">
+	{% include "header.html" %}
+
+
+	<div class="row">
+
+		<div class="col-md-10">
+			<h2>EnOcean sensors</h2>
+
+			<p>List of all devices in the database:</p>
+			<ul class="sensors">
+			</ul>
+
+
+			<form id="add-sensor" class="form-inline" action="/sensor" method="POST">
+				<h4>Add a sensor</h4>
+
+				<div class="form-group">
+					<input type="text" class="form-control" name="id" placeholder="Sensor ID (hexa)">
+				</div>
+
+				<div class="form-group">
+					<input type="text" class="form-control" name="name" placeholder="Sensor name">
+				</div>
+
+				<div class="form-group">
+		            <select class="selectpicker" data-title="Actuators" name="actuators"
+		                    placeholder="Linked actuators" multiple>
+		            	{% for actuator in actuators %}
+		            	<option value="{{actuator.device_id}}">{{actuator.name}}</option>
+		            	{% endfor %}
+		            </select>
+	            </div>
+
+
+				<div class="form-group">
+		            <select class="selectpicker" data-width="auto" data-title="Sensor type" name="type"
+		                    placeholder="Sensor type">
+		            	{% for sensor_type in sensor_types %}
+		            	<option value="{{sensor_type.__name__}}">{{sensor_type.__name__}}</option>
+		            	{% endfor %}
+		            </select>
+	            </div>
+
+				<button type="submit" class="btn btn-primary">Add device</button>
+			</form>
+
+		</div>
+
+
+
+		<div class="col-md-2">
+			<h2>Lamps</h2>
+
+			<ul class="lamps">
+<!--
+				{% for lamp in lamps %}
+				<li {% if lamp.turned_on %}class="turned_on"{% endif %} data-sensor-id="{{lamp.device_id}}">
+					<span class="device_id">{{ lamp.device_id }}</span><br />
+					<span class="name">{{lamp.name}}</span>
+				</li>
+				{% endfor %}
+-->
+
+			</ul>
+
+		</div>
+
+	</div>
+</div>
+{% endblock body %}
+
+{% block javascript %}
+
+{% raw %}
+<script id="sensor-template" type="text/x-handlebars-template">
+	<li {{#if ignored}}class="ignored"{{/if}} data-sensor-id="{{device_id}}">
+
+		<span class="device_id">{{device_id}}</span> <span class="name">{{name}}</span>
+		<span class="delete glyphicon glyphicon-remove"></span>
+	</li>
+</script>
+{% endraw %}
+
+<script src="/static/js/sensors.js"></script>
+{% endblock %}
