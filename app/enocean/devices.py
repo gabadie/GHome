@@ -102,13 +102,13 @@ class Switch(Sensor):
                     self.top_right = not self.top_right
 
                     if self.top_right:
-                        self.onclick_top_right()
+                        self.onclick_top_right(None) # TODO: pass main_server
 
                 else:
                     self.top_left = not self.top_left
 
                     if self.top_left:
-                        self.onclick_top_left()
+                        self.onclick_top_left(None) # TODO: pass main_server
 
             else:
                 direction = Switch.BOTTOM
@@ -116,12 +116,12 @@ class Switch(Sensor):
                     self.bottom_right = not self.bottom_right
 
                     if self.bottom_right:
-                        self.onclick_bottom_right()
+                        self.onclick_bottom_right(None) # TODO: pass main_server
                 else:
                     self.bottom_left = not self.bottom_left
 
                     if self.bottom_left:
-                        self.onclick_bottom_left()
+                        self.onclick_bottom_left(None) # TODO: pass main_server
 
             pressed = True
 
@@ -198,13 +198,13 @@ class Lamp(model.devices.Actuator):
 
         self.save()
 
-    def callback_turn_on(self):
+    def callback_turn_on(self, server):
         return self.turn_on(True)
 
-    def callback_turn_off(self):
+    def callback_turn_off(self, server):
         return self.turn_on(False)
 
-    def callback_toggle(self):
+    def callback_toggle(self, server):
         return self.turn_on(not self.turned_on)
 
 class Socket(model.devices.Actuator):
@@ -216,15 +216,15 @@ class Socket(model.devices.Actuator):
 
         self.save()
 
-    def callback_activate(self):
+    def callback_activate(self, server):
         if not self.activated:
             return callback_toggle()
 
-    def callback_desactivate(self):
+    def callback_desactivate(self, server):
         if self.activated:
             return callback_toggle()
 
-    def callback_toggle(self):
+    def callback_toggle(self, server):
         pressed = True
         side = Switch.RIGHT
         if self.activated:

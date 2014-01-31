@@ -73,9 +73,9 @@ class Object(mongoengine.Document):
 
 
 class Event(mongoengine.Document):
-    def __call__(self):
+    def __call__(self, server):
         for callback in Connection.objects(triggering_event=self):
-            callback.trigger()
+            callback.trigger(server)
 
     def connect(self, bound_callback):
         obj = bound_callback.__self__
@@ -99,14 +99,14 @@ class Connection(mongoengine.Document):
     receiving_object = mongoengine.ReferenceField(Object, required=True)
     method_name = mongoengine.StringField()
 
-    def trigger(self):
+    def trigger(self, server):
         class_content = self.receiving_object.__class__.__dict__
 
         if self.method_name not in class_content:
             logger.error("Can not trigger event connection: {}.{} have been removed...".format(self.receiving_object.__class__.__name__, self.method_name))
             raise NotImplemented
 
-        class_content[self.method_name](self.receiving_object)
+        class_content[self.method_name](self.receiving_object, server)
 
 def slot():
     return mongoengine.ReferenceField(Event, required=True, default=Event)
