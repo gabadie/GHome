@@ -11,7 +11,8 @@ sys.path.insert(0, '..')
 
 import enocean.client
 from rpc_server import RpcServer, Raspi
-
+import logger
+from config import GlobalConfig
 
 class MainServer(object):
 
@@ -45,8 +46,6 @@ class MainServer(object):
 
 
 if __name__ == "__main__":
-    import logger
-    from config import GlobalConfig
 
     logger.add_file('log/main_server')
 
