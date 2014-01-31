@@ -21,29 +21,39 @@ class Server(object):
     # main_server: main_server.server.MainServer
     # looping_task: mongoengine.task.LoopingCall
     # previous_minutes: int
-    quantum = 10 # seconds
+    quantum = 30 # seconds
 
     def __init__(self, main_server):
+        logger.info("Clock initializing (quantum = {} seconds)".format(Server.quantum))
+
         self.main_server = main_server
 
         now = datetime.now()
         self.previous_minutes = (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).seconds / 60
 
-        self.looping_task = twisted.internet.task.LoopingCall(self.looping_trigger)
+        self.looping_task = twisted.internet.task.LoopingCall(self.looping_callback)
         self.looping_task.start(Server.quantum)
 
     def trigger_events(self, week_day, minutes, previous_minute):
         clock_events = Event.objects(minutes__gt=previous_minute, minutes__lte=minutes)
 
         for clock_event in clock_events:
+            logger.info("Clock event '{}' triggered".format(clock_event.name))
+
             clock_event.event(self.main_server)
 
         return
 
-    def looping_trigger(self):
+    def looping_callback(self):
         now = datetime.now()
         minutes = (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).seconds / 60
+
+        if minutes == self.previous_minutes:
+            return
+
         week_day = now.weekday()
+
+        logger.info("Clock looping callback ({} minutes since midnight)".format(minutes))
 
         if minutes < self.previous_minutes:
             # changing day
