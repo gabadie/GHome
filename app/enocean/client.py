@@ -32,7 +32,7 @@ class ClientProtocol(protocol.Protocol):
             logger.info("The device ({}) is currently ignored".format(t.sensor_id))
             return
 
-        device.process_telegram(t, self)
+        device.process_telegram(t, self.main_server)
 
     def dataReceived(self, data):
         #logger.info("EnOcean received data: {}".format(data))

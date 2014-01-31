@@ -83,7 +83,7 @@ class Switch(Sensor):
 
         return telegram.sensor_telegram(sensor_id=sensor_id, data_bytes=data_bytes)
 
-    def parse_readings(self, data_bytes):
+    def parse_readings(self, data_bytes, server):
         print "Data bytes = {}".format(data_bytes)
         if data_bytes[0] & 0x10 == 0:
             side = Switch.UNKNOWN
@@ -102,13 +102,13 @@ class Switch(Sensor):
                     self.top_right = not self.top_right
 
                     if self.top_right:
-                        self.onclick_top_right(None) # TODO: pass main_server
+                        self.onclick_top_right(server)
 
                 else:
                     self.top_left = not self.top_left
 
                     if self.top_left:
-                        self.onclick_top_left(None) # TODO: pass main_server
+                        self.onclick_top_left(server)
 
             else:
                 direction = Switch.BOTTOM
@@ -116,12 +116,12 @@ class Switch(Sensor):
                     self.bottom_right = not self.bottom_right
 
                     if self.bottom_right:
-                        self.onclick_bottom_right(None) # TODO: pass main_server
+                        self.onclick_bottom_right(server)
                 else:
                     self.bottom_left = not self.bottom_left
 
                     if self.bottom_left:
-                        self.onclick_bottom_left(None) # TODO: pass main_server
+                        self.onclick_bottom_left(server)
 
             pressed = True
 
@@ -131,7 +131,7 @@ class Switch(Sensor):
         return model.devices.SwitchState(device=self, side=side, direction=direction, pressed=pressed)
 
     def process_telegram(self, telegram, server):
-        switch_state = self.parse_readings(telegram.data_bytes)
+        switch_state = self.parse_readings(telegram.data_bytes, server)
         switch_state.save()
 
 
