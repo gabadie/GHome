@@ -11,6 +11,10 @@ sys.path.insert(0, '..')
 import logger
 import event
 
+#
+# week_day variable are integer, between 0 (for Monday) and 6 (for Sunday)
+#
+
 class Event(event.Object):
     name = mongoengine.StringField(required=True)
     event = event.slot()
@@ -19,7 +23,18 @@ class Event(event.Object):
 
 
     def week_day_mask(self, week_day):
+        assert week_day >= 0 and week_day < 7
         return (self.week_days_mask & (1 << week_day)) != 0
+
+    def set_week_day_mask(self, week_day, boolean_mask):
+        assert isinstance(boolean_mask, bool)
+        assert week_day >= 0 and week_day < 7
+
+        if boolean_mask:
+            self.week_days_mask = self.week_days_mask | (1 << week_day)
+
+        else:
+            self.week_days_mask = self.week_days_mask & ~(1 << week_day)
 
 
 class Server(object):
