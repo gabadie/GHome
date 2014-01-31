@@ -210,7 +210,7 @@ class Lamp(model.devices.Actuator):
 class Socket(model.devices.Actuator):
     activated = mongoengine.BooleanField(default=False)
 
-    def activated(self, activated):
+    def activate(self, activated):
         self.activated = activated
         logger.info("Socket #{} state changed. activated = {}".format(self.device_id, self.activated))
 
@@ -233,10 +233,9 @@ class Socket(model.devices.Actuator):
             direction = Switch.BOTTOM
 
         telegram = Switch.generate_telegram(sensor_id=self.device_id, side=side, direction=direction, pressed=True)
+        server.enocean_protocol.send_data(telegram.__str__())
 
-        server.enocean_protocol.send_data(telegram)
-
-        return self.activated(not self.activated)
+        return self.activate(not self.activated)
 
 
 def from_telegram(telegram):

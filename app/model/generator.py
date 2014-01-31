@@ -12,6 +12,7 @@ sys.path.insert(0, '..')
 import enocean.devices
 import model.devices
 from config import GlobalConfig
+from main_server.rpc_server import RpcServer
 
 class Generator:
     def __init__(self, config):
@@ -87,27 +88,39 @@ class Generator:
 
     def generate_sample(self):
         #Thermometer
-        devices = self.generate_devices(enocean.devices.Thermometer, 3)
-        self.generate_readings(devices[0], 5, 60)
-        self.generate_reading_evolution(devices[1], model.devices.Temperature, 10, 15, 2, 60)
-        self.generate_reading_evolution(devices[2], model.devices.Humidity, 10, 62, 6, 60)
+        thermometers = self.generate_devices(enocean.devices.Thermometer, 3)
+        self.generate_readings(thermometers[0], 5, 60)
+        self.generate_reading_evolution(thermometers[1], model.devices.Temperature, 10, 15, 2, 60)
+        self.generate_reading_evolution(thermometers[2], model.devices.Humidity, 10, 62, 6, 60)
 
         #Switch
-        devices = self.generate_devices(enocean.devices.Switch, 2)
-        self.generate_readings(devices[0], 5, 120)
-        devices = self.generate_devices(enocean.devices.WindowContact, 1)
-        self.generate_readings(devices[0], 10, 1800)
+        switches = self.generate_devices(enocean.devices.Switch, 2)
+        self.generate_readings(switches[0], 5, 120)
+
+        #Windows Contactor
+        wc = self.generate_devices(enocean.devices.WindowContact, 1)
+        self.generate_readings(wc[0], 10, 1800)
 
         #LightMovementSensor
-        devices = self.generate_devices(enocean.devices.LightMovementSensor, 1)
-        self.generate_readings(devices[0], 20, 300)
-        self.generate_reading_evolution(devices[0], model.devices.Brightness, 24, 50, 20, 900)
+        lms = self.generate_devices(enocean.devices.LightMovementSensor, 1)
+        self.generate_readings(lms[0], 20, 300)
+        self.generate_reading_evolution(lms[0], model.devices.Brightness, 24, 50, 20, 900)
 
         #Lamp
-        devices = self.generate_devices(enocean.devices.Lamp, 3)
+        lamps = self.generate_devices(enocean.devices.Lamp, 3)
 
         #Socket
-        devices = self.generate_devices(enocean.devices.Socket, 1)
+        sockets = self.generate_devices(enocean.devices.Socket, 2)
+
+        #Event binding
+        #Switches and sockets
+        RpcServer.xmlrpc_bind_devices(switches[0].device_id, 'onclick_top_right', sockets[0].device_id, 'callback_toggle')
+        RpcServer.xmlrpc_bind_devices(switches[0].device_id, 'onclick_top_left', sockets[1].device_id, 'callback_toggle')
+
+        #Switches and lamps
+        RpcServer.xmlrpc_bind_devices(switches[1].device_id, 'onclick_top_right', lamps[0].device_id, 'callback_toggle')
+        RpcServer.xmlrpc_bind_devices(switches[1].device_id, 'onclick_bottom_right', lamps[1].device_id, 'callback_toggle')
+        RpcServer.xmlrpc_bind_devices(switches[1].device_id, 'onclick_top_left', lamps[2].device_id, 'callback_toggle')
 
     @property
     def unique_id(self):
