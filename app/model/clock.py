@@ -17,6 +17,11 @@ class Event(event.Object):
     minutes = mongoengine.IntField(default=0, required=True)
     week_days_mask = mongoengine.IntField(default=0, required=True)
 
+
+    def week_day_mask(self, week_day):
+        return (self.week_days_mask & (1 << week_day)) != 0
+
+
 class Server(object):
     # main_server: main_server.server.MainServer
     # looping_task: mongoengine.task.LoopingCall
@@ -40,7 +45,8 @@ class Server(object):
         for clock_event in clock_events:
             logger.info("Clock event '{}' triggered".format(clock_event.name))
 
-            clock_event.event(self.main_server)
+            if clock_event.week_day_mask(week_day):
+                clock_event.event(self.main_server)
 
         return
 
