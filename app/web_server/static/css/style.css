@@ -1,4 +1,24 @@
+@font-face {
+  font-family: "OpenSans Regular";
+  src: url("../fonts/Regular/OpenSans-Regular.eot");
+  src:
+    url("../fonts/Regular/OpenSans-Regular.woff") format("woff"),
+    url("../fonts/Regular/OpenSans-Regular.otf") format("opentype"),
+    url("../fonts/Regular/OpenSans-Regular.svg") format("svg");
+}
+@font-face {
+    font-family: 'fjordone';
+    src: url('../fonts/fjordone/fjordone-regular-webfont.eot');
+    src: url('../fonts/fjordone/fjordone-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/fjordone/fjordone-regular-webfont.woff') format('woff'),
+         url('../fonts/fjordone/fjordone-regular-webfont.ttf') format('truetype'),
+         url('../fonts/fjordone/fjordone-regular-webfont.svg#fjordone') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
 body {
+	font-family: "OpenSans Regular";
 	background: url('../img/stardust.png');
 }
 
@@ -7,19 +27,17 @@ body {
 .container {
 	width: 100%;
 	margin: 0 auto;
-	padding-bottom: 10px;
+	padding: 0;
 	background: rgba(255, 255, 255, 0.9);
 	box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.3);
 }
 
 .header {
-/*	background: #222; */
-
 	color: #FFF;
-	padding: 10px 0;
+	padding: 20px;
 	background: #0E111D;
 
-	/* Gradient */
+	/* Gradient, only on Webkit */
 	background-image: -webkit-gradient(
 		linear,
 		left top,
@@ -27,7 +45,6 @@ body {
 		color-stop(0, #06070A),
 		color-stop(1, #3F484F)
 	);
-
 }
 
 .header .logo {
@@ -35,6 +52,92 @@ body {
 	font-size: 24px;
 	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
 }
+
+/* Main menu */
+
+.big-menu {
+	list-style: none;
+	font-size: 0;
+	padding: 0;
+}
+
+.big-menu  li{
+	text-align: center;
+	width: 49%;
+	margin: 0.5%;
+	display: inline-block;
+	font-size: 32px;
+	padding: 35px 15px;
+	color: #FFF;
+	font-weight: bold;
+	text-shadow: 0px -1px 0 rgba(0, 0, 0, 0.5);
+	position: relative;
+	overflow: hidden;
+
+	border-radius: 10px;
+}
+
+.big-menu  li::after {
+	position: absolute;
+	opacity: 1;
+}
+
+.big-menu .house {
+	background-color: #c0392b;
+}
+.big-menu .house::after{
+	content: url('../img/home.png');
+    bottom: -50px;
+    right: -15px;
+}
+
+.big-menu .monitoring {
+	background-color: #3498db;
+}
+.big-menu .monitoring::after{
+	content: url('../img/graph.png');
+    bottom: -80px;
+    right: -15px;
+}
+
+.big-menu .news {
+	background-color: #2c3e50;
+}
+.big-menu .news::after{
+	content: url('../img/news.png');
+    bottom: -80px;
+    right: -15px;
+}
+
+.big-menu .clothes {
+	background-color: #16a085;
+}
+.big-menu .clothes::after{
+	content: url('../img/clothes.png');
+    bottom: -10px;
+    right: 15px;
+}
+
+.big-menu .music {
+	background-color: #2980b9;
+}
+.big-menu .music::after{
+	content: url('../img/music.png');
+    bottom: -30px;
+    right: -15px;
+}
+
+.big-menu .setup {
+	background-color: #95a5a6;
+}
+.big-menu .setup::after{
+	content: url('../img/setup.png');
+    bottom: -30px;
+    right: -15px;
+}
+
+
+/* Sensors */
 
 .sensors {
 	list-style: none;

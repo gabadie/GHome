@@ -23,10 +23,14 @@ rpc = xmlrpclib.Server('http://{}:{}/'.format(config.main_server.ip, config.main
 
 @app.route('/')
 def index():
+    return render_template('index.html')
+
+@app.route('/setup')
+def setup():
     actuators = devices.Actuator.objects()
     sensor_types = Sensor.__subclasses__()
 
-    return render_template('index.html', sensor_types=sensor_types, actuators=actuators)
+    return render_template('setup.html', sensor_types=sensor_types, actuators=actuators)
 
 @app.route('/monitoring')
 def monitoring():
