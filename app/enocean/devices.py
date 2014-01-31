@@ -10,7 +10,7 @@ import telegram
 import model.devices
 from model import event
 import logger
-
+from main_server.server import MainServer
 
 class Sensor(model.devices.Sensor):
 
@@ -234,7 +234,7 @@ class Socket(model.devices.Actuator):
 
         telegram = Switch.generate_telegram(sensor_id=self.device_id, side=side, direction=direction, pressed=True)
 
-        main_server.enocean_protocol.send_data(telegram)
+        server.enocean_protocol.send_data(telegram)
 
         return self.activated(not self.activated)
 
