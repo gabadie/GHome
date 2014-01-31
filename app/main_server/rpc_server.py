@@ -2,16 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import os
 from twisted.web import xmlrpc
 import xmlrpclib
-
 
 #from SimpleXMLRPCServer import SimpleXMLRPCServer
 #from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
 
-
-sys.path.insert(0, '..')
-sys.path.insert(0, '../../libs/py8tracks')
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__) + '/../'))
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__) + '/../../libs/py8tracks/'))
 
 from config import GlobalConfig
 config = GlobalConfig()
