@@ -25,18 +25,12 @@ class Server(object):
 
     def __init__(self, main_server):
         self.main_server = main_server
-        self.previous_minutes = self.minutes_from_day_begining()
+
+        now = datetime.now()
+        self.previous_minutes = (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).seconds / 60
 
         self.looping_task = twisted.internet.task.LoopingCall(self.looping_trigger)
         self.looping_task.start(Server.quantum)
-
-    def current_week_day(self):
-        return int(datetime.today().weekday())
-
-    def minutes_from_day_begining(self):
-        now = datetime.now()
-
-        return (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).seconds / 60
 
     def trigger_events(self, week_day, minutes, previous_minute):
         clock_events = Event.objects(minutes__gt=previous_minute, minutes__lte=minutes)
@@ -47,8 +41,9 @@ class Server(object):
         return
 
     def looping_trigger(self):
-        minutes = self.minutes_from_day_begining()
-        week_day = self.current_week_day()
+        now = datetime.now()
+        minutes = (now - now.replace(hour=0, minute=0, second=0, microsecond=0)).seconds / 60
+        week_day = now.weekday()
 
         if minutes < self.previous_minutes:
             # changing day
