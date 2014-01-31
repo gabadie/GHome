@@ -15,8 +15,6 @@ from rpc_server import RpcServer, Raspi
 
 class MainServer(object):
 
-    instance = None
-
     def __init__(self, config):
         self.config = config
         self.db = mongoengine.connect(config.mongo_db)
@@ -24,8 +22,6 @@ class MainServer(object):
         self.enocean_protocol = None
 
         logger.info('main server initialized')
-
-        MainServer.instance = self
 
     def run(self):
         logger.info('running main server...')
