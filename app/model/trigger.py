@@ -25,12 +25,12 @@ class ThresholdTrigger(Trigger):
         self.max = max
 
     # Returns whether a event has been triggered
-    def trigger(self, oldValue, newValue):
+    def trigger(self, oldValue, newValue, server):
         if oldValue < self.max and newValue > self.max:
-            self.overflow()
+            self.overflow(server)
             return True
         elif oldValue > self.min and newValue < self.min:
-            self.underflow()
+            self.underflow(server)
             return True
         return False
 
@@ -48,22 +48,22 @@ def IntervalTrigger(Trigger):
         self.min = min
         self.max = max
 
-    def trigger(self, oldValue, newValue):
+    def trigger(self, oldValue, newValue, server):
         # if we were inside the interval
         if self.min <= oldValue <= self.max:
             if newValue > self.max:
-                self.aboveInterval()
+                self.aboveInterval(server)
                 return True
             elif newValue < self.min:
-                self.belowInterval()
+                self.belowInterval(server)
                 return True
         # else if we are inside the interval now
         elif self.min <= newValue <= self.max:
             if oldValue > self.max:
-                self.enterInFromAbove()
+                self.enterInFromAbove(server)
                 return True
             if oldValue < self.min:
-                self.enterInFromBelow()
+                self.enterInFromBelow(server)
                 return True
 
         return False

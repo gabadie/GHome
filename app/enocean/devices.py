@@ -10,7 +10,7 @@ import telegram
 import model.devices
 from model import event
 import logger
-
+from main_server.server import MainServer
 
 class Sensor(model.devices.Sensor):
 
@@ -28,9 +28,14 @@ class Thermometer(Sensor):
         data_bytes = [0x0 for i in xrange(4)]
         data_bytes[1] = int(humidity * 250 / 100)
         data_bytes[2] = int(temperature * 250 / 40)
+        data_bytes[3] = 0x01
         return telegram.sensor_telegram(sensor_id=sensor_id, data_bytes=data_bytes)
 
     def parse_readings(self, data_bytes):
+        if data_bytes[3] & 0x01 == 0:
+            logger.info("EnOcean thermometer #{}'s is no longer available".format(hex(self.device_id)))
+            return (False, 0, 0)
+
         temperature = data_bytes[2] * 40 / 250.0
         humidity = data_bytes[1] * 100 / 250.0
         temp_r = model.devices.Temperature(device=self, value=temperature)
@@ -38,13 +43,14 @@ class Thermometer(Sensor):
 
         logger.info("EnOcean thermometer #{}'s reading: Temperature = {}°C, Humidity = {}%".format(hex(self.device_id), temperature, humidity))
 
-        return temp_r, humidity_r
+        return (True, temp_r, humidity_r)
 
     def process_telegram(self, telegram, server):
-        temperature, humidity = self.parse_readings(telegram.data_bytes)
+        validity, temperature, humidity = self.parse_readings(telegram.data_bytes)
 
-        temperature.save()
-        humidity.save()
+        if validity:
+            temperature.save()
+            humidity.save()
 
 class Switch(Sensor):
     UNKNOWN, TOP, BOTTOM, RIGHT, LEFT = range(5)
@@ -58,7 +64,6 @@ class Switch(Sensor):
     onclick_bottom_right = event.slot()
     onclick_top_left = event.slot()
     onclick_bottom_left = event.slot()
-
 
     @staticmethod
     def generate_telegram(sensor_id, side, direction, pressed):
@@ -78,7 +83,7 @@ class Switch(Sensor):
 
         return telegram.sensor_telegram(sensor_id=sensor_id, data_bytes=data_bytes)
 
-    def parse_readings(self, data_bytes):
+    def parse_readings(self, data_bytes, server):
         print "Data bytes = {}".format(data_bytes)
         if data_bytes[0] & 0x10 == 0:
             side = Switch.UNKNOWN
@@ -97,13 +102,13 @@ class Switch(Sensor):
                     self.top_right = not self.top_right
 
                     if self.top_right:
-                        self.onclick_top_right()
+                        self.onclick_top_right(server)
 
                 else:
                     self.top_left = not self.top_left
 
                     if self.top_left:
-                        self.onclick_top_left()
+                        self.onclick_top_left(server)
 
             else:
                 direction = Switch.BOTTOM
@@ -111,12 +116,12 @@ class Switch(Sensor):
                     self.bottom_right = not self.bottom_right
 
                     if self.bottom_right:
-                        self.onclick_bottom_right()
+                        self.onclick_bottom_right(server)
                 else:
                     self.bottom_left = not self.bottom_left
 
                     if self.bottom_left:
-                        self.onclick_bottom_left()
+                        self.onclick_bottom_left(server)
 
             pressed = True
 
@@ -126,7 +131,7 @@ class Switch(Sensor):
         return model.devices.SwitchState(device=self, side=side, direction=direction, pressed=pressed)
 
     def process_telegram(self, telegram, server):
-        switch_state = self.parse_readings(telegram.data_bytes)
+        switch_state = self.parse_readings(telegram.data_bytes, server)
         switch_state.save()
 
 
@@ -187,23 +192,51 @@ class LightMovementSensor(Sensor):
 class Lamp(model.devices.Actuator):
     turned_on = mongoengine.BooleanField(default=False)
 
-    def activate(self, sensor):
-        return self.turn_on(not self.turned_on)
-
     def turn_on(self, turned_on):
         self.turned_on = turned_on
         logger.info("Lamp #{} state changed. turned_on = {}".format(self.device_id, self.turned_on))
 
         self.save()
 
-    def callback_turn_on(self):
+    def callback_turn_on(self, server):
         return self.turn_on(True)
 
-    def callback_turn_off(self):
+    def callback_turn_off(self, server):
         return self.turn_on(False)
 
-    def callback_toggle(self):
+    def callback_toggle(self, server):
         return self.turn_on(not self.turned_on)
+
+class Socket(model.devices.Actuator):
+    activated = mongoengine.BooleanField(default=False)
+
+    def activated(self, activated):
+        self.activated = activated
+        logger.info("Socket #{} state changed. activated = {}".format(self.device_id, self.activated))
+
+        self.save()
+
+    def callback_activate(self, server):
+        if not self.activated:
+            return callback_toggle()
+
+    def callback_desactivate(self, server):
+        if self.activated:
+            return callback_toggle()
+
+    def callback_toggle(self, server):
+        pressed = True
+        side = Switch.RIGHT
+        if self.activated:
+            direction = Switch.TOP
+        else:
+            direction = Switch.BOTTOM
+
+        telegram = Switch.generate_telegram(sensor_id=self.device_id, side=side, direction=direction, pressed=True)
+
+        server.enocean_protocol.send_data(telegram)
+
+        return self.activated(not self.activated)
 
 
 def from_telegram(telegram):

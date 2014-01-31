@@ -7,6 +7,7 @@ import tempfile
 import subprocess
 import time
 import signal
+from model import generator
 from config import *
 
 
@@ -90,7 +91,11 @@ if __name__ == "__main__":
 
     if len(sys.argv) > 1:
         config = GlobalConfig.from_json(sys.argv[1])
+    else:
+        config = GlobalConfig()
 
+    model_generator = generator.Generator(config)
+    model_generator.generate_sample()
     main_server = MainServerProcess(config)
     web_server = WebServerProcess(config)
 

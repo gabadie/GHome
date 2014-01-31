@@ -9,6 +9,7 @@ sys.path.insert(0, '..')
 import telegram
 import devices
 import logger
+import enocean
 
 
 class ClientProtocol(protocol.Protocol):
@@ -31,7 +32,7 @@ class ClientProtocol(protocol.Protocol):
             logger.info("The device ({}) is currently ignored".format(t.sensor_id))
             return
 
-        device.process_telegram(t, self)
+        device.process_telegram(t, self.main_server)
 
     def dataReceived(self, data):
         #logger.info("EnOcean received data: {}".format(data))
@@ -46,6 +47,12 @@ class ClientProtocol(protocol.Protocol):
         for packet in data_packets:
             t = telegram.from_str(packet)
             self.process_telegram(t)
+
+    def send_data(self, data):
+        addr = self.transport.getPeer()
+        logger.info("EnOcean sends telegram to '{}:{}': {}".format(addr.host, addr.port, t))
+
+        self.transport.write(data)
 
 
 class ClientProtocolFactory(protocol.ReconnectingClientFactory):

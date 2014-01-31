@@ -13,11 +13,7 @@ class FakeDevice0(event.Object):
     def __str__(self):
         return self.name
 
-    def event_callback(self):
-        self.received_event = True
-        self.save()
-
-    def callback_receive_event(self):
+    def callback_receive_event(self, server):
         self.received_event = True
         self.save()
 
@@ -79,7 +75,7 @@ def test_callbacks():
     assert a.received_event == False
     assert b.received_event == False
 
-    a.event0()
+    a.event0(None)
 
     assert a.received_event == False
     assert b.received_event == False
