@@ -21,10 +21,17 @@ app = Flask(__name__)
 app.debug = True
 rpc = xmlrpclib.Server('http://{}:{}/'.format(config.main_server.ip, config.main_server.rpc_port))
 
+def dump_actuator(actuator):
+    a_json = json.loads(actuator.to_json())
+    a_json['callbacks'] = actuator.callbacks.keys()
+    return a_json
+
 def dump_sensor(sensor):
     s_json = json.loads(sensor.to_json())
     s_json['events'] = sensor.events.keys()
     s_json['type'] = sensor.__class__.__name__
+    # TODO : find a way to render the sensors without putting this into each sensor's data
+    s_json['actuators'] = [dump_actuator(actuator) for actuator in devices.Actuator.objects]
     return s_json
 
 @app.route('/')

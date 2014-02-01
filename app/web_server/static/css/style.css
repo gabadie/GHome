@@ -76,15 +76,20 @@ body {
 
 	border-radius: 10px;
 
-	/* Effet de flou */
-    filter: blur(3px) grayscale(0.2);
-    -webkit-filter: blur(3px) grayscale(0.2);
+    /* Effet de flou */
+    filter: blur(3px) grayscale(0.4);
+    -webkit-filter: blur(3px) grayscale(0.4);
+
+    /* Animation de transition */
+    transition: filter 0.6s;
+    -webkit-transition: -webkit-filter 0.6s; /* Safari */
 }
 
 .big-menu li:hover {
 	filter: none;
     -webkit-filter: blur(0) grayscale(0);
 }
+
 
 .big-menu  li::after {
 	position: absolute;
@@ -183,6 +188,16 @@ body {
 
 input.sensor-toggle {
     margin-bottom: -10px;
+}
+
+.callback-binding select {
+    width: 20%;
+    margin: 0 0.5%;
+    display: inline-block;
+}
+
+.callback-binding select[name="callback"]:disabled {
+    display: none;
 }
 
 .sensors li.ignored .heading{

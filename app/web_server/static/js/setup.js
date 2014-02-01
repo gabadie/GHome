@@ -7,11 +7,9 @@ $(document).ready(function() {
     sensor_template = loadTemplate('#sensor-template');
     lamp_template = loadTemplate('#lamp-template');
 
-    $('.selectpicker').selectpicker();
 
     updateSensors();
     bindSensors();
-
     updateLamps();
     setInterval(updateLamps, 500);
 
@@ -47,6 +45,7 @@ var updateLamps = function() {
 
 var bindSensors = function() {
 
+    // Expanding a sensor's view (by clicking on its heading)
     $('.sensors').on('click', 'li .heading', function(e) {
         console.log('lol');
         $li = $(this).closest('li');
@@ -58,6 +57,7 @@ var bindSensors = function() {
 
     });
 
+    // Toggling a sensor's state (ignored / not ignored)
     $('.sensors').on('click', 'li .sensor-toggle', function(e) {
         console.log('lol');
         $li = $(this).closest('li.sensor');
@@ -84,6 +84,7 @@ var bindSensors = function() {
 
     });
 
+    // Deleting a sensor
     $('.sensors').on('click', 'li .delete', function(e) {
         $this = $(this).closest('li');
         var sensor_id = $this.attr('data-sensor-id');
@@ -97,4 +98,15 @@ var bindSensors = function() {
         // Avoid triggering an event on the parent li
         e.stopPropagation();
     });
+
+    // Activating the right callbacks' list
+    $('.sensors').on('change', 'select[name="actuator"]', function(e) {
+        $('select[name="callback"]').prop('disabled', true);
+        $('select[name="callback"][data-actuator-id="' + $(this).val() + '"]').prop('disabled', false);
+
+    });
+
+
+    // s = $('select[name="callback"][data-actuator-id="889977"]')
+
 }

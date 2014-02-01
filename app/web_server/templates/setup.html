@@ -27,7 +27,7 @@
 
 				<input type="text" class="form-control" name="id" placeholder="Sensor ID (hexa)">
 				<input type="text" class="form-control" name="name" placeholder="Sensor name">
-	            <select class="selectpicker form-control" data-width="auto" data-title="Sensor type" name="type"
+	            <select class="form-control" data-width="auto" data-title="Sensor type" name="type"
 	                    placeholder="Sensor type">
 	            	{% for sensor_type in sensor_types %}
 	            	<option value="{{sensor_type.__name__}}">{{sensor_type.__name__}}</option>
@@ -68,6 +68,7 @@
 
 		<div class="details">
 			<ul class="list-group infos">
+				{{! Sensor's status + a toggle to change it}}
 				<li class="list-group-item">
 					{{#if ignored}}
 						<span class="sensor-status label-danger">Ignoré</span>
@@ -78,18 +79,41 @@
 					{{/if}}
 				</li>
 
+
+				{{! Sensor's type (Thermometer, Switch, ...)}}
 				<li class="list-group-item">
 					<span class="title">Type:</span> {{type}}
 				</li>
 
 				{{#if events}}
-					<li class="list-group-item">
-						<span class="title">Events:</span>
-			            <select class="selectpicker form-control" data-width="auto" data-title="Event" name="event" placeholder="Event">
+
+
+					<li class="list-group-item callback-binding">
+						<span class="title">Bind a callback:</span>
+
+						{{! Event select }}
+			            <select class="form-control" name="event" placeholder="Event">
 						{{#each events}}
 				            	<option value="{{this}}">{{this}}</option>
 		            	{{/each}}
 			            </select>
+
+			            {{! Actuators select }}
+						<select class="form-control" name="actuator" placeholder="Actuator">
+						{{#each actuators}}
+				            	<option value="{{device_id}}">{{name}}</option>
+		            	{{/each}}
+			            </select>
+
+			            {{! Each actuator's callbacks select }}
+			            {{#each actuators}}
+			            		<select class="form-control" name="callback" placeholder="Callback" data-actuator-id="{{device_id}}" {{#if @first}}{{else}}disabled{{/if}}>
+								{{#each callbacks}}
+						            	<option value="{{this}}">{{this}}</option>
+				            	{{/each}}
+					            </select>
+		            	{{/each}}
+
 					</li>
 				{{/if}}
 
