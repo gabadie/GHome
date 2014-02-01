@@ -10,6 +10,7 @@ import twisted.web
 sys.path.insert(0, '..')
 
 import enocean.client
+import model.clock
 from rpc_server import RpcServer, Raspi
 import logger
 from config import GlobalConfig
@@ -20,6 +21,7 @@ class MainServer(object):
         self.config = config
         self.db = mongoengine.connect(config.mongo_db)
         self.rpc_server = None
+        self.clock_server = None
         self.enocean_protocol = None
 
         logger.info('main server initialized')
@@ -35,6 +37,9 @@ class MainServer(object):
         raspi=Raspi()
         self.rpc_server.putSubHandler('raspi',raspi)
         reactor.listenTCP(self.config.main_server.rpc_port, twisted.web.server.Site(self.rpc_server))
+
+        """ Launchs Clock Server """
+        self.clock_server = model.clock.Server(self)
 
         """ Main loop """
         reactor.run()

@@ -3,10 +3,12 @@
 
 import os
 import sys
+import signal
 import tempfile
 import subprocess
 import time
 import signal
+import logger
 from model import generator
 from config import *
 
@@ -39,7 +41,7 @@ class AbstractServerProcess(object):
 
         self.process = subprocess.Popen(["python", script_path, config_path], stdout=stdout, stderr=stderr, cwd=cwd)
 
-        time.sleep(0.1)
+        time.sleep(0.5)
 
     def terminate(self):
         self.process.send_signal(signal.SIGKILL)
@@ -99,10 +101,14 @@ if __name__ == "__main__":
     main_server = MainServerProcess(config)
     web_server = WebServerProcess(config)
 
-    print "main_server: {}".format(main_server.pid)
-    print "web_server: {}".format(web_server.pid)
+    logger.info("main_server PID: {}".format(main_server.pid))
+    logger.info("web_server PID: {}".format(web_server.pid))
 
-    time.sleep(10)
+    try:
+        signal.pause()
+
+    except KeyboardInterrupt:
+        print
 
     main_server.terminate()
     web_server.terminate()
