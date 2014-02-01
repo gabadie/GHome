@@ -1,32 +1,24 @@
 {% extends "base.html" %}
 
+{% block style %}
+{% endblock %}
+
 {% block body %}
 <div class="container">
 	{% include "header.html" %}
 
 	<ul class="big-menu">
 		<a href="#"><li class="house">Vue Maison</li></a>
-		<a href="#"><li class="monitoring">Monitoring</li></a>
+		<a href="monitoring"><li class="monitoring">Monitoring</li></a>
 		<a href="#"><li class="news">Actualités</li></a>
 		<a href="#"><li class="clothes">Vêtements</li></a>
 		<a href="#"><li class="music">Musique</li></a>
-		<a href="#"><li class="setup">Configurer</li></a>
+		<a href="setup"><li class="setup">Configurer</li></a>
 	</ul>
 
 </div>
 {% endblock body %}
 
+
 {% block javascript %}
-
-{% raw %}
-<script id="sensor-template" type="text/x-handlebars-template">
-	<li {{#if ignored}}class="ignored"{{/if}} data-sensor-id="{{device_id}}">
-
-		<span class="device_id">{{device_id}}</span> <span class="name">{{name}}</span>
-		<span class="delete glyphicon glyphicon-remove"></span>
-	</li>
-</script>
-{% endraw %}
-
-<script src="/static/js/sensors.js"></script>
 {% endblock %}

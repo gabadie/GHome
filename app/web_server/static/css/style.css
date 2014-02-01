@@ -75,6 +75,15 @@ body {
 	overflow: hidden;
 
 	border-radius: 10px;
+
+	/* Effet de flou */
+    filter: blur(3px) grayscale(0.2);
+    -webkit-filter: blur(3px) grayscale(0.2);
+}
+
+.big-menu li:hover {
+	filter: none;
+    -webkit-filter: blur(0) grayscale(0);
 }
 
 .big-menu  li::after {
@@ -128,9 +137,10 @@ body {
 }
 
 .big-menu .setup {
-	background-color: #95a5a6;
+	background-color: #7f8c8d;
 }
 .big-menu .setup::after{
+	opacity: 0.8;
 	content: url('../img/setup.png');
     bottom: -30px;
     right: -15px;
@@ -144,39 +154,74 @@ body {
 	padding: 5px 10px;
 }
 
-.sensors li{
-	padding: 6px;
-	background: rgba(39, 174, 96, 1);
-	box-shadow: 0 0 80px rgba(0, 0, 0, 0.2);
-	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
-	border: 1px solid #2ecc71;
-	border-bottom: none;
-	color: #FFF;
+.sensors li {
 }
 
-.sensors .ignored {
+.sensors li .heading{
+	background: rgba(39, 174, 96, 1);
+	box-shadow: 0 0 80px rgba(0, 0, 0, 0.2);
+	padding: 10px;
+
+	color: #FFF;
+	border-bottom: none;
+}
+
+.sensors li .details {
+	display: none;
+	padding: 10px;
+}
+
+.sensors li .details .infos .title{
+    font-weight: bold;
+}
+
+.sensor-status {
+    padding: 4px 6px;
+    color: #FFF;
+    border-radius: 4px;
+}
+
+input.sensor-toggle {
+    margin-bottom: -10px;
+}
+
+.sensors li.ignored .heading{
 	background-color: rgba(192, 57, 47, 1);
 	border-color: #DC4435;
 	color: #FF9388;
 }
 
-.sensors .device_id {
-	font-size: 11px;
+.sensors .name {
+	font-size: 15px;
+	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
 	font-weight: bold;
+}
+
+.sensors .device_id {
+	font-size: 12px;
 	margin-right: 10px;
 }
 
-.sensors li .delete {
+.sensors li .glyphicon {
 	float: right;
 	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
 	opacity: 0.5;
 	color: #FFF;
+	margin: 0 3px;
 }
 
-.sensors li .delete:hover {
+
+.sensors li .glyphicon:hover {
 	opacity: 1;
 }
 
+
+.sensors li .state-indicator {
+	color: #2ecc71;
+	text-shadow: 0px 0px 10px rgba(46, 204, 113, 0.5);
+}
+
+/* Lamps */
 
 .lamps {
 	list-style: none;

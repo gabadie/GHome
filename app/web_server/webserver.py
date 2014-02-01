@@ -21,6 +21,12 @@ app = Flask(__name__)
 app.debug = True
 rpc = xmlrpclib.Server('http://{}:{}/'.format(config.main_server.ip, config.main_server.rpc_port))
 
+def dump_sensor(sensor):
+    s_json = json.loads(sensor.to_json())
+    s_json['events'] = sensor.events.keys()
+    s_json['type'] = sensor.__class__.__name__
+    return s_json
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -63,34 +69,22 @@ def graph_data():
 @app.route('/sensor', methods=['POST', 'GET'])
 def all_sensors():
     if request.method == 'GET':
-        result = json.loads(Sensor.objects.to_json())
+        result = [dump_sensor(sensor) for sensor in Sensor.objects]
         resp = dict(ok=True, result=result)
     elif request.method == 'POST':
         form = request.form
-        s_id, s_name, s_type, actuator_ids = [form.get(val) for val in ['id', 'name', 'type', 'actuators']]
+        s_id, s_name, s_type = [form.get(val) for val in ['id', 'name', 'type']]
 
-        print s_id, s_name, s_type, actuator_ids
+        print s_id, s_name, s_type
 
         # Converting from hexa representation
         s_id = int(s_id, 16)
-
-        # DIRTY FIX, doesn't capture all actuators (must change form submit in js)
-        actuator_ids = [actuator_ids]
-        print "ACTUATORS ID = ", actuator_ids
-
-
-        # Finding the actuators
-        actuators = devices.Actuator.objects(device_id__in=actuator_ids)
-        if actuators is None:
-            actuators = []
-
-        print "ACTUATORS = ", actuators
 
         # Finding the sensor class
         SensorClass = [s_cls for s_cls in Sensor.__subclasses__() if s_cls.__name__ == s_type][0]
 
         # Creating the new device
-        s = SensorClass(device_id=s_id, name=s_name, actuators=actuators, ignored=False)
+        s = SensorClass(device_id=s_id, name=s_name, ignored=False)
         s.save()
 
         sensors = json.loads(Sensor.objects(device_id=s_id).to_json())
@@ -130,7 +124,7 @@ def sensor_ignored(device_id):
         sensor = Sensor.objects(device_id=device_id).first()
         sensor.ignored = request.json['value']
         sensor.save()
-        resp = dict(ok=True, sensor_id=device_id)
+        resp = dict(ok=True, result=dump_sensor(sensor))
 
     return json.dumps(resp)
 

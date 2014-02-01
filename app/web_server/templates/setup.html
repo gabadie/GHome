@@ -1,51 +1,40 @@
 {% extends "base.html" %}
 
+{% block style %}
+<link href="static/css/iostoggle.css" rel="stylesheet">
+{% endblock %}
+
+
 {% block body %}
 <div class="container">
 	{% include "header.html" %}
 
 
-	<div class="row">
+	<div>
 
 		<div class="col-md-10">
 			<h2>EnOcean sensors</h2>
 
 			<p>List of all devices in the database:</p>
+
 			<ul class="sensors">
+				<!-- Populated by JS Handlebars -->
 			</ul>
 
 
 			<form id="add-sensor" class="form-inline" action="/sensor" method="POST">
 				<h4>Add a sensor</h4>
 
-				<div class="form-group">
-					<input type="text" class="form-control" name="id" placeholder="Sensor ID (hexa)">
-				</div>
+				<input type="text" class="form-control" name="id" placeholder="Sensor ID (hexa)">
+				<input type="text" class="form-control" name="name" placeholder="Sensor name">
+	            <select class="selectpicker form-control" data-width="auto" data-title="Sensor type" name="type"
+	                    placeholder="Sensor type">
+	            	{% for sensor_type in sensor_types %}
+	            	<option value="{{sensor_type.__name__}}">{{sensor_type.__name__}}</option>
+	            	{% endfor %}
+	            </select>
 
-				<div class="form-group">
-					<input type="text" class="form-control" name="name" placeholder="Sensor name">
-				</div>
-
-				<div class="form-group">
-		            <select class="selectpicker" data-title="Actuators" name="actuators"
-		                    placeholder="Linked actuators" multiple>
-		            	{% for actuator in actuators %}
-		            	<option value="{{actuator.device_id}}">{{actuator.name}}</option>
-		            	{% endfor %}
-		            </select>
-	            </div>
-
-
-				<div class="form-group">
-		            <select class="selectpicker" data-width="auto" data-title="Sensor type" name="type"
-		                    placeholder="Sensor type">
-		            	{% for sensor_type in sensor_types %}
-		            	<option value="{{sensor_type.__name__}}">{{sensor_type.__name__}}</option>
-		            	{% endfor %}
-		            </select>
-	            </div>
-
-				<button type="submit" class="btn btn-primary">Add device</button>
+				<button type="submit" class="btn btn-primary form-control">Add device</button>
 			</form>
 
 		</div>
@@ -56,15 +45,7 @@
 			<h2>Lamps</h2>
 
 			<ul class="lamps">
-<!--
-				{% for lamp in lamps %}
-				<li {% if lamp.turned_on %}class="turned_on"{% endif %} data-sensor-id="{{lamp.device_id}}">
-					<span class="device_id">{{ lamp.device_id }}</span><br />
-					<span class="name">{{lamp.name}}</span>
-				</li>
-				{% endfor %}
--->
-
+				<!-- Populated by JS Handlebars -->
 			</ul>
 
 		</div>
@@ -75,15 +56,56 @@
 
 {% block javascript %}
 
+<!-- Handlebars templates for sensors / lamps -->
 {% raw %}
 <script id="sensor-template" type="text/x-handlebars-template">
-	<li {{#if ignored}}class="ignored"{{/if}} data-sensor-id="{{device_id}}">
+	<li class="sensor{{#if ignored}} ignored{{/if}}" data-sensor-id="{{device_id}}">
+		<div class="heading">
+			<span class="device_id">{{device_id}}</span> <span class="name">{{name}}</span>
 
+			<span class="delete glyphicon glyphicon-remove"></span>
+		</div>
+
+		<div class="details">
+			<ul class="list-group infos">
+				<li class="list-group-item">
+					{{#if ignored}}
+						<span class="sensor-status label-danger">Ignoré</span>
+						<input class="modern-toggle sensor-toggle" type="checkbox" />
+					{{else}}
+						<span class="sensor-status label-success">Activé</span>
+						<input class="modern-toggle sensor-toggle" type="checkbox" checked/>
+					{{/if}}
+				</li>
+
+				<li class="list-group-item">
+					<span class="title">Type:</span> {{type}}
+				</li>
+
+				{{#if events}}
+					<li class="list-group-item">
+						<span class="title">Events:</span>
+			            <select class="selectpicker form-control" data-width="auto" data-title="Event" name="event" placeholder="Event">
+						{{#each events}}
+				            	<option value="{{this}}">{{this}}</option>
+		            	{{/each}}
+			            </select>
+					</li>
+				{{/if}}
+
+			</ul>
+
+
+		</div>
+	</li>
+</script>
+
+<script id="lamp-template" type="text/x-handlebars-template">
+	<li {{#if turned_on}}class="turned_on"{{/if}} data-sensor-id="{{device_id}}">
 		<span class="device_id">{{device_id}}</span> <span class="name">{{name}}</span>
-		<span class="delete glyphicon glyphicon-remove"></span>
 	</li>
 </script>
 {% endraw %}
 
-<script src="/static/js/sensors.js"></script>
+<script src="/static/js/setup.js"></script>
 {% endblock %}
