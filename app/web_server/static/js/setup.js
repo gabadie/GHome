@@ -30,8 +30,6 @@ var updateSensors = function() {
             $.each(data.result, function(i, s) {
                 $('.sensors').append(sensor_template(s));
             });
-
-            bindSensors();
     });
 }
 
@@ -49,8 +47,8 @@ var updateLamps = function() {
 
 var bindSensors = function() {
 
-    $('.sensors li .heading').unbind();
-    $('.sensors li .heading').click(function(e) {
+    $('.sensors').on('click', 'li .heading', function(e) {
+        console.log('lol');
         $li = $(this).closest('li');
         $('.sensors li').not($li).find('.details').hide(200);
 
@@ -60,8 +58,8 @@ var bindSensors = function() {
 
     });
 
-    $('.sensors li .sensor-toggle').unbind();
-    $('.sensors li .sensor-toggle').click(function(e) {
+    $('.sensors').on('click', 'li .sensor-toggle', function(e) {
+        console.log('lol');
         $li = $(this).closest('li.sensor');
         var currently_ignored = $li.hasClass('ignored');
         var sensor_id = $li.attr('data-sensor-id');
@@ -75,7 +73,6 @@ var bindSensors = function() {
             $new_li = $("[data-sensor-id='" + sensor.device_id + "']");
             $new_li.find('.details').show();
 
-            bindSensors();
         });
 
         if (currently_ignored) {
@@ -87,12 +84,14 @@ var bindSensors = function() {
 
     });
 
-    $('.sensors li .delete').unbind();
-    $('.sensors li .delete').click(function(e) {
-        var sensor_id = $(this).parent('li').attr('data-sensor-id');
+    $('.sensors').on('click', 'li .delete', function(e) {
+        $this = $(this).closest('li');
+        var sensor_id = $this.attr('data-sensor-id');
 
         apiCall('/sensor/' + sensor_id, 'DELETE', {}, function(data) {
-            updateSensors();
+            $this.hide(200, function() {
+                $this.remove();
+            });
         });
 
         // Avoid triggering an event on the parent li
