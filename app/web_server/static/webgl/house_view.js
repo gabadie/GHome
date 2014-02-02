@@ -36,11 +36,90 @@ function House()
 
 }
 
-function HouseWall(house)
+var objectsLib = new Object();
+objectsLib.cube = [
+    // vertex       , normal
+    // Z
+    -1.0, -1.0,  1.0,  0.0,  0.0,  1.0,
+    +1.0, -1.0,  1.0,  0.0,  0.0,  1.0,
+    +1.0, +1.0,  1.0,  0.0,  0.0,  1.0,
+    +1.0, +1.0,  1.0,  0.0,  0.0,  1.0,
+    -1.0, +1.0,  1.0,  0.0,  0.0,  1.0,
+    -1.0, -1.0,  1.0,  0.0,  0.0,  1.0,
+
+    +1.0, -1.0, -1.0,  0.0,  0.0, -1.0,
+    -1.0, -1.0, -1.0,  0.0,  0.0, -1.0,
+    -1.0, +1.0, -1.0,  0.0,  0.0, -1.0,
+    -1.0, +1.0, -1.0,  0.0,  0.0, -1.0,
+    +1.0, +1.0, -1.0,  0.0,  0.0, -1.0,
+    +1.0, -1.0, -1.0,  0.0,  0.0, -1.0,
+
+    // Y
+    +1.0, +1.0, -1.0,  0.0,  1.0,  0.0,
+    -1.0, +1.0, -1.0,  0.0,  1.0,  0.0,
+    -1.0, +1.0, +1.0,  0.0,  1.0,  0.0,
+    -1.0, +1.0, +1.0,  0.0,  1.0,  0.0,
+    +1.0, +1.0, +1.0,  0.0,  1.0,  0.0,
+    +1.0, +1.0, -1.0,  0.0,  1.0,  0.0,
+
+    -1.0, -1.0, +1.0,  0.0, -1.0,  0.0,
+    +1.0, -1.0, -1.0,  0.0, -1.0,  0.0,
+    +1.0, -1.0, +1.0,  0.0, -1.0,  0.0,
+    -1.0, -1.0, -1.0,  0.0, -1.0,  0.0,
+    +1.0, -1.0, -1.0,  0.0, -1.0,  0.0,
+    -1.0, -1.0, +1.0,  0.0, -1.0,  0.0,
+
+    // X
+    +1.0, -1.0, -1.0,  1.0,  0.0,  0.0,
+    +1.0, +1.0, -1.0,  1.0,  0.0,  0.0,
+    +1.0, +1.0, +1.0,  1.0,  0.0,  0.0,
+    +1.0, +1.0, +1.0,  1.0,  0.0,  0.0,
+    +1.0, -1.0, +1.0,  1.0,  0.0,  0.0,
+    +1.0, -1.0, -1.0,  1.0,  0.0,  0.0,
+
+    -1.0, +1.0, +1.0, -1.0,  0.0,  0.0,
+    -1.0, -1.0, -1.0, -1.0,  0.0,  0.0,
+    -1.0, -1.0, +1.0, -1.0,  0.0,  0.0,
+    -1.0, +1.0, -1.0, -1.0,  0.0,  0.0,
+    -1.0, -1.0, -1.0, -1.0,  0.0,  0.0,
+    -1.0, +1.0, +1.0, -1.0,  0.0,  0.0,
+];
+
+function HouseWallVertexArray(wall_count)
 {
-    this.walls = new Array();
+    this.vertices_count = wall_count * 6 * 6;
+    this.array = new Array(this.vertices_count * 3);
+    this.wall_id = 0;
 
+    this.wall = function(x0, y0, x1, y1)
+    {
+        var stride = 6;
+        var offset = 36 * stride * this.wall_id;
+        var wall_thickness = 0.1;
 
+        var x = float(x0 - 0.5 * wall_thickness);
+        var y = float(y0 - 0.5 * wall_thickness);
+        var z = float(0.0);
+        var dx = float(wall_thickness + x1 - x0);
+        var dy = float(wall_thickness + y1 - y0);
+        var dz = float(2.2);
+
+        this.wall_id++;
+
+        for (var i = 0; i < 36; i++)
+        {
+            // vertice
+            this.array[offset + i * stride + 0] = x + dx * (0.5 + 0.5 * objectsLib.cube[i * stride + 0]);
+            this.array[offset + i * stride + 1] = y + dy * (0.5 + 0.5 * objectsLib.cube[i * stride + 1]);
+            this.array[offset + i * stride + 2] = z + dz * (0.5 + 0.5 * objectsLib.cube[i * stride + 2]);
+
+            // normal
+            this.array[offset + i * stride + 3] = objectsLib.cube[i * stride + 3];
+            this.array[offset + i * stride + 4] = objectsLib.cube[i * stride + 4];
+            this.array[offset + i * stride + 5] = objectsLib.cube[i * stride + 5];
+        }
+
+    }
 
 }
 
@@ -76,6 +155,23 @@ function HouseView(output, canvas_id, house)
 
     this.update_model = function()
     {
+        var room_count = this.house.rooms.length;
+        var wall_count = room_count * 4;
+
+        var wall_vertices = HouseWallVertexArray(wall_count);
+
+        for (var i = 0; i < room_count; i++)
+        {
+            var x0 = this.house.rooms[i].x;
+            var y0 = this.house.rooms[i].y;
+            var x1 = x0 + this.house.rooms[i].w;
+            var y1 = y0 + this.house.rooms[i].h;
+
+            wall_vertices.wall(x0, y0, x1, y0);
+            wall_vertices.wall(x1, y0, x1, y1);
+            wall_vertices.wall(x0, y1, x1, y1);
+            wall_vertices.wall(x0, y0, x0, y1);
+        }
 
         this.update()
     }
@@ -87,10 +183,10 @@ function HouseView(output, canvas_id, house)
         gl.clearColor(0.2, 0.5, 1.0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
 
-        var model_screen_matrix = mul4(this.viewport.projectionScreenMatrix, this.camera.modelProjectionMatrix);
+        var space_screen_matrix = mul4(this.viewport.projectionScreenMatrix, this.camera.spaceProjectionMatrix);
 
-        gl.useProgram(self.program);
-        gl.uniformMatrix4fv(self.uniform.model_screen_matrix, false, new Float32Array(model_screen_matrix));
+        gl.useProgram(this.program);
+        gl.uniformMatrix4fv(this.uniform.model_screen_matrix, false, new Float32Array(space_screen_matrix));
 
     }
 

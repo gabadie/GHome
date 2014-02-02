@@ -21,13 +21,16 @@
 
     function main()
     {
-        console = new EngineConsole();
+        var console = new EngineConsole();
 
-        house = new House();
-        house_view = new HouseView(console, "renderingZone", house);
+        var house = new House();
+        var house_view = new HouseView(console, "renderingZone", house);
     }
 
-    main();
+    document.body.onload = function()
+    {
+        main();
+    }
 
 </script>
 
