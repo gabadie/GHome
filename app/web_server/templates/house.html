@@ -1,32 +1,16 @@
-<html>
-    <head>
-        <title> House View </title>
-    </head>
-    <body>
-        <h1> Hello, {{ user}}, what do you want to listen to ? </h1>
-        <form id="play-music" class="form-music" >
-            <h4>Choose a category</h4>
+{% extends "base.html" %}
 
-            <div class="form-group">
-                <input id="tag" type=text list=browsers name=tag>
-                <datalist id=browsers >
-                    {% for option in combo_options %}
-                    <option> {{option}}
-                    {% endfor %}
-                </datalist>
-            </div>
-            <button type="submit" class="btn btn-primary btn-sm">Search for music</button>
-        </form>
-         <button id="pausing"> Pause </button>
-         <button id="next"> next </button>
-         <button id="previous"> previous </button>
-        <label> Music playing now is = </label>
-        <text id="fileName"> </text>
-    </body>
-</html>
+{% block style %}
+{% endblock %}
 
-    <!-- JS files, placed at the end for faster page loading -->
-    <script src="static/js/jquery-1.10.2.js"></script>
-    <script src="static/js/jquery.form.min.js"></script>
+{% block body %}
+<div class="container">
+    {% include "header.html" %}
 
-    <script src="static/js/music.js"></script>
+    Hello world
+</div>
+{% endblock body %}
+
+
+{% block javascript %}
+{% endblock %}
