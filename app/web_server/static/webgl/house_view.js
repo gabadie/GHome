@@ -191,7 +191,7 @@ function HouseView(output, canvas_id, house)
         gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
         gl.enable(gl.DEPTH_TEST);
 
-        gl.clearColor(0.2, 0.5, 1.0, 1.0);
+        gl.clearColor(0.0, 0.0, 0.0, 0.0);
         gl.clearDepth(1.0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -199,10 +199,13 @@ function HouseView(output, canvas_id, house)
 
         gl.useProgram(this.program);
         gl.uniformMatrix4fv(this.uniform.model_screen_matrix, false, new Float32Array(space_screen_matrix));
+        gl.uniform4f(this.uniform.albedo, 0.85, 0.9, 1.0, 1.0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
         gl.enableVertexAttribArray(this.attribute.vertex);
+        gl.enableVertexAttribArray(this.attribute.normal);
         gl.vertexAttribPointer(this.attribute.vertex, 3, gl.FLOAT, false, 4 * 6, 4 * 0);
+        gl.vertexAttribPointer(this.attribute.normal, 3, gl.FLOAT, false, 4 * 6, 4 * 3);
 
         gl.drawArrays(gl.TRIANGLES, 0, this.vertices_count);
     }
@@ -212,16 +215,27 @@ function HouseView(output, canvas_id, house)
         var gl = this.gl;
 
         var vertex_shader_code = [
-            "attribute vec3 vertex;",
+            "precision mediump float;",
+            "attribute vec3 in_vertex;",
+            "attribute vec3 in_normal;",
+            "varying vec3 normal;",
             "uniform mat4 modelScreenMatrix;",
             "void main() {",
-                "gl_Position = modelScreenMatrix * vec4(vertex, 1.0);",
+                "normal = in_normal;",
+                "gl_Position = modelScreenMatrix * vec4(in_vertex, 1.0);",
             "}"
         ].join("\n");
 
         var fragment_shader_code = [
+            "precision mediump float;",
+            "varying vec3 normal;",
+            "uniform vec4 albedo;",
             "void main() {",
-                "gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);",
+                "float factor = 0.1 * max(dot(normal, vec3(-3.0, -5.0, 7.0)), 0.0);",
+                "gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0) * (0.5 + 0.4 * factor);",
+                "gl_FragColor *= albedo;",
+                //"gl_FragColor.xyz = 0.5 + 0.5 * normal;",
+                "gl_FragColor.a = 1.0;",
             "}"
         ].join("\n");
 
@@ -242,9 +256,11 @@ function HouseView(output, canvas_id, house)
 
         this.uniform = new Object();
         this.uniform.model_screen_matrix = gl.getUniformLocation(this.program, "modelScreenMatrix");
+        this.uniform.albedo = gl.getUniformLocation(this.program, "albedo");
 
         this.attribute = new Object();
-        this.attribute.vertex = gl.getAttribLocation(this.program, "vertex");
+        this.attribute.vertex = gl.getAttribLocation(this.program, "in_vertex");
+        this.attribute.normal = gl.getAttribLocation(this.program, "in_normal");
     }
 
     this.load();
