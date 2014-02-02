@@ -87,7 +87,8 @@ def event_binding():
         connections = [dump_connection(c) for c in event.Connection.objects]
         resp = dict(ok=True, result=connections)
     elif request.method == 'POST':
-        sensor_id, s_event, actuator_id, callback = [request.json[attr] for attr in ['sensor', 'event', 'actuator', 'callback']]
+        sensor_id, s_event = request.json['sensor'], request.json['event']
+        actuator_id, callback = request.json['actuator'], request.json['callback']
         connection_id = rpc.bind_devices(sensor_id, s_event, actuator_id, callback)
         connection = json.loads(event.Connection.objects.get(connection_id).to_json())
         resp = dict(ok=True, result=connection)

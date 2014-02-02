@@ -6,6 +6,9 @@ loadTemplate = function(template_id) {
 $(document).ready(function() {
     sensor_template = loadTemplate('#sensor-template');
     lamp_template = loadTemplate('#lamp-template');
+    connection_template = loadTemplate('#connection-template');
+
+    Handlebars.registerPartial("connection-template", $("#connection-template").html());
 
     updateSensors();
     bindSensors();
@@ -108,12 +111,24 @@ var bindSensors = function() {
         });
     });
 
+    // Adding an event binding
+    $('.sensors').on('click', '.callback-binding .add', function(e) {
+        var $this = $(this);
+
+        // var binding_form = $this.closest('form');
+
+        // FORM = binding_form;
+        // console.log(binding_form);
+        // console.log(binding_form.serialize());
+    });
 
     // Activating the right callbacks' list
     $('.sensors').on('change', 'select[name="actuator"]', function(e) {
         $('select[name="callback"]').prop('disabled', true);
         $('select[name="callback"][data-actuator-id="' + $(this).val() + '"]').prop('disabled', false);
     });
+
+
 
 
     // s = $('select[name="callback"][data-actuator-id="889977"]')

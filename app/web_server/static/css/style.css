@@ -191,13 +191,21 @@ input.sensor-toggle {
 }
 
 .callback-binding select {
-    width: 20%;
     margin: 0 0.5%;
     display: inline-block;
 }
 
 .callback-binding select[name="callback"]:disabled {
     display: none;
+}
+
+.callback-binding .add {
+    margin-top: 8px;
+    color: #27ae60;
+}
+
+.callback-binding .add:hover {
+    color: #2ecc71;
 }
 
 .sensors li.ignored .heading{
