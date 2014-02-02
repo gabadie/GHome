@@ -35,7 +35,7 @@ function EngineViewportInit(obj)
 
 function EngineCameraInit(obj)
 {
-    obj.from = [ -1.0, 0.0, 0.0 ];
+    obj.from = [ 0.0, -1.0, 0.0 ];
     obj.at = [ 0.0, 0.0, 0.0 ];
     obj.near = 0.1;
     obj.far = 1000.0;
@@ -98,5 +98,13 @@ function EngineCameraInit(obj)
 
 }
 
+function Viewport()
+{
+    EngineViewportInit(this);
+}
 
+function Camera()
+{
+    EngineCameraInit(this);
+}
 
