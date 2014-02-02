@@ -98,5 +98,13 @@ function EngineCameraInit(obj)
 
 }
 
+function Viewport()
+{
+    EngineViewportInit(this);
+}
 
+function Camera()
+{
+    EngineCameraInit(this);
+}
 

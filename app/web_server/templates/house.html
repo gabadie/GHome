@@ -15,6 +15,7 @@
 <script type="text/javascript" src="static/webgl/utils.js"></script>
 <script type="text/javascript" src="static/webgl/console.js"></script>
 <script type="text/javascript" src="static/webgl/camera.js"></script>
+<script type="text/javascript" src="static/webgl/house_view.js"></script>
 
 <script type="text/javascript">
 
@@ -22,7 +23,8 @@
     {
         console = new EngineConsole();
 
-        console.error('hello world');
+        house = new House();
+        house_view = new HouseView(console, "renderingZone", house);
     }
 
     main();

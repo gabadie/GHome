@@ -56,6 +56,44 @@ function utilBaseName(url)
     return url.replace(/\\/g,'/').replace( /.*\//, '' );
 }
 
+function createWebGLXContext(canvas,version=1)
+{
+    var gl = null;
+
+    if (version == 2)
+    {
+        gl = canvas.getContext("experimental-webgl2");
+
+        if (!gl)
+        {
+            throw 'WebGL 2 unsupported';
+        }
+
+        if (!gl instanceof WebGL2RenderingContext)
+        {
+            // unexpected rendering context.
+            return false;
+            throw 'Unexpected WebGL 2 rendering context';
+        }
+    }
+    else if (version == 1)
+    {
+        gl = canvas.getContext("experimental-webgl");
+
+        if (!gl)
+        {
+            throw 'WebGL 1 unsupported';
+        }
+
+        if (!gl instanceof WebGLRenderingContext)
+        {
+            throw 'Unexpected WebGL 1 rendering context';
+        }
+    }
+
+    return gl;
+};
+
 
 // --------------------------------------------------------------- MATH
 
