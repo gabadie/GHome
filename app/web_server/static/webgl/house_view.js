@@ -86,6 +86,12 @@ function HouseView(output, canvas_id, house)
 
         gl.clearColor(0.2, 0.5, 1.0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
+
+        var model_screen_matrix = mul4(this.viewport.projectionScreenMatrix, this.camera.modelProjectionMatrix);
+
+        gl.useProgram(self.program);
+        gl.uniformMatrix4fv(self.uniform.model_screen_matrix, false, new Float32Array(model_screen_matrix));
+
     }
 
     this.load = function()
@@ -120,6 +126,12 @@ function HouseView(output, canvas_id, house)
         gl.linkProgram(program);
 
         this.program = program;
+
+        this.uniform = new Object();
+        this.uniform.model_screen_matrix = gl.getUniformLocation(this.program, "modelScreenMatrix");
+
+        this.attribute = new Object();
+        this.attribute.vertex = gl.getAttribLocation(this.program, "vertex");
     }
 
     this.load();
