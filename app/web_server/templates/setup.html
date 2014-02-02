@@ -87,6 +87,83 @@
 
 				{{#if events}}
 
+					{{#if connections}}
+					<li class="list-group-item">
+						{{! List of existing event bindings}}
+						<table class="table table-striped">
+					      <thead>
+					        <tr>
+					          <th>Event</th>
+					          <th>Actuator</th>
+					          <th>Callback</th>
+					          <th> </th>
+					        </tr>
+					      </thead>
+					      <tbody>
+
+
+						{{#each connections}}
+					        <tr class="event-connection" data-connection-id="{{_id.$oid}}">
+
+								<td>
+									{{triggering_event}}
+								</td>
+
+								<td>
+									<span class="device_id">{{receiving_object.device_id}}</span>  {{receiving_object.name}}
+								</td>
+
+								<td>
+									{{method_name}}
+								</td>
+
+								<td>
+									<span class="delete glyphicon glyphicon-remove"></span>
+								</td>
+							</tr>
+						{{/each}}
+
+							{{!-- Binding events should be done inside the table, but it's buggy for some reason
+							<tr class="callback-binding">
+								<td>
+									{{! Event select }}
+						            <select class="form-control" name="event" placeholder="Event">
+									{{#each events}}
+							            	<option value="{{this}}">{{this}}</option>
+					            	{{/each}}
+						            </select>
+					            </td>
+
+								<td>
+						            {{! Actuators select }}
+									<select class="form-control" name="actuator" placeholder="Actuator">
+									{{#each actuators}}
+							            	<option value="{{device_id}}">{{name}}</option>
+					            	{{/each}}
+						            </select>
+						        </td>
+
+								<td>
+						            {{! Each actuator's callbacks select }}
+						            {{#each actuators}}
+						            		<select class="form-control" name="callback" placeholder="Callback" data-actuator-id="{{device_id}}" {{#if @first}}{{else}}disabled{{/if}}>
+											{{#each callbacks}}
+									            	<option value="{{this}}">{{this}}</option>
+							            	{{/each}}
+								            </select>
+					            	{{/each}}
+				            	</td>
+
+							</tr>
+ 							--}}
+
+
+					      </tbody>
+					    </table>
+
+					</li>
+					{{/if}}
+
 
 					<li class="list-group-item callback-binding">
 						<span class="title">Bind a callback:</span>

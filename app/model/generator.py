@@ -126,3 +126,7 @@ class Generator:
     def unique_id(self):
         self.id += 1
         return self.id
+
+if __name__ == '__main__':
+    g = Generator(GlobalConfig())
+    g.generate_sample()

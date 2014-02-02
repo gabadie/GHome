@@ -113,7 +113,9 @@ class RpcServer(xmlrpc.XMLRPC):
             logger.error("Unknown device when binding {}.{} to {}.{}".format(sensor.__class__, sensor_event, actuator.__class__, actuator_callback))
             return
 
-        sensor.events[sensor_event].connect(actuator.callbacks[actuator_callback])
+        connection = sensor.events[sensor_event].connect(actuator.callbacks[actuator_callback])
+
+        return connection.id
 
     def xmlrcp_trigger_event(self, sensor_id, sensor_event):
         sensor = devices.Sensor.objects(device_id=sensor_id).first()

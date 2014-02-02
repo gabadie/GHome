@@ -87,11 +87,13 @@ class Event(mongoengine.Document):
         connection = Connection(triggering_event=self, receiving_object=obj, method_name=method_name)
         connection.save()
 
+        return connection
+
     def delete(self):
         for c in Connection.objects(triggering_event=self):
             c.delete()
 
-        mongoengine.Document.delete(self)
+        super(Event, self).delete()
 
 
 class Connection(mongoengine.Document):
@@ -104,7 +106,7 @@ class Connection(mongoengine.Document):
 
         if self.method_name not in class_content:
             logger.error("Can not trigger event connection: {}.{} have been removed...".format(self.receiving_object.__class__.__name__, self.method_name))
-            raise NotImplemented
+            raise ValueError
 
         class_content[self.method_name](self.receiving_object, server)
 

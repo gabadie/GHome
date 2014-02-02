@@ -61,7 +61,7 @@ body {
 	padding: 0;
 }
 
-.big-menu  li{
+.big-menu li{
 	text-align: center;
 	width: 49%;
 	margin: 0.5%;
@@ -217,12 +217,20 @@ input.sensor-toggle {
 	margin-right: 10px;
 }
 
-.sensors li .glyphicon {
+.sensors li .heading .glyphicon {
 	float: right;
 	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
 	opacity: 0.5;
 	color: #FFF;
 	margin: 0 3px;
+}
+
+.event-connection .delete {
+    color: #c0392b;
+}
+
+.event-connection .delete:hover {
+    color: #e74c3c;
 }
 
 

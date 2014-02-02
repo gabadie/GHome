@@ -5,22 +5,23 @@ import xmlrpclib
 import calendar
 import json
 import sys
-sys.path.insert(0, '..')
+sys.path.append('..')
 
 from flask import Flask, render_template, request, jsonify
 import mongoengine
 
-from model import devices
+from model import devices, event
 from enocean.devices import Sensor, Lamp
 
 from config import GlobalConfig
 config = GlobalConfig()
 
-# Initializing the app
+## Initializing the app
 app = Flask(__name__)
 app.debug = True
 rpc = xmlrpclib.Server('http://{}:{}/'.format(config.main_server.ip, config.main_server.rpc_port))
 
+## Utility functions
 def dump_actuator(actuator):
     a_json = json.loads(actuator.to_json())
     a_json['callbacks'] = actuator.callbacks.keys()
@@ -30,10 +31,29 @@ def dump_sensor(sensor):
     s_json = json.loads(sensor.to_json())
     s_json['events'] = sensor.events.keys()
     s_json['type'] = sensor.__class__.__name__
+
     # TODO : find a way to render the sensors without putting this into each sensor's data
     s_json['actuators'] = [dump_actuator(actuator) for actuator in devices.Actuator.objects]
+
+    # TODO : Dirty hack to get events' name
+    connections = dict()
+    for e_name, e in sensor.events.iteritems():
+        connections = [dump_connection(c) for c in event.Connection.objects(triggering_event=e)]
+        for c in connections:
+            c['triggering_event'] = e_name
+
+    s_json['connections'] = connections
+
     return s_json
 
+
+def dump_connection(connection):
+    c_json = json.loads(connection.to_json())
+    c_json['receiving_object'] = json.loads(connection.receiving_object.to_json())
+    c_json['triggering_event'] = json.loads(connection.triggering_event.to_json())
+    return c_json
+
+## Main pages
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -54,6 +74,49 @@ def news():
     return render_template('news.html')
 
 
+## API
+
+@app.route('/connection', methods=['GET', 'POST'])
+def event_binding():
+    resp = dict(ok=False)
+    if request.method == 'GET':
+        connections = [dump_connection(c) for c in event.Connection.objects]
+        resp = dict(ok=True, result=connections)
+    elif request.method == 'POST':
+        sensor_id, s_event, actuator_id, callback = [request.json[attr] for attr in ['sensor', 'event', 'actuator', 'callback']]
+        connection_id = rpc.bind_devices(sensor_id, s_event, actuator_id, callback)
+        connection = json.loads(event.Connection.objects.get(connection_id).to_json())
+        resp = dict(ok=True, result=connection)
+
+    return json.dumps(resp)
+
+
+@app.route('/connection/<connection_id>', methods=['GET', 'DELETE'])
+def event_connection(connection_id):
+    resp = dict(ok=False)
+    connection = event.Connection.objects.get(id=connection_id)
+
+    if connection is None:
+        return json.dumps(resp)
+    elif request.method == 'GET':
+        c_json = dump_connection(connection)
+        resp = dict(ok=True, result=c_json)
+    elif request.method == 'DELETE':
+        connection.delete()
+        resp = dict(ok=True)
+
+    return json.dumps(resp)
+
+@app.route('/sensor/<sensor_id>/connections', methods=['GET'])
+def sensor_connections(sensor_id):
+    resp = dict(ok=False)
+    if request.method == 'GET':
+        sensor = Sensor.objects.get(device_id=sensor_id)
+        resp = dict(ok=True, result=dump_sensor(sensor)['connections'])
+
+    return json.dumps(resp)
+
+# Monitoring
 @app.route('/graph_data', methods=['GET'])
 def graph_data():
     temp_map = defaultdict(list)
@@ -72,7 +135,6 @@ def graph_data():
 
 
 # Devices
-
 @app.route('/sensor', methods=['POST', 'GET'])
 def all_sensors():
     if request.method == 'GET':
@@ -106,9 +168,12 @@ def all_sensors():
 def sensor(device_id):
     device_id = int(device_id)
     if request.method == 'GET':
-        sensor = json.loads(Sensor.objects(device_id=device_id).to_json())[0]
-        print sensor
-        resp = dict(ok=True, result=sensor)
+        s = Sensor.objects.get(device_id=device_id)
+        if s is None:
+            resp = dict(ok=True, result="Couldn't find sensor")
+        else:
+            sensor = json.loads(s.to_json())
+            resp = dict(ok=True, result=sensor)
     elif request.method == 'DELETE':
         device = Sensor.objects(device_id=device_id).first()
         print device
@@ -143,8 +208,8 @@ def lamps():
 
     return json.dumps(resp)
 
-# Music player
 
+# Music player
 @app.route('/player', methods=['POST','GET'])
 def playMusic():
     if request.method == 'POST':

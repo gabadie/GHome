@@ -7,11 +7,10 @@ $(document).ready(function() {
     sensor_template = loadTemplate('#sensor-template');
     lamp_template = loadTemplate('#lamp-template');
 
-
     updateSensors();
     bindSensors();
     updateLamps();
-    setInterval(updateLamps, 500);
+    //setInterval(updateLamps, 500);
 
     $('#add-sensor').ajaxForm({
         dataType:  'json',
@@ -47,7 +46,6 @@ var bindSensors = function() {
 
     // Expanding a sensor's view (by clicking on its heading)
     $('.sensors').on('click', 'li .heading', function(e) {
-        console.log('lol');
         $li = $(this).closest('li');
         $('.sensors li').not($li).find('.details').hide(200);
 
@@ -59,7 +57,6 @@ var bindSensors = function() {
 
     // Toggling a sensor's state (ignored / not ignored)
     $('.sensors').on('click', 'li .sensor-toggle', function(e) {
-        console.log('lol');
         $li = $(this).closest('li.sensor');
         var currently_ignored = $li.hasClass('ignored');
         var sensor_id = $li.attr('data-sensor-id');
@@ -85,7 +82,7 @@ var bindSensors = function() {
     });
 
     // Deleting a sensor
-    $('.sensors').on('click', 'li .delete', function(e) {
+    $('.sensors').on('click', '.heading .delete', function(e) {
         $this = $(this).closest('li');
         var sensor_id = $this.attr('data-sensor-id');
 
@@ -99,11 +96,23 @@ var bindSensors = function() {
         e.stopPropagation();
     });
 
+    // Deleting an event binding
+    $('.sensors').on('click', '.event-connection .delete', function(e) {
+        var connection_li = $(this).closest('.event-connection');
+        var connection_id = connection_li.attr('data-connection-id');
+
+        apiCall('/connection/' + connection_id, 'DELETE', {}, function(data) {
+            if (data.ok) {
+                connection_li.hide(300, function() { connection_li.remove(); });
+            }
+        });
+    });
+
+
     // Activating the right callbacks' list
     $('.sensors').on('change', 'select[name="actuator"]', function(e) {
         $('select[name="callback"]').prop('disabled', true);
         $('select[name="callback"][data-actuator-id="' + $(this).val() + '"]').prop('disabled', false);
-
     });
 
 
