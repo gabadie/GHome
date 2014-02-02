@@ -112,16 +112,6 @@ class RpcServer(xmlrpc.XMLRPC):
         logger.info("RpcServer.xmlrpc_ping(\"" + str(msg) + "\")")
         return msg
 
-    # TODO : Remove this? (can't create a generic device, needs args)
-    def xmlrpc_create_device(self, device_id, device_name, device_type):
-        # Finding the device class
-        DeviceClass = [d_class for d_class in model.devices.Device.__subclasses__() if d_class.__name__ == device_type][0]
-
-        d = DeviceClass(device_id=device_id, name=device_name, ignored=False)
-        d.save()
-
-        return True
-
     @staticmethod
     def xmlrpc_bind_devices(sensor_id, sensor_event, actuator_id, actuator_callback):
         sensor = devices.Sensor.objects(device_id=sensor_id).first()
