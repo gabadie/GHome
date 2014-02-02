@@ -97,12 +97,12 @@ function HouseWallVertexArray(wall_count)
         var offset = 36 * stride * this.wall_id;
         var wall_thickness = 0.1;
 
-        var x = float(x0 - 0.5 * wall_thickness);
-        var y = float(y0 - 0.5 * wall_thickness);
-        var z = float(0.0);
-        var dx = float(wall_thickness + x1 - x0);
-        var dy = float(wall_thickness + y1 - y0);
-        var dz = float(2.2);
+        var x = (x0 - 0.5 * wall_thickness);
+        var y = (y0 - 0.5 * wall_thickness);
+        var z = (0.0);
+        var dx = (wall_thickness + x1 - x0);
+        var dy = (wall_thickness + y1 - y0);
+        var dz = (2.2);
 
         this.wall_id++;
 
@@ -155,10 +155,12 @@ function HouseView(output, canvas_id, house)
 
     this.update_model = function()
     {
+        var gl = this.gl;
+
         var room_count = this.house.rooms.length;
         var wall_count = room_count * 4;
 
-        var wall_vertices = HouseWallVertexArray(wall_count);
+        var wall_vertices = new HouseWallVertexArray(wall_count);
 
         for (var i = 0; i < room_count; i++)
         {
@@ -173,6 +175,12 @@ function HouseView(output, canvas_id, house)
             wall_vertices.wall(x0, y0, x0, y1);
         }
 
+        this.buffer = gl.createBuffer();
+        this.vertices_count = wall_vertices.vertices_count;
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(wall_vertices.array), gl.STATIC_DRAW);
+
         this.update()
     }
 
@@ -180,14 +188,23 @@ function HouseView(output, canvas_id, house)
     {
         var gl = this.gl;
 
+        gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+        gl.enable(gl.DEPTH_TEST);
+
         gl.clearColor(0.2, 0.5, 1.0, 1.0);
-        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.clearDepth(1.0);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         var space_screen_matrix = mul4(this.viewport.projectionScreenMatrix, this.camera.spaceProjectionMatrix);
 
         gl.useProgram(this.program);
         gl.uniformMatrix4fv(this.uniform.model_screen_matrix, false, new Float32Array(space_screen_matrix));
 
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+        gl.enableVertexAttribArray(this.attribute.vertex);
+        gl.vertexAttribPointer(this.attribute.vertex, 3, gl.FLOAT, false, 4 * 6, 4 * 0);
+
+        gl.drawArrays(gl.TRIANGLES, 0, this.vertices_count);
     }
 
     this.load = function()

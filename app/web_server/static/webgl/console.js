@@ -20,7 +20,7 @@ function EngineConsole()
         div.style.left = '0px';
         div.style.width = utilWindowWidth() + 'px';
         div.style.height = utilWindowHeight() + 'px';
-        div.style.background = 'rgba(0,0,0,0.5)';
+        div.style.background = 'rgba(0,0,0,0.6)';
         div.style.color = 'rgba(255,255,255,0.5)';
         div.style.zIndex = '1';
         div.style.fontFamily = 'Consolas, monospace';
@@ -75,7 +75,7 @@ function EngineConsole()
     {
         var html = '<div>' + message + '</div>';
 
-        html += '<table>';
+        html += '<table style="color:#FFFFFF;">';
         html += '<tr><td>' + matrix[0 + 4 * 0] + '</td><td>' + matrix[0 + 4 * 1] + '</td><td>' + matrix[0 + 4 * 2] + '</td><td>' + matrix[0 + 4 * 3] + '</td></tr>';
         html += '<tr><td>' + matrix[1 + 4 * 0] + '</td><td>' + matrix[1 + 4 * 1] + '</td><td>' + matrix[1 + 4 * 2] + '</td><td>' + matrix[1 + 4 * 3] + '</td></tr>';
         html += '<tr><td>' + matrix[2 + 4 * 0] + '</td><td>' + matrix[2 + 4 * 1] + '</td><td>' + matrix[2 + 4 * 2] + '</td><td>' + matrix[2 + 4 * 3] + '</td></tr>';
