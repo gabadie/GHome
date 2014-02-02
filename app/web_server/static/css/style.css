@@ -23,6 +23,41 @@ body {
 }
 
 /* main structure */
+#notification-bar {
+    display: none;
+
+    position: fixed;
+    z-index: 2;
+    left: 15%;
+    width: 70%;
+
+    padding: 11px;
+    margin-top: 20px;
+    border-radius: 4px;
+    background: #2D71E9;
+    color: #FFF;
+    font-weight: bold;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+    box-shadow: 1px -1px 25px rgba(0, 0, 0, 0.3);
+}
+
+
+#notification-bar.info {
+    background-color: #2980b9;
+}
+
+#notification-bar.success {
+    background-color: #27ae60;
+}
+
+#notification-bar.warning {
+    background-color: #d35400;
+}
+
+#notification-bar.error {
+    background-color: #c0392b;
+}
+
 
 .container {
 	width: 100%;
@@ -93,7 +128,7 @@ body {
 
 .big-menu  li::after {
 	position: absolute;
-	opacity: 1;
+	z-index: -1;
 }
 
 .big-menu .house {

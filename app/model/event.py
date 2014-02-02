@@ -80,9 +80,8 @@ class Event(mongoengine.Document):
     def connect(self, bound_callback):
         obj = bound_callback.__self__
         method_name = bound_callback.__name__
-
-        if len(Connection.objects(triggering_event=self, receiving_object=obj, method_name=method_name)) > 0:
-            return
+        if Connection.objects(triggering_event=self, receiving_object=obj, method_name=method_name):
+            raise ValueError("Connection already exists")
 
         connection = Connection(triggering_event=self, receiving_object=obj, method_name=method_name)
         connection.save()

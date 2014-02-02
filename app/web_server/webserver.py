@@ -82,18 +82,30 @@ def house():
 
 @app.route('/connection', methods=['GET', 'POST'])
 def event_binding():
-    resp = dict(ok=False)
+
     if request.method == 'GET':
         connections = [dump_connection(c) for c in event.Connection.objects]
         resp = dict(ok=True, result=connections)
+        return json.dumps(resp)
+
     elif request.method == 'POST':
         sensor_id, s_event = request.json['sensor'], request.json['event']
         actuator_id, callback = request.json['actuator'], request.json['callback']
-        connection_id = rpc.bind_devices(sensor_id, s_event, actuator_id, callback)
-        connection = json.loads(event.Connection.objects.get(connection_id).to_json())
-        resp = dict(ok=True, result=connection)
 
-    return json.dumps(resp)
+        sensor = devices.Sensor.objects.get(device_id=sensor_id)
+        actuator = devices.Actuator.objects.get(device_id=actuator_id)
+
+        try:
+            connection = sensor.events[s_event].connect(actuator.callbacks[callback])
+        except ValueError as e:
+            resp = dict(ok=False, result=str(e))
+            return json.dumps(resp)
+
+        connection_json = dump_connection(connection)
+        connection_json['triggering_event'] = s_event
+
+        resp = dict(ok=True, result=connection_json)
+        return json.dumps(resp)
 
 
 @app.route('/connection/<connection_id>', methods=['GET', 'DELETE'])
@@ -149,9 +161,9 @@ def all_sensors():
         form = request.form
         s_id, s_name, s_type = [form.get(val) for val in ['id', 'name', 'type']]
 
-        print s_id, s_name, s_type
+        app.logger.info((s_id, s_name, s_type))
 
-        # Converting from hexa representation
+        # Converting from hexadecimal representation
         s_id = int(s_id, 16)
 
         # Finding the sensor class

@@ -113,13 +113,25 @@ var bindSensors = function() {
 
     // Adding an event binding
     $('.sensors').on('click', '.callback-binding .add', function(e) {
-        var $this = $(this);
+        var cb_form = $(this).closest('.callback-binding');
 
-        // var binding_form = $this.closest('form');
+        var sensor = cb_form.find('input[name="sensor"]').val();
+        var event = cb_form.find('select[name="event"]').val();
+        var actuator = cb_form.find('select[name="actuator"]').val();
+        var callback = cb_form.find('select[name="callback"]:enabled').val();
 
-        // FORM = binding_form;
-        // console.log(binding_form);
-        // console.log(binding_form.serialize());
+        var params = {sensor: sensor, event: event, actuator: actuator, callback: callback};
+
+        apiCall('/connection', 'POST', params, function(data) {
+            if (data.ok) {
+                $(this).closest('table').append(connection_template(data.result));
+            }
+            else {
+                notification.error("Couldn't add a binding between '" + event + "' and '"
+                                    + actuator + '.' + callback + "' : " + data.result);
+            }
+        });
+
     });
 
     // Activating the right callbacks' list
