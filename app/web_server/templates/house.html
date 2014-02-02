@@ -7,10 +7,29 @@
 <div class="container">
     {% include "header.html" %}
 
-    Hello world
+    <canvas id="renderingZone" width="512" height="512">
+        WebGL 2 canvas
+    </canvas>
 </div>
-{% endblock body %}
 
+<script type="text/javascript" src="static/webgl/utils.js"></script>
+<script type="text/javascript" src="static/webgl/console.js"></script>
+<script type="text/javascript" src="static/webgl/camera.js"></script>
+
+<script type="text/javascript">
+
+    function main()
+    {
+        console = new EngineConsole();
+
+        console.error('hello world');
+    }
+
+    main();
+
+</script>
+
+{% endblock body %}
 
 {% block javascript %}
 {% endblock %}
