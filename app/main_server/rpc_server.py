@@ -2,11 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import os
 from twisted.web import xmlrpc
 import xmlrpclib
 
-sys.path.append('..')
-sys.path.append('../../libs/py8tracks/')
+#from SimpleXMLRPCServer import SimpleXMLRPCServer
+#from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
+
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__) + '/../'))
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__) + '/../../libs/py8tracks/'))
 
 from config import GlobalConfig
 config = GlobalConfig()
@@ -104,6 +108,10 @@ class RpcServer(xmlrpc.XMLRPC):
         raspi = Raspi()
         self.putSubHandler('raspi',raspi)
 
+    def xmlrpc_ping(self, msg):
+        logger.info("RpcServer.xmlrpc_ping(\"" + str(msg) + "\")")
+        return msg
+
     @staticmethod
     def xmlrpc_bind_devices(sensor_id, sensor_event, actuator_id, actuator_callback):
         sensor = devices.Sensor.objects(device_id=sensor_id).first()
@@ -116,6 +124,7 @@ class RpcServer(xmlrpc.XMLRPC):
         connection = sensor.events[sensor_event].connect(actuator.callbacks[actuator_callback])
 
         return connection.id
+
 
     def xmlrcp_trigger_event(self, sensor_id, sensor_event):
         sensor = devices.Sensor.objects(device_id=sensor_id).first()

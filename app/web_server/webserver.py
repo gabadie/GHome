@@ -73,6 +73,10 @@ def monitoring():
 def news():
     return render_template('news.html')
 
+@app.route('/house')
+def house():
+    return render_template('house.html')
+
 
 ## API
 
