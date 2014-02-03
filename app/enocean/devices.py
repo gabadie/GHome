@@ -10,7 +10,6 @@ import telegram
 import model.devices
 from model import event
 import logger
-from main_server.server import MainServer
 
 class Sensor(model.devices.Sensor):
 
@@ -218,14 +217,13 @@ class Socket(model.devices.Actuator):
 
     def callback_activate(self, server):
         if not self.activated:
-            return callback_toggle()
+            return self.callback_toggle()
 
-    def callback_desactivate(self, server):
+    def  callback_deactivate(self, server):
         if self.activated:
-            return callback_toggle()
+            return self.callback_toggle()
 
     def callback_toggle(self, server):
-        pressed = True
         side = Switch.RIGHT
         if self.activated:
             direction = Switch.TOP
@@ -233,7 +231,7 @@ class Socket(model.devices.Actuator):
             direction = Switch.BOTTOM
 
         telegram = Switch.generate_telegram(sensor_id=self.device_id, side=side, direction=direction, pressed=True)
-        server.enocean_protocol.send_data(telegram.__str__())
+        server.enocean_protocol.send_data(str(telegram))
 
         return self.activate(not self.activated)
 
