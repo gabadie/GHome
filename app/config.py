@@ -22,8 +22,9 @@ class GlobalConfig:
     def __init__(self):
         """ Construct with the development configuration """
 
-        self.mongo_db = "ghome_development"
-        self.api_8tracks =  "cd7a9189d060c79845828dc26471dbd6397cdb31"
+        self.mongo_db = 'ghome_development'
+        self.api_8tracks =  'cd7a9189d060c79845828dc26471dbd6397cdb31'
+        self.api_shopsense = 'uid3444-24262962-52'
 
         self.enocean = GlobalConfig.EnOcean()
         self.main_server = GlobalConfig.MainServer()
