@@ -68,24 +68,38 @@ body {
 }
 
 .header {
-	color: #FFF;
-	padding: 20px;
-	background: #0E111D;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
 
-	/* Gradient, only on Webkit */
-	background-image: -webkit-gradient(
-		linear,
-		left top,
-		left 117%,
-		color-stop(0, #06070A),
-		color-stop(1, #3F484F)
-	);
+  background: #2B3C67;
+  color: #FFF;
+  font-weight: bold;
+  text-shadow: -1px 1px 0px rgba(0, 0, 0, 0.5);
+}
+
+.header a {
+    color: inherit;
+}
+.header a:hover {
+    text-decoration: none;
 }
 
 .header .logo {
 	margin: 10px;
 	font-size: 24px;
 	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+
+    opacity: 0.7;
+}
+
+.header .logo:hover {
+    opacity: 1;
+}
+
+.header .logo .glyphicon {
+    top: 9px;
+    font-size: 33px;
 }
 
 /* Main menu */

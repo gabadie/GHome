@@ -95,6 +95,9 @@ def event_binding():
         sensor = devices.Sensor.objects.get(device_id=sensor_id)
         actuator = devices.Actuator.objects.get(device_id=actuator_id)
 
+        app.logger.info(sensor.events[s_event])
+        app.logger.info(actuator.callbacks[callback])
+
         try:
             connection = sensor.events[s_event].connect(actuator.callbacks[callback])
         except ValueError as e:
