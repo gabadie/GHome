@@ -19,7 +19,7 @@
 
 body {
 	font-family: "OpenSans Regular";
-	background: url('../img/stardust.png');
+	background: url('../img/triangles.png');
 }
 
 /* main structure */
@@ -212,12 +212,20 @@ body {
 }
 
 .sensors li .heading{
-	background: rgba(39, 174, 96, 1);
+	background-color: rgba(39, 174, 96, 1);
 	box-shadow: 0 0 80px rgba(0, 0, 0, 0.2);
 	padding: 10px;
 
 	color: #FFF;
 	border-bottom: none;
+
+    transition: background-color 2s ease;
+}
+
+.sensors li.ignored .heading{
+    background-color: rgba(192, 57, 47, 1);
+    border-color: #DC4435;
+    color: #FF9388;
 }
 
 .sensors li .details {
@@ -255,12 +263,6 @@ input.sensor-toggle {
 
 .callback-binding .add:hover {
     color: #2ecc71;
-}
-
-.sensors li.ignored .heading{
-	background-color: rgba(192, 57, 47, 1);
-	border-color: #DC4435;
-	color: #FF9388;
 }
 
 .sensors .name {
@@ -333,4 +335,42 @@ input.sensor-toggle {
 /* graph */
 #values-chart {
   height: 500px;
+}
+
+
+/* Fashion */
+.fashion-products {
+    list-style: none;
+}
+
+.fashion-products li {
+    width: 30%;
+    display: inline-block;
+    padding: 30px;
+}
+
+
+.fashion-products .img-wrapper {
+    max-height: 350px;
+    display: block;
+    overflow: hidden;
+}
+
+
+.fashion-products .img-wrapper:wrapper {
+    max-height: inherit;
+}
+
+
+.fashion-products li img{
+    width: 100%;
+}
+
+.fashion-products .name {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.fashion-products .price {
+    font-style: italic;
 }

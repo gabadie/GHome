@@ -10,7 +10,8 @@ sys.path.append('..')
 from flask import Flask, render_template, request, jsonify
 import mongoengine
 
-from model import devices, event
+from model import devices, event, fashion
+
 from enocean.devices import Sensor, Lamp
 
 from config import GlobalConfig
@@ -272,6 +273,20 @@ def music():
     combo_options = ["jazzy", "happy", "sad", "worry"] #TODO this in the config file ?
     return render_template("music.html", combo_options=combo_options, user=user)
 
+@app.route('/fashion')
+def fashion_page():
+    return render_template('fashion.html')
+
+@app.route('/product/')
+def products():
+    products = json.loads(fashion.Product.objects.to_json())
+    result = dict(ok=True, result=products)
+    return json.dumps(result)
+
+@app.route('/product/search')
+def products_search():
+    # TODO : implement this
+    return products()
 
 if __name__ == "__main__":
 
