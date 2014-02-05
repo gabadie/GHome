@@ -4,12 +4,13 @@
 import sys
 import mongoengine
 import types
+import inspect
 
 sys.path.insert(0, '..')
 
 import logger
 
-class Object(mongoengine.Document):
+class Eventable(mongoengine.Document):
     meta = {'allow_inheritance': True}
 
     def save(self):
@@ -62,7 +63,8 @@ class Object(mongoengine.Document):
 
             elif isinstance(value, list):
                 for sub_value in value:
-                    if isinstance(sub_value, Object):
+                    # /!\ UGLY HACK /!\
+                    if Eventable.__name__ in (c.__name__ for c in inspect.getmro(sub_value.__class__)):
                         sub_events_map = sub_value.events
                         key_prefix = "{}.".format(sub_value)
 
@@ -97,7 +99,7 @@ class Event(mongoengine.Document):
 
 class Connection(mongoengine.Document):
     triggering_event = mongoengine.ReferenceField(Event, required=True)
-    receiving_object = mongoengine.ReferenceField(Object, required=True)
+    receiving_object = mongoengine.ReferenceField(Eventable, required=True)
     method_name = mongoengine.StringField()
 
     def trigger(self, server):

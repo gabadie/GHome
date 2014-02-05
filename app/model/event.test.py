@@ -5,7 +5,7 @@ import event
 import mongoengine
 
 
-class FakeDevice0(event.Object):
+class FakeDevice0(event.Eventable):
     event0 = event.slot()
     name = mongoengine.StringField()
     received_event = mongoengine.BooleanField(default=False)
@@ -18,7 +18,7 @@ class FakeDevice0(event.Object):
         self.save()
 
 
-class FakeDevice1(event.Object):
+class FakeDevice1(event.Eventable):
     devices = mongoengine.ListField(mongoengine.ReferenceField(FakeDevice0))
 
 
