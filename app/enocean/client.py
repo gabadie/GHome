@@ -35,18 +35,16 @@ class ClientProtocol(protocol.Protocol):
         device.process_telegram(t, self.main_server)
 
     def dataReceived(self, data):
-        #logger.info("EnOcean received data: {}".format(data))
-
         # Splicing data into 28 characters long packets
         data_packets = [data[i:i + 28] for i in xrange(0, len(data), 28)]
         if len(data_packets[-1]) < 28:
             logger.info('Ignoring incomplete packet: {}'.format(data_packets[-1]))
             del data_packets[-1]
-        #logger.info(data_packets)
 
         for packet in data_packets:
             t = telegram.from_str(packet)
             self.process_telegram(t)
+
 
     def send_data(self, data):
         addr = self.transport.getPeer()
