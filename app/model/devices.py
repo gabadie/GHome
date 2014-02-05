@@ -41,7 +41,7 @@ class Actuator(Device):
 
 class Sensor(Device):
     ignored = mongoengine.BooleanField(required=True, default=False)
-    actuators = mongoengine.ListField(mongoengine.ReferenceField(Actuator), default=[])
+    actuators = mongoengine.ListField(mongoengine.ReferenceField(Actuator), default=list)
 
     def activated(self):
         for actuator in self.actuators:
