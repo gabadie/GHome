@@ -19,6 +19,10 @@ class ClientProtocol(protocol.Protocol):
 
     def process_telegram(self, t):
         addr = self.transport.getPeer()
+
+        if t.org == 0x58:
+            return
+
         logger.info("EnOcean received telegram from '{}:{}': {}".format(addr.host, addr.port, t))
 
         telegram_device_id = str(t.sensor_id)
@@ -26,7 +30,7 @@ class ClientProtocol(protocol.Protocol):
         device = devices.Sensor.objects(device_id=telegram_device_id).first()
 
         if not device:
-            #logger.info("Unknown device ID: {}".format(telegram_device_id))
+            logger.info("Unknown device ID: {}".format(telegram_device_id))
             return
         if device.ignored:
             logger.info("The device ({}) is currently ignored".format(t.sensor_id))
@@ -44,7 +48,6 @@ class ClientProtocol(protocol.Protocol):
         for packet in data_packets:
             t = telegram.from_str(packet)
             self.process_telegram(t)
-
 
     def send_data(self, data):
         addr = self.transport.getPeer()
