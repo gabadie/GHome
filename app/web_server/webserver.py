@@ -6,16 +6,19 @@ import calendar
 import json
 import sys
 sys.path.append('..')
+sys.path.append('../../libs')
 
 from flask import Flask, render_template, request, jsonify
 import mongoengine
 
 from model import devices, event, fashion
+from feedzilla import feedzilla
 
 from enocean.devices import Sensor, Lamp
 
 from config import GlobalConfig
 config = GlobalConfig()
+news_api = feedzilla.APIFeedzilla()
 
 ## Initializing the app
 app = Flask(__name__)
@@ -72,7 +75,23 @@ def monitoring():
 
 @app.route('/news')
 def news():
-    return render_template('news.html')
+    # category_id = news_api.categories()[0].id
+    # category_name = news_api.categories()[0].englishName
+    # articles = news_api.articles(category_id)
+    # #articles_dump = [json.dumps(article.__dict__) for article in articles]
+    # return render_template('news.html', category = category_name, articles=articles)
+    categories = news_api.categories()
+    return render_template('news.html', categories = categories)
+
+
+@app.route('/news/<category_id>')
+def newsCategory(category_id):
+    # category_id = news_api.categories()[0].id
+    category_name = news_api.categorieById(int(category_id)).englishName
+    articles = news_api.articles(category_id)
+    # #articles_dump = [json.dumps(article.__dict__) for article in articles]
+    return render_template('newsCategory.html', category_name = category_name, articles = articles)
+
 
 @app.route('/house')
 def house():
@@ -287,6 +306,7 @@ def products():
 def products_search():
     # TODO : implement this
     return products()
+
 
 if __name__ == "__main__":
 
