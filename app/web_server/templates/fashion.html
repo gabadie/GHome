@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block style %}
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    {% include "header.html" %}
+
+
+    <input id="fashion-query" type="text" name="query" class="form-control" />
+
+    <ul class="fashion-products">
+    </ul>
+
+
+</div>
+{% endblock body %}
+
+
+{% block javascript %}
+
+    {% raw %}
+    <script id="product-template" type="text/x-handlebars-template">
+        <li>
+            <div class="img-wrapper img-thumbnail">
+                <img src="{{main_image}}" class="img-responsive" />
+            </div>
+            <span class="name">{{name}}</span> <br/>
+            <span class="price">{{price_label}}</span>
+        </li>
+    </script>
+    {% endraw %}
+
+    <script src="/static/js/fashion.js"></script>
+{% endblock %}
