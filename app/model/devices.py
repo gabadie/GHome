@@ -7,7 +7,7 @@ import event
 
 # Generic classes
 
-class Device(event.Object):
+class Device(event.Eventable):
     device_id = mongoengine.IntField(required=True, unique=True)
     name = mongoengine.StringField()
 
