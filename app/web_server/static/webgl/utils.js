@@ -56,9 +56,14 @@ function utilBaseName(url)
     return url.replace(/\\/g,'/').replace( /.*\//, '' );
 }
 
-function createWebGLXContext(canvas,version=1)
+function createWebGLXContext(canvas,version)
 {
     var gl = null;
+
+    if (version == undefined)
+    {
+        version = 1;
+    }
 
     if (version == 2)
     {
