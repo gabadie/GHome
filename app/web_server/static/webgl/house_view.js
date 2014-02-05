@@ -7,13 +7,27 @@ function HouseRect(x, y, w, h)
     this.h = h;
 }
 
+function HouseDevices(id, x, y, z)
+{
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    this.id = id;
+}
+
 function House()
 {
     this.rooms = new Array();
+    this.devices = new Array();
 
     this.addRoom = function(x, y, w, h)
     {
         this.rooms.push(new HouseRect(x, y, w, h))
+    }
+
+    this.addDevice = function(id, x, y, z)
+    {
+        this.devices.push(new HouseDevices(id, x, y, z))
     }
 
     this.getBoundingBox = function()
@@ -201,13 +215,44 @@ function HouseView(output, canvas_id, house)
         gl.uniformMatrix4fv(this.uniform.model_screen_matrix, false, new Float32Array(space_screen_matrix));
         gl.uniform4f(this.uniform.albedo, 0.85, 0.9, 1.0, 1.0);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
         gl.enableVertexAttribArray(this.attribute.vertex);
         gl.enableVertexAttribArray(this.attribute.normal);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
         gl.vertexAttribPointer(this.attribute.vertex, 3, gl.FLOAT, false, 4 * 6, 4 * 0);
         gl.vertexAttribPointer(this.attribute.normal, 3, gl.FLOAT, false, 4 * 6, 4 * 3);
-
         gl.drawArrays(gl.TRIANGLES, 0, this.vertices_count);
+
+        gl.uniform4f(this.uniform.albedo, 1.0, 0.8, 0.8, 1.0);
+
+        for (var i = 0; i < this.house.devices.length; i++)
+        {
+            device = this.house.devices[i];
+            device_matrix = space_screen_matrix.slice(0);
+            device_matrix[3 * 4 + 0] += device.x * space_screen_matrix[0 *4 + 0] +  device.y * space_screen_matrix[1 *4 + 0] + device.z * space_screen_matrix[2 *4 + 0];
+            device_matrix[3 * 4 + 1] += device.x * space_screen_matrix[0 *4 + 1] +  device.y * space_screen_matrix[1 *4 + 1] + device.z * space_screen_matrix[2 *4 + 1];
+            device_matrix[3 * 4 + 2] += device.x * space_screen_matrix[0 *4 + 2] +  device.y * space_screen_matrix[1 *4 + 2] + device.z * space_screen_matrix[2 *4 + 2];
+            device_matrix[3 * 4 + 3] += device.x * space_screen_matrix[0 *4 + 3] +  device.y * space_screen_matrix[1 *4 + 3] + device.z * space_screen_matrix[2 *4 + 3];
+            device_matrix[0 *4 + 0] *= 0.3;
+            device_matrix[0 *4 + 1] *= 0.3;
+            device_matrix[0 *4 + 2] *= 0.3;
+            device_matrix[0 *4 + 3] *= 0.3;
+            device_matrix[1 *4 + 0] *= 0.3;
+            device_matrix[1 *4 + 1] *= 0.3;
+            device_matrix[1 *4 + 2] *= 0.3;
+            device_matrix[1 *4 + 3] *= 0.3;
+            device_matrix[2 *4 + 0] *= 0.3;
+            device_matrix[2 *4 + 1] *= 0.3;
+            device_matrix[2 *4 + 2] *= 0.3;
+            device_matrix[2 *4 + 3] *= 0.3;
+
+            gl.uniformMatrix4fv(this.uniform.model_screen_matrix, false, new Float32Array(device_matrix));
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.cube_buffer);
+            gl.vertexAttribPointer(this.attribute.vertex, 3, gl.FLOAT, false, 4 * 6, 4 * 0);
+            gl.vertexAttribPointer(this.attribute.normal, 3, gl.FLOAT, false, 4 * 6, 4 * 3);
+            gl.drawArrays(gl.TRIANGLES, 0, 36);
+        }
     }
 
     this.load = function()
@@ -261,6 +306,12 @@ function HouseView(output, canvas_id, house)
         this.attribute = new Object();
         this.attribute.vertex = gl.getAttribLocation(this.program, "in_vertex");
         this.attribute.normal = gl.getAttribLocation(this.program, "in_normal");
+
+        this.cube_buffer = gl.createBuffer();
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.cube_buffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(objectsLib.cube), gl.STATIC_DRAW);
+
     }
 
     this.load();
