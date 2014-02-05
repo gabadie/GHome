@@ -1,52 +1,48 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+import mongoengine
+from event import Eventable, slot
 
-from event import *
-
-class Trigger(event.Object):
-
-    def __init__(self, name):
-        self.name = name
+class Trigger(Eventable):
+    name = mongoengine.StringField(required=True)
 
     def __str__(self):
         return self.name
 
-    #def trigger(self, oldValue, newValue):
+    def trigger(self, oldValue, newValue, server):
+        raise NotImplemented
+
 
 class ThresholdTrigger(Trigger):
+
+    min = mongoengine.fields.IntField(required=True)
+    max = mongoengine.fields.IntField(required=True)
 
     # Events
     underflow = slot()
     overflow  = slot()
 
-    def __init__(self, name, min, max):
-        super(Trigger, self).__init__(name)
-        self.min = min
-        self.max = max
-
     # Returns whether a event has been triggered
     def trigger(self, oldValue, newValue, server):
         if oldValue < self.max and newValue > self.max:
+            print "OVERFLOW"
             self.overflow(server)
             return True
         elif oldValue > self.min and newValue < self.min:
+            print "UNDERFLOW"
             self.underflow(server)
             return True
         return False
 
 
-def IntervalTrigger(Trigger):
+class IntervalTrigger(Trigger):
+
+    min = mongoengine.fields.IntField(required=True)
+    max = mongoengine.fields.IntField(required=True)
 
     # Events
     enterInFromAbove = slot()
     enterInFromBelow = slot()
     aboveInterval = slot()
     belowInterval = slot()
-
-    def __init__(self, name, min, max):
-        super(Trigger, self).__init__(name)
-        self.min = min
-        self.max = max
 
     def trigger(self, oldValue, newValue, server):
         # if we were inside the interval
@@ -67,4 +63,5 @@ def IntervalTrigger(Trigger):
                 return True
 
         return False
+
 
