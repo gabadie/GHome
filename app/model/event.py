@@ -4,12 +4,13 @@
 import sys
 import mongoengine
 import types
+import inspect
 
 sys.path.insert(0, '..')
 
 import logger
 
-class Object(mongoengine.Document):
+class Eventable(mongoengine.Document):
     meta = {'allow_inheritance': True}
 
     def save(self):
@@ -62,7 +63,8 @@ class Object(mongoengine.Document):
 
             elif isinstance(value, list):
                 for sub_value in value:
-                    if isinstance(sub_value, Object) :
+                    # /!\ UGLY HACK /!\
+                    if Eventable.__name__ in (c.__name__ for c in inspect.getmro(sub_value.__class__)):
                         sub_events_map = sub_value.events
                         key_prefix = "{}.".format(sub_value)
 
@@ -97,7 +99,7 @@ class Event(mongoengine.Document):
 
 class Connection(mongoengine.Document):
     triggering_event = mongoengine.ReferenceField(Event, required=True)
-    receiving_object = mongoengine.ReferenceField(Object, required=True)
+    receiving_object = mongoengine.ReferenceField(Eventable, required=True)
     method_name = mongoengine.StringField()
 
     def trigger(self, server):
@@ -111,64 +113,3 @@ class Connection(mongoengine.Document):
 
 def slot():
     return mongoengine.ReferenceField(Event, required=True, default=Event)
-
-class Trigger(Object):
-    name = mongoengine.StringField(required=True)
-
-    def __str__(self):
-        return self.name
-
-class ThresholdTrigger(Trigger):
-
-    # Events
-    underflow = slot()
-    overflow  = slot()
-
-    min = mongoengine.fields.IntField(required=True)
-    max = mongoengine.fields.IntField(required=True)
-
-    # Returns whether a event has been triggered
-    def trigger(self, oldValue, newValue, server):
-        if oldValue < self.max and newValue > self.max:
-            self.overflow(server)
-            return True
-        elif oldValue > self.min and newValue < self.min:
-            self.underflow(server)
-            return True
-        return False
-
-
-# def IntervalTrigger(Trigger):
-
-#     # Events
-#     enterInFromAbove = slot()
-#     enterInFromBelow = slot()
-#     aboveInterval = slot()
-#     belowInterval = slot()
-
-#     def __init__(self, name, min, max):
-#         super(Trigger, self).__init__(name)
-#         self.min = min
-#         self.max = max
-
-#     def trigger(self, oldValue, newValue, server):
-#         # if we were inside the interval
-#         if self.min <= oldValue <= self.max:
-#             if newValue > self.max:
-#                 self.aboveInterval(server)
-#                 return True
-#             elif newValue < self.min:
-#                 self.belowInterval(server)
-#                 return True
-#         # else if we are inside the interval now
-#         elif self.min <= newValue <= self.max:
-#             if oldValue > self.max:
-#                 self.enterInFromAbove(server)
-#                 return True
-#             if oldValue < self.min:
-#                 self.enterInFromBelow(server)
-#                 return True
-
-#         return False
-
-

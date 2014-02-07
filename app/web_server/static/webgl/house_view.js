@@ -141,10 +141,12 @@ function HouseView(output, canvas_id, house)
 {
     this.output = output;
     this.canvas = document.getElementById(canvas_id);
+    this.canvas.view_context = this;
     this.house = house;
 
     this.viewport = new Viewport();
     this.camera = new Camera();
+    this.selected_device = null;
 
     try
     {
@@ -198,6 +200,11 @@ function HouseView(output, canvas_id, house)
         this.update()
     }
 
+    this.screenSpaceMatrix = function()
+    {
+        return mul4(this.viewport.projectionScreenMatrix, this.camera.spaceProjectionMatrix);
+    }
+
     this.draw = function()
     {
         var gl = this.gl;
@@ -209,7 +216,7 @@ function HouseView(output, canvas_id, house)
         gl.clearDepth(1.0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        var space_screen_matrix = mul4(this.viewport.projectionScreenMatrix, this.camera.spaceProjectionMatrix);
+        var space_screen_matrix = this.screenSpaceMatrix();
 
         gl.useProgram(this.program);
         gl.uniformMatrix4fv(this.uniform.model_screen_matrix, false, new Float32Array(space_screen_matrix));
@@ -223,12 +230,10 @@ function HouseView(output, canvas_id, house)
         gl.vertexAttribPointer(this.attribute.normal, 3, gl.FLOAT, false, 4 * 6, 4 * 3);
         gl.drawArrays(gl.TRIANGLES, 0, this.vertices_count);
 
-        gl.uniform4f(this.uniform.albedo, 1.0, 0.8, 0.8, 1.0);
-
         for (var i = 0; i < this.house.devices.length; i++)
         {
-            device = this.house.devices[i];
-            device_matrix = space_screen_matrix.slice(0);
+            var device = this.house.devices[i];
+            var device_matrix = space_screen_matrix.slice(0);
             device_matrix[3 * 4 + 0] += device.x * space_screen_matrix[0 *4 + 0] +  device.y * space_screen_matrix[1 *4 + 0] + device.z * space_screen_matrix[2 *4 + 0];
             device_matrix[3 * 4 + 1] += device.x * space_screen_matrix[0 *4 + 1] +  device.y * space_screen_matrix[1 *4 + 1] + device.z * space_screen_matrix[2 *4 + 1];
             device_matrix[3 * 4 + 2] += device.x * space_screen_matrix[0 *4 + 2] +  device.y * space_screen_matrix[1 *4 + 2] + device.z * space_screen_matrix[2 *4 + 2];
@@ -247,6 +252,15 @@ function HouseView(output, canvas_id, house)
             device_matrix[2 *4 + 3] *= 0.3;
 
             gl.uniformMatrix4fv(this.uniform.model_screen_matrix, false, new Float32Array(device_matrix));
+
+            if (device == this.selected_device)
+            {
+                gl.uniform4f(this.uniform.albedo, 1.0, 0.4, 0.4, 1.0);
+            }
+            else
+            {
+                gl.uniform4f(this.uniform.albedo, 1.0, 0.8, 0.8, 1.0);
+            }
 
             gl.bindBuffer(gl.ARRAY_BUFFER, this.cube_buffer);
             gl.vertexAttribPointer(this.attribute.vertex, 3, gl.FLOAT, false, 4 * 6, 4 * 0);
@@ -314,7 +328,90 @@ function HouseView(output, canvas_id, house)
 
     }
 
+    this.select_device = function(device)
+    {
+        this.selected_device = device;
+        this.update();
+    }
+
+    this.select_at_screen_pos = function(pos_x, pos_y)
+    {
+        this.camera.update();
+
+        var selected_device = null;
+        var space_screen_matrix = this.screenSpaceMatrix();
+
+        pos_x = (pos_x / this.viewport.width) * 2.0 - 1.0;
+        pos_y = (pos_y / this.viewport.height) * -2.0 + 1.0;
+
+        for (var i = 0; i < this.house.devices.length; i++)
+        {
+            var device = this.house.devices[i];
+
+            var screen_x = device.x * space_screen_matrix[0 * 4 + 0] + device.y * space_screen_matrix[1 * 4 + 0] + device.z * space_screen_matrix[2 * 4 + 0] + space_screen_matrix[3 * 4 + 0];
+            var screen_y = device.x * space_screen_matrix[0 * 4 + 1] + device.y * space_screen_matrix[1 * 4 + 1] + device.z * space_screen_matrix[2 * 4 + 1] + space_screen_matrix[3 * 4 + 1];
+            var screen_w = device.x * space_screen_matrix[0 * 4 + 3] + device.y * space_screen_matrix[1 * 4 + 3] + device.z * space_screen_matrix[2 * 4 + 3] + space_screen_matrix[3 * 4 + 3];
+
+            screen_x = screen_x / screen_w;
+            screen_y = screen_y / screen_w;
+
+            var screen_delta_x = pos_x - screen_x;
+            var screen_delta_y = pos_y - screen_y;
+            var screen_delta = Math.sqrt(screen_delta_x * screen_delta_x + screen_delta_y * screen_delta_y);
+
+            var bounding_radius = 0.3 * Math.sqrt(3) / screen_w;
+
+            if (screen_delta > bounding_radius)
+            {
+                continue;
+            }
+
+            selected_device = device;
+        }
+
+        this.select_device(selected_device);
+    }
+
+    this.event_onclick = function(e)
+    {
+        var posx = 0;
+        var posy = 0;
+
+        if (!e)
+        {
+            var e = window.event;
+        }
+
+        if (e.pageX || e.pageY)
+        {
+            posx = e.pageX;
+            posy = e.pageY;
+        }
+        else if (e.clientX || e.clientY)
+        {
+            posx = e.clientX + document.body.scrollLeft
+                + document.documentElement.scrollLeft;
+            posy = e.clientY + document.body.scrollTop
+                + document.documentElement.scrollTop;
+        }
+
+        posx -= this.canvas.offsetLeft;
+        posy -= this.canvas.offsetTop;
+
+        this.select_at_screen_pos(posx, posy);
+    }
+
+    this.event_onclick_bind = function()
+    {
+        this.canvas.onclick = function(e)
+        {
+            this.view_context.event_onclick(e);
+        }
+    }
+
     this.load();
     this.update_model();
+    this.event_onclick_bind();
+
 }
 

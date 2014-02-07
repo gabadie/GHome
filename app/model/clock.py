@@ -15,7 +15,7 @@ import event
 # week_day variable are integer, between 0 (for Monday) and 6 (for Sunday)
 #
 
-class Event(event.Object):
+class Event(event.Eventable):
     name = mongoengine.StringField(required=True)
     event = event.slot()
     minutes = mongoengine.IntField(default=0, required=True)
