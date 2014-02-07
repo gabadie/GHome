@@ -22,6 +22,11 @@ body {
 	background: url('../img/triangles.png');
 }
 
+table {
+    table-layout: fixed;
+    word-wrap: break-word;
+}
+
 /* main structure */
 #notification-bar {
     display: none;
