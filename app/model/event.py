@@ -20,7 +20,7 @@ class Eventable(mongoengine.Document):
             if isinstance(value, Event):
                 value.save()
 
-        mongoengine.Document.save(self)
+        super(Eventable, self).save()
 
     def delete(self):
         for c in Connection.objects(receiving_object=self):
@@ -33,7 +33,7 @@ class Eventable(mongoengine.Document):
             if isinstance(value, Event):
                 value.delete()
 
-        mongoengine.Document.delete(self)
+        super(Eventable, self).delete()
 
     @property
     def callbacks(self):

@@ -46,6 +46,7 @@ def test_events_list_db():
     assert 'event0' in obj0.events
 
     obj1 = FakeDevice0.objects(name="hello").first()
+    print obj1
     assert isinstance(obj1, FakeDevice0)
     assert 'event0' in obj1.events
 
