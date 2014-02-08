@@ -11,10 +11,12 @@ sys.path.append('../../libs')
 from flask import Flask, render_template, request, jsonify
 import mongoengine
 
-from model import devices, event, fashion
-from feedzilla import feedzilla
+from model.devices import Temperature
+from enocean.devices import Sensor, Actuator, Lamp
+from model.event import Connection
+from model.fashion import Product
 
-from enocean.devices import Sensor, Lamp
+from feedzilla import feedzilla
 
 from config import GlobalConfig
 config = GlobalConfig()
@@ -37,12 +39,12 @@ def dump_sensor(sensor):
     s_json['type'] = sensor.__class__.__name__
 
     # TODO : find a way to render the sensors without putting this into each sensor's data
-    s_json['actuators'] = [dump_actuator(actuator) for actuator in devices.Actuator.objects]
+    s_json['actuators'] = [dump_actuator(actuator) for actuator in Actuator.objects]
 
     # TODO : Dirty hack to get events' name
     connections = dict()
     for e_name, e in sensor.events.iteritems():
-        connections = [dump_connection(c) for c in event.Connection.objects(triggering_event=e)]
+        connections = [dump_connection(c) for c in Connection.objects(triggering_event=e)]
         for c in connections:
             c['triggering_event'] = e_name
 
@@ -64,7 +66,7 @@ def index():
 
 @app.route('/setup')
 def setup():
-    actuators = devices.Actuator.objects()
+    actuators = Actuator.objects()
     sensor_types = Sensor.__subclasses__()
 
     return render_template('setup.html', sensor_types=sensor_types, actuators=actuators)
@@ -104,7 +106,7 @@ def house():
 def event_binding():
 
     if request.method == 'GET':
-        connections = [dump_connection(c) for c in event.Connection.objects]
+        connections = [dump_connection(c) for c in Connection.objects]
         resp = dict(ok=True, result=connections)
         return json.dumps(resp)
 
@@ -112,8 +114,8 @@ def event_binding():
         sensor_id, s_event = request.json['sensor'], request.json['event']
         actuator_id, callback = request.json['actuator'], request.json['callback']
 
-        sensor = devices.Sensor.objects.get(device_id=sensor_id)
-        actuator = devices.Actuator.objects.get(device_id=actuator_id)
+        sensor = Sensor.objects.get(device_id=sensor_id)
+        actuator = Actuator.objects.get(device_id=actuator_id)
 
         app.logger.info(sensor.events[s_event])
         app.logger.info(actuator.callbacks[callback])
@@ -134,7 +136,7 @@ def event_binding():
 @app.route('/connection/<connection_id>', methods=['GET', 'DELETE'])
 def event_connection(connection_id):
     resp = dict(ok=False)
-    connection = event.Connection.objects.get(id=connection_id)
+    connection = Connection.objects.get(id=connection_id)
 
     if connection is None:
         return json.dumps(resp)
@@ -160,7 +162,7 @@ def sensor_connections(sensor_id):
 @app.route('/graph_data', methods=['GET'])
 def graph_data():
     temp_map = defaultdict(list)
-    for temperature in devices.Temperature.objects():
+    for temperature in Temperature.objects():
         device = temperature.device
 
         key = '{} - {}'.format(device.device_id, device.name)
@@ -298,7 +300,7 @@ def fashion_page():
 
 @app.route('/product/')
 def products():
-    products = json.loads(fashion.Product.objects.to_json())
+    products = json.loads(Product.objects.to_json())
     result = dict(ok=True, result=products)
     return json.dumps(result)
 

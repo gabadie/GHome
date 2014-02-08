@@ -12,12 +12,14 @@ from model import event
 import logger
 
 class Sensor(model.devices.Sensor):
-
     ignored = mongoengine.BooleanField(default=True)
 
     def process_telegram(self, telegram, server):
         raise NotImplementedError
 
+
+class Actuator(model.devices.Actuator):
+    pass
 
 # Sensors
 class Thermometer(Sensor):
@@ -196,7 +198,7 @@ class LightMovementSensor(Sensor):
 
 
 # Actuators
-class Lamp(model.devices.Actuator):
+class Lamp(Actuator):
     turned_on = mongoengine.BooleanField(default=False)
 
     def turn_on(self, turned_on):
@@ -214,7 +216,7 @@ class Lamp(model.devices.Actuator):
     def callback_toggle(self, server):
         return self.turn_on(not self.turned_on)
 
-class Socket(model.devices.Actuator):
+class Socket(Actuator):
     activated = mongoengine.BooleanField(default=False)
 
     def activate(self, activated):
