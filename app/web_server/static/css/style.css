@@ -130,9 +130,9 @@ table {
 
 	border-radius: 10px;
 
-    /* Effet de flou */
-    filter: blur(3px) grayscale(0.4);
-    -webkit-filter: blur(3px) grayscale(0.4);
+    /* Effet de désaturation */
+    filter: grayscale(0.55);
+    -webkit-filter: grayscale(0.55);
 
     /* Animation de transition */
     transition: filter 0.6s;
@@ -141,7 +141,7 @@ table {
 
 .big-menu li:hover {
 	filter: none;
-    -webkit-filter: blur(0) grayscale(0);
+    -webkit-filter: grayscale(0);
 }
 
 
