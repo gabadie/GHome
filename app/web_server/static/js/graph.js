@@ -1,7 +1,10 @@
+DATA_CACHE = {};
+
 $(document).ready(function () {
 
   apiCall('graph_data', 'GET', {}, function(data) {
-    drawGraph(data);
+    DATA_CACHE = data;
+    drawGraph(data.Temperature);
   });
 
 });

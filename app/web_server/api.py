@@ -8,13 +8,13 @@ import calendar
 import json
 import xmlrpclib
 
-from geopy import geocoders 
+from geopy import geocoders
 from metwit import Metwit
 from flask import request, jsonify, Blueprint, current_app
 
 from enocean.devices import Sensor, Actuator, Lamp
 from model.event import Connection
-from model.devices import Temperature
+from model.devices import NumericReading
 from model.fashion import Product
 
 from config import GlobalConfig
@@ -126,19 +126,21 @@ def sensor_connections(sensor_id):
 # Monitoring
 @rest_api.route('/graph_data', methods=['GET'])
 def graph_data():
-    temp_map = defaultdict(list)
-    for temperature in Temperature.objects():
-        device = temperature.device
+    result = dict()
+    for Reading in NumericReading.__subclasses__():
+        readings_map = defaultdict(list)
+        for reading in Reading.objects:
+            device = reading.device
 
-        key = '{} - {}'.format(device.device_id, device.name)
-        timestamp = calendar.timegm(temperature.date.utctimetuple()) * 1000
-        data = [timestamp, temperature.value]
+            key = '{} - {}'.format(device.device_id, device.name)
+            timestamp = calendar.timegm(reading.date.utctimetuple()) * 1000
+            data = [timestamp, reading.value]
 
-        temp_map[key].append(data)
+            readings_map[key].append(data)
 
-    res = [dict(key=k, values=v) for k, v in temp_map.iteritems()]
+        result[Reading.__name__] = [dict(key=k, values=v) for k, v in readings_map.iteritems()]
 
-    return json.dumps(res)
+    return json.dumps(result)
 
 
 # Devices
@@ -251,16 +253,16 @@ def products_search():
 def get_location():
     if request.method =='POST':
         location = request.form.get('location')
-        
+
         g = geocoders.GoogleV3()
         loc = g.geocode(location)
-        
+
         if loc is None:
             result = dict(ok=False, geo=False, meteo=False, location=None)
         else:
             place, (lat, lon) = loc
             content = Metwit.weather.get(location_lat=lat, location_lng=lon)
             result = dict(ok=True, geo=True, meteo=True, location=place, latitude=lat, longitude=lon, weather=content)
-        
+
         return json.dumps(result)
 
