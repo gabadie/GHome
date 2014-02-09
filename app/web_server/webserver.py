@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
 import json
 import sys
 sys.path.append('..')
@@ -91,4 +90,4 @@ if __name__ == "__main__":
         config = GlobalConfig.from_json(sys.argv[1])
     db = mongoengine.connect(config.mongo_db)
 
-    app.run(host="localhost", port=config.web_server.port, debug=True)
+    app.run(host="0.0.0.0", port=config.web_server.port, debug=True)

@@ -6,16 +6,6 @@
     url("../fonts/Regular/OpenSans-Regular.otf") format("opentype"),
     url("../fonts/Regular/OpenSans-Regular.svg") format("svg");
 }
-@font-face {
-    font-family: 'fjordone';
-    src: url('../fonts/fjordone/fjordone-regular-webfont.eot');
-    src: url('../fonts/fjordone/fjordone-regular-webfont.eot?#iefix') format('embedded-opentype'),
-         url('../fonts/fjordone/fjordone-regular-webfont.woff') format('woff'),
-         url('../fonts/fjordone/fjordone-regular-webfont.ttf') format('truetype'),
-         url('../fonts/fjordone/fjordone-regular-webfont.svg#fjordone') format('svg');
-    font-weight: normal;
-    font-style: normal;
-}
 
 body {
 	font-family: "OpenSans Regular";
@@ -44,6 +34,7 @@ table {
     font-weight: bold;
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
     box-shadow: 1px -1px 25px rgba(0, 0, 0, 0.3);
+    overflow-wrap: break-word;
 }
 
 
