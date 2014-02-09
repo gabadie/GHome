@@ -7,6 +7,10 @@ $(document).ready(function () {
     drawGraph(data.Temperature);
   });
 
+  $('#reading-type').change(function() {
+    drawGraph(DATA_CACHE[$(this).val()]);
+  })
+
 });
 
 

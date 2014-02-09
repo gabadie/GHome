@@ -11,6 +11,7 @@ import mongoengine
 
 from enocean.devices import Sensor, Actuator
 from model.fashion import Product
+from model.devices import NumericReading
 
 from feedzilla import feedzilla
 
@@ -40,7 +41,8 @@ def setup():
 
 @app.route('/monitoring')
 def monitoring():
-    return render_template('monitoring.html')
+    reading_classes = NumericReading.__subclasses__()
+    return render_template('monitoring.html', reading_classes=reading_classes)
 
 @app.route('/news')
 def news():
