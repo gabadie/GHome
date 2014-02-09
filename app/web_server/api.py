@@ -251,12 +251,16 @@ def products_search():
 def get_location():
     if request.method =='POST':
         location = request.form.get('location')
-
+        
         g = geocoders.GoogleV3()
-        place, (lat, lon) = g.geocode(location)
-
-	content = Metwit.weather.get(location_lat=lat, location_lng=lon)
-        result = dict(ok=True, location=place, latitude=lat, longitude=lon, weather=content)
-
+        loc = g.geocode(location)
+        
+        if loc is None:
+            result = dict(ok=False, geo=False, meteo=False, location=None)
+        else:
+            place, (lat, lon) = loc
+            content = Metwit.weather.get(location_lat=lat, location_lng=lon)
+            result = dict(ok=True, geo=True, meteo=True, location=place, latitude=lat, longitude=lon, weather=content)
+        
         return json.dumps(result)
 

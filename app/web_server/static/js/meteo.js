@@ -6,16 +6,20 @@ $(document).ready(function() {
             var node = document.getElementById("weather");
 	    node.innerHTML = "";
 
-	    if (data.ok) {
-		var loc = document.createElement('div'); 
+            var loc = document.createElement('div'); 
+	    if (data.geo) {
 		loc.innerHTML = data.location + " (" + data.latitude + ", " + data.longitude + ")";
-		node.appendChild(loc);
+	    } else {
+		loc.innerHTML = "L'adresse spécifiée n'a pu être géolocalisée";
+	    }
+            node.appendChild(loc);
 
+            var prev = document.createElement('div');
+	    if (data.meteo) {
 		var actual = document.createElement('div');
 		actual.innerHTML = "Il est " + data.weather[0].timestamp + ", le ciel est " + data.weather[0].weather.status;
 		node.appendChild(actual);
 
-		var prev = document.createElement('div');
 		var table = document.createElement('table');
 		var tbody = document.createElement('tbody');
 		var line = document.createElement('tr');
@@ -32,17 +36,11 @@ $(document).ready(function() {
 		table.appendChild(tbody);
 		table.setAttribute("class", "table table-striped");
 		prev.appendChild(table);
-		node.appendChild(prev);
             }
             else {
-                node.innerHTML = "Les données météo n'ont pu être récupérées"
+                prev.innerHTML = "Les données météorologiques n'ont pu être récupérées"
             }
-            
-            $.each(data.result, function(i, content) {
-		var div = document.createElement('div'); 
-		div.innerHTML = content;
-                document.getElementById("weather").appendChild(div);
-            });
+            node.appendChild(prev);
 
         }
         });
