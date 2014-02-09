@@ -222,7 +222,10 @@ function HouseViewCameraControl(view)
         }
 
         this.view.camera_oriented = this.camera_oriented + this.camera_speed * (this.get_cursor_y(e) - this.cursor_y);
-        this.view.camera_direction = this.camera_direction - this.camera_speed * (this.get_cursor_x(e) - this.cursor_x);
+        this.view.camera_oriented = Math.min(this.view.camera_oriented, Math.PI * 0.98);
+        this.view.camera_oriented = Math.max(this.view.camera_oriented, Math.PI * 0.60);
+
+        this.view.camera_direction = floatReste(this.camera_direction - this.camera_speed * (this.get_cursor_x(e) - this.cursor_x), 2.0 * Math.PI);
         this.view.update();
     }
 
