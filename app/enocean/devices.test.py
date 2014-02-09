@@ -8,6 +8,7 @@ sys.path.insert(0, '..')
 
 import model
 import enocean.devices as devices
+from model.trigger import ThresholdTrigger
 
 
 def test_mongoengine():
@@ -98,6 +99,25 @@ def test_light_movement_sensor():
     assert brightness.value == 48
     assert movement.value
 
+def test_has_events():
+    thermometer = devices.Thermometer(device_id=404)
+    switch = devices.Switch(device_id=405, ignored=False)
+    wc = devices.WindowContact(device_id=406, ignored=False, open=False)
+    lms = devices.LightMovementSensor(device_id=407, ignored=False)
+    
+    print "Thermometer events : {} ".format(thermometer.events)
+    print "Switch events : {} ".format(switch.events)
+    print "Window contact events : {} ".format(wc.events)
+    print "Light sensor events : {} ".format(lms.events)
+
+    thermometer.temperature_triggers.append(ThresholdTrigger(name="Threshold0", min=10, max=45))
+    thermometer.temperature_triggers.append(ThresholdTrigger(name="Threshold1", min=46, max=50))
+    print "Thermometer events : {} ".format(thermometer.events)
+
+    lms.voltage_triggers.append(ThresholdTrigger(name="Threshold0", min=10, max=45))
+    lms.brightness_triggers.append(ThresholdTrigger(name="Threshold0", min=10, max=45))
+    print "Light sensor events : {} ".format(lms.events)
+
 if __name__ == "__main__":
     test_mongoengine()
     test_thermometer()
@@ -105,4 +125,5 @@ if __name__ == "__main__":
     test_switch()
     test_window_contactor()
     test_light_movement_sensor()
+    test_has_events()
     print "Tests passed !"

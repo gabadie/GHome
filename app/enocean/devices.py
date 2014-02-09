@@ -6,10 +6,11 @@ import mongoengine
 
 sys.path.insert(0, '..')
 
+import logger
 import telegram
 import model.devices
 from model import event
-import logger
+from model.trigger import Trigger
 
 class Sensor(model.devices.Sensor):
 
@@ -21,6 +22,10 @@ class Sensor(model.devices.Sensor):
 
 # Sensors
 class Thermometer(Sensor):
+    temperature_triggers = mongoengine.ListField(mongoengine.ReferenceField(Trigger), default=list)
+    humity_triggers      = mongoengine.ListField(mongoengine.ReferenceField(Trigger), default=list)
+    _old_temperature = None
+    _old_humidity    = None
 
     @staticmethod
     def generate_telegram(sensor_id, temperature, humidity):
@@ -50,6 +55,18 @@ class Thermometer(Sensor):
         if validity:
             temperature.save()
             humidity.save()
+
+        # If there are cached values, trigger events
+        if self._old_temperature != None and self._old_humidity != None:
+            for t in self.temperature_triggers:
+                t.trigger(self._old_temperature, temperature, server)
+
+            for h in self.humidity_triggers:
+                h.trigger(self._old_humidity, humidity, server)
+
+        self._old_temperature = temperature
+        self._old_humidity    = humidity
+
 
 class Switch(Sensor):
     UNKNOWN, TOP, BOTTOM, RIGHT, LEFT = range(5)
@@ -137,6 +154,9 @@ class Switch(Sensor):
 class WindowContact(Sensor):
     open = mongoengine.BooleanField(default=True)
 
+    opened  = event.slot()
+    closed  = event.slot()
+
     @staticmethod
     def generate_telegram(sensor_id, open):
         data_bytes = [0x0 for i in xrange(4)]
@@ -154,8 +174,16 @@ class WindowContact(Sensor):
         window_state = self.parse_readings(telegram.data_bytes)
         window_state.save()
 
+        if window_state == True:
+            self.opened(server)
+        else:
+            self.closed(server)
+
 
 class LightMovementSensor(Sensor):
+    voltage_triggers    = mongoengine.ListField(mongoengine.ReferenceField(Trigger), default=list)
+    brightness_triggers = mongoengine.ListField(mongoengine.ReferenceField(Trigger), default=list)
+    moved = event.slot()
 
     @staticmethod
     def generate_telegram(sensor_id, voltage, brightness, movement):

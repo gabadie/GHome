@@ -7,8 +7,23 @@ class Trigger(Eventable):
     def __str__(self):
         return self.name
 
+    # Returns whether a event has been triggered
     def trigger(self, oldValue, newValue, server):
         raise NotImplemented
+
+
+class BinaryTrigger(Trigger):
+    # Events
+    open  = slot()
+    close = slot()
+
+    # Returns whether a event has been triggered
+    def trigger(self, oldValue, newValue, server):
+        if oldValue != newValue:
+            if oldValue == False:
+                self.open(server)
+            else:
+                self.close(server)
 
 
 class ThresholdTrigger(Trigger):
