@@ -126,12 +126,12 @@ class Generator:
         #switch = enocean.devices.Switch(device_id=switch_id, name="THESWITCH", ignored=False)
         #switch.save()
 
-        wc_id = int("0001B592", 16)
+        wc_id = int("0001B593", 16)
         wc = enocean.devices.WindowContact(device_id=wc_id, name="BindedindowContactor", ignored=False)
         wc.save()
 
 
-        socket_id = int("FF9F1E03", 16)
+        socket_id = int("FF9F1E05", 16)
         socket = enocean.devices.Socket(device_id=socket_id, name="BindedSocket", ignored=False)
         socket.save()
         #self.rpc_server.xmlrpc_bind_devices(switch_id, 'onclick_top_right', socket_id, 'callback_toggle')
