@@ -45,7 +45,7 @@ function House()
             max_y = Math.max(max_y, this.rooms[i].y + this.rooms[i].h);
         }
 
-        return HouseRect(min_x, min_y, max_x - min_x, max_y - min_y);
+        return new HouseRect(min_x, min_y, max_x - min_x, max_y - min_y);
     }
 
 }
@@ -257,6 +257,10 @@ function HouseView(output, canvas_id, house)
         this.viewport.width = this.canvas.width;
         this.viewport.height = this.canvas.height;
         this.viewport.update();
+
+        var bounding_box = this.house.getBoundingBox();
+        this.camera.at[0] = bounding_box.x + bounding_box.w / 2;
+        this.camera.at[1] = bounding_box.y + bounding_box.h / 2;
 
         this.camera.from[0] = Math.sin(this.camera_direction) * Math.sin(this.camera_oriented) * this.camera_distance;
         this.camera.from[1] = - Math.cos(this.camera_direction) * Math.sin(this.camera_oriented) * this.camera_distance;
