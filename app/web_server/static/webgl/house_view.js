@@ -45,7 +45,7 @@ function House()
             max_y = Math.max(max_y, this.rooms[i].y + this.rooms[i].h);
         }
 
-        return HouseRect(min_x, min_y, max_x - min_x, max_y - min_y);
+        return new HouseRect(min_x, min_y, max_x - min_x, max_y - min_y);
     }
 
 }
@@ -137,6 +137,100 @@ function HouseWallVertexArray(wall_count)
 
 }
 
+function HouseViewCameraControl(view)
+{
+    this.view = view;
+    this.cursor_x = 0;
+    this.cursor_y = 0;
+    this.camera_oriented = 0;
+    this.camera_direction = 0;
+    this.camera_speed = 0.01;
+    this.draging = false;
+
+    this.get_cursor_x = function(e)
+    {
+        var posx = 0;
+
+        if (!e)
+        {
+            var e = window.event;
+        }
+
+        if (e.pageX || e.pageY)
+        {
+            posx = e.pageX;
+        }
+        else if (e.clientX || e.clientY)
+        {
+            posx = e.clientX + document.body.scrollLeft
+                + document.documentElement.scrollLeft;
+        }
+
+        posx -= this.view.canvas.offsetLeft;
+
+        return posx;
+    }
+
+    this.get_cursor_y = function(e)
+    {
+        var posy = 0;
+
+        if (!e)
+        {
+            var e = window.event;
+        }
+
+        if (e.pageX || e.pageY)
+        {
+            posy = e.pageY;
+        }
+        else if (e.clientX || e.clientY)
+        {
+            posy = e.clientY + document.body.scrollTop
+                + document.documentElement.scrollTop;
+        }
+
+        posy -= this.view.canvas.offsetTop;
+
+        return posy;
+    }
+
+    this.event_onmousedown = function(e)
+    {
+        var posx = this.get_cursor_x(e);
+        var posy = this.get_cursor_y(e);
+
+        this.view.select_at_screen_pos(posx, posy);
+
+        this.cursor_x = posx;
+        this.cursor_y = posy;
+        this.camera_oriented = this.view.camera_oriented;
+        this.camera_direction = this.view.camera_direction;
+        this.draging = true;
+    }
+
+    this.event_onmouseup = function(e)
+    {
+        this.draging = false;
+    }
+
+    this.event_onmousemove = function(e)
+    {
+        if (!this.draging)
+        {
+            return
+        }
+
+        this.view.camera_oriented = this.camera_oriented + this.camera_speed * (this.get_cursor_y(e) - this.cursor_y);
+        this.view.camera_oriented = Math.min(this.view.camera_oriented, Math.PI * 0.98);
+        this.view.camera_oriented = Math.max(this.view.camera_oriented, Math.PI * 0.60);
+
+        this.view.camera_direction = floatReste(this.camera_direction - this.camera_speed * (this.get_cursor_x(e) - this.cursor_x), 2.0 * Math.PI);
+        this.view.update();
+    }
+
+}
+
 function HouseView(output, canvas_id, house)
 {
     this.output = output;
@@ -146,6 +240,9 @@ function HouseView(output, canvas_id, house)
 
     this.viewport = new Viewport();
     this.camera = new Camera();
+    this.camera_distance = 10.0;
+    this.camera_oriented = Math.PI * 0.75; // 0 -> camera look to +Z
+    this.camera_direction = Math.PI * 0.25; // 0 -> camera look to +Y
     this.selected_device = null;
 
     try
@@ -163,6 +260,17 @@ function HouseView(output, canvas_id, house)
         this.viewport.width = this.canvas.width;
         this.viewport.height = this.canvas.height;
         this.viewport.update();
+
+        var bounding_box = this.house.getBoundingBox();
+        this.camera.at[0] = bounding_box.x + bounding_box.w / 2;
+        this.camera.at[1] = bounding_box.y + bounding_box.h / 2;
+
+        this.camera.from[0] = Math.sin(this.camera_direction) * Math.sin(this.camera_oriented) * this.camera_distance;
+        this.camera.from[1] = - Math.cos(this.camera_direction) * Math.sin(this.camera_oriented) * this.camera_distance;
+        this.camera.from[2] = - Math.cos(this.camera_oriented) * this.camera_distance;
+        this.camera.from[0] += this.camera.at[0];
+        this.camera.from[1] += this.camera.at[1];
+        this.camera.from[2] += this.camera.at[2];
 
         this.camera.update();
 
@@ -372,46 +480,25 @@ function HouseView(output, canvas_id, house)
         this.select_device(selected_device);
     }
 
-    this.event_onclick = function(e)
+    this.mouse_event = new HouseViewCameraControl(this);
+
+    this.canvas.onmousedown = function(e)
     {
-        var posx = 0;
-        var posy = 0;
-
-        if (!e)
-        {
-            var e = window.event;
-        }
-
-        if (e.pageX || e.pageY)
-        {
-            posx = e.pageX;
-            posy = e.pageY;
-        }
-        else if (e.clientX || e.clientY)
-        {
-            posx = e.clientX + document.body.scrollLeft
-                + document.documentElement.scrollLeft;
-            posy = e.clientY + document.body.scrollTop
-                + document.documentElement.scrollTop;
-        }
-
-        posx -= this.canvas.offsetLeft;
-        posy -= this.canvas.offsetTop;
-
-        this.select_at_screen_pos(posx, posy);
+        this.view_context.mouse_event.event_onmousedown(e);
     }
 
-    this.event_onclick_bind = function()
+    this.canvas.onmouseup = function(e)
     {
-        this.canvas.onclick = function(e)
-        {
-            this.view_context.event_onclick(e);
-        }
+        this.view_context.mouse_event.event_onmouseup(e);
+    }
+
+    this.canvas.onmousemove = function(e)
+    {
+        this.view_context.mouse_event.event_onmousemove(e);
     }
 
     this.load();
     this.update_model();
-    this.event_onclick_bind();
 
 }
 
