@@ -497,6 +497,59 @@ function HouseView(output, canvas_id, house)
         this.view_context.mouse_event.event_onmousemove(e);
     }
 
+    this.event_onkeypress = function(e)
+    {
+        if (this.selected_device == null)
+        {
+            return;
+        }
+
+        var step = 0.1;
+        var code = 0;
+
+        if (e.charCode) {
+            code = e.charCode;
+        }
+        else {
+            code = e.keyCode;
+        }
+
+        code = String.fromCharCode(code);
+
+        if (code == 'D')
+        {
+            this.selected_device.x += step;
+        }
+        if (code == 'A')
+        {
+            this.selected_device.x -= step;
+        }
+        if (code == 'Z')
+        {
+            this.selected_device.y += step;
+        }
+        if (code == 'Q')
+        {
+            this.selected_device.y -= step;
+        }
+        if (code == 'R')
+        {
+            this.selected_device.z += step;
+        }
+        if (code == 'F')
+        {
+            this.selected_device.z -= step;
+        }
+
+        this.update();
+    }
+
+    this.canvas.onkeydown = function(e)
+    {
+        this.view_context.event_onkeypress(e);
+    }
+    this.canvas.tabIndex = 1000;
+
     this.load();
     this.update_model();
 
