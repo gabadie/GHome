@@ -137,11 +137,14 @@ function HouseWallVertexArray(wall_count)
 
 }
 
-function HouseViewCameraControl(view, cursor_x, cursor_y)
+function HouseViewCameraControl(view)
 {
     this.view = view;
-    this.cursor_x = cursor_x;
-    this.cursor_y = cursor_y;
+    this.cursor_x = 0;
+    this.cursor_y = 0;
+    this.camera_oriented = 0;
+    this.camera_direction = 0;
+    this.camera_speed = 0.01;
     this.draging = false;
 
     this.get_cursor_x = function(e)
@@ -198,6 +201,11 @@ function HouseViewCameraControl(view, cursor_x, cursor_y)
         var posy = this.get_cursor_y(e);
 
         this.view.select_at_screen_pos(posx, posy);
+
+        this.cursor_x = posx;
+        this.cursor_y = posy;
+        this.camera_oriented = this.view.camera_oriented;
+        this.camera_direction = this.view.camera_direction;
         this.draging = true;
     }
 
@@ -213,7 +221,9 @@ function HouseViewCameraControl(view, cursor_x, cursor_y)
             return
         }
 
-        console.info(e.pageX + ", " + e.pageY);
+        this.view.camera_oriented = this.camera_oriented + this.camera_speed * (this.get_cursor_y(e) - this.cursor_y);
+        this.view.camera_direction = this.camera_direction - this.camera_speed * (this.get_cursor_x(e) - this.cursor_x);
+        this.view.update();
     }
 
 }
@@ -227,6 +237,9 @@ function HouseView(output, canvas_id, house)
 
     this.viewport = new Viewport();
     this.camera = new Camera();
+    this.camera_distance = 10.0;
+    this.camera_oriented = Math.PI * 0.75; // 0 -> camera look to +Z
+    this.camera_direction = Math.PI * 0.25; // 0 -> camera look to +Y
     this.selected_device = null;
 
     try
@@ -244,6 +257,13 @@ function HouseView(output, canvas_id, house)
         this.viewport.width = this.canvas.width;
         this.viewport.height = this.canvas.height;
         this.viewport.update();
+
+        this.camera.from[0] = Math.sin(this.camera_direction) * Math.sin(this.camera_oriented) * this.camera_distance;
+        this.camera.from[1] = - Math.cos(this.camera_direction) * Math.sin(this.camera_oriented) * this.camera_distance;
+        this.camera.from[2] = - Math.cos(this.camera_oriented) * this.camera_distance;
+        this.camera.from[0] += this.camera.at[0];
+        this.camera.from[1] += this.camera.at[1];
+        this.camera.from[2] += this.camera.at[2];
 
         this.camera.update();
 
