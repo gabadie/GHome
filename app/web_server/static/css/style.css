@@ -186,6 +186,15 @@ table {
     right: -15px;
 }
 
+.big-menu .meteo {
+	background-color: #c0392b;
+}
+.big-menu .meteo::before{
+	content: url('../img/meteo.png');
+    bottom: -70px;
+    right: -15px;
+}
+
 .big-menu .setup {
 	background-color: #7f8c8d;
 }
