@@ -181,16 +181,12 @@ class WindowContact(Sensor):
         window_state = self.parse_readings(telegram.data_bytes, server)
         window_state.save()
 
-        if window_state == True:
-            self.opened(server)
-        else:
-            self.closed(server)
-
 
 class LightMovementSensor(Sensor):
     voltage_triggers    = mongoengine.ListField(mongoengine.ReferenceField(Trigger), default=list)
     brightness_triggers = mongoengine.ListField(mongoengine.ReferenceField(Trigger), default=list)
-    moved = event.slot()
+
+    on_moved = event.slot()
 
     @staticmethod
     def generate_telegram(sensor_id, voltage, brightness, movement):
@@ -209,6 +205,9 @@ class LightMovementSensor(Sensor):
         r_volt = model.devices.Voltage(device=self, value=voltage).save()
         r_bright = model.devices.Brightness(device=self, value=brightness).save()
         r_mov = model.devices.Movement(device=self, value=movement).save()
+
+        if r_mov:
+            self.on_moved(server)
 
         logger.info("EnOcean light/movement sensor #{}'s reading: Voltage = {}V, brightness = {}, movement = {}.".format(hex(self.device_id), voltage, brightness, movement))
 

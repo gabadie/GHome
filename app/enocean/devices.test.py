@@ -8,6 +8,7 @@ sys.path.insert(0, '..')
 
 from enocean.devices import Sensor, Thermometer, Lamp, Switch, WindowContact, LightMovementSensor
 from model.devices import Device, Temperature, Humidity
+from model.trigger import ThresholdTrigger
 
 
 def test_mongoengine():
@@ -99,10 +100,10 @@ def test_light_movement_sensor():
     assert movement.value
 
 def test_has_events():
-    thermometer = devices.Thermometer(device_id=404)
-    switch = devices.Switch(device_id=405, ignored=False)
-    wc = devices.WindowContact(device_id=406, ignored=False, open=False)
-    lms = devices.LightMovementSensor(device_id=407, ignored=False)
+    thermometer = Thermometer(device_id=404)
+    switch = Switch(device_id=405, ignored=False)
+    wc = WindowContact(device_id=406, ignored=False, open=False)
+    lms = LightMovementSensor(device_id=407, ignored=False)
     
     print "Thermometer events : {} ".format(thermometer.events)
     print "Switch events : {} ".format(switch.events)
@@ -113,9 +114,29 @@ def test_has_events():
     thermometer.temperature_triggers.append(ThresholdTrigger(name="Threshold1", min=46, max=50))
     print "Thermometer events : {} ".format(thermometer.events)
 
-    lms.voltage_triggers.append(ThresholdTrigger(name="Threshold0", min=10, max=45))
-    lms.brightness_triggers.append(ThresholdTrigger(name="Threshold0", min=10, max=45))
+    lms.voltage_triggers.append(ThresholdTrigger(name="VoltThreshold", min=10, max=45))
+    lms.brightness_triggers.append(ThresholdTrigger(name="BrightThreshold", min=10, max=45))
     print "Light sensor events : {} ".format(lms.events)
+
+    assert 'Threshold0.underflow' in thermometer.events
+    assert 'Threshold0.overflow'  in thermometer.events
+    assert 'Threshold1.underflow' in thermometer.events
+    assert 'Threshold1.overflow'  in thermometer.events
+
+    assert 'onclick_bottom_left'  in switch.events
+    assert 'onclick_bottom_right' in switch.events
+    assert 'onclick_top_left'  in switch.events
+    assert 'onclick_top_right' in switch.events
+
+    assert 'on_opened' in wc.events
+    assert 'on_closed' in wc.events
+
+    assert 'on_moved' in lms.events
+    assert 'VoltThreshold.underflow' in lms.events
+    assert 'VoltThreshold.overflow'  in lms.events
+    assert 'BrightThreshold.underflow' in lms.events
+    assert 'BrightThreshold.overflow'  in lms.events
+
 
 if __name__ == "__main__":
     test_mongoengine()
