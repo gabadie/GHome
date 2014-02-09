@@ -122,6 +122,22 @@ class Generator:
         RpcServer.xmlrpc_bind_devices(switches[1].device_id, 'onclick_bottom_right', lamps[1].device_id, 'callback_toggle')
         RpcServer.xmlrpc_bind_devices(switches[1].device_id, 'onclick_top_left', lamps[2].device_id, 'callback_toggle')
 
+        #switch_id = int("0021CBE5", 16)
+        #switch = enocean.devices.Switch(device_id=switch_id, name="THESWITCH", ignored=False)
+        #switch.save()
+
+        wc_id = int("0001B593", 16)
+        wc = enocean.devices.WindowContact(device_id=wc_id, name="BindedindowContactor", ignored=False)
+        wc.save()
+
+
+        socket_id = int("FF9F1E05", 16)
+        socket = enocean.devices.Socket(device_id=socket_id, name="BindedSocket", ignored=False)
+        socket.save()
+        #self.rpc_server.xmlrpc_bind_devices(switch_id, 'onclick_top_right', socket_id, 'callback_toggle')
+        RpcServer.xmlrpc_bind_devices(wc_id, 'on_opened', socket_id, 'callback_desactivate')
+        RpcServer.xmlrpc_bind_devices(wc_id, 'on_closed', socket_id, 'callback_activate')
+
     @property
     def unique_id(self):
         self.id += 1

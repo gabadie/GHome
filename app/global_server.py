@@ -109,6 +109,8 @@ if __name__ == "__main__":
 
     except KeyboardInterrupt:
         print
+    except AttributeError:
+        time.sleep(0.1)
 
     main_server.terminate()
     web_server.terminate()

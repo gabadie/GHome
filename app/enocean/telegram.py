@@ -30,8 +30,10 @@ def from_bytes(bytes, strict=False):
 
 def sensor_telegram(sensor_id, data_bytes, h_seq=3, org=5):
     data = sum(d << 8 * (3 - i) for i, d in enumerate(data_bytes))
-    return Telegram([0xA5, 0x5A], h_seq=h_seq, length=12, org=org, data=data,
-                 sensor_id=sensor_id, status=0, checksum=0)
+    t = Telegram([0xA5, 0x5A], h_seq=h_seq, length=11, org=org, data=data,
+                 sensor_id=sensor_id, status=0x30, checksum=0)
+    t.checksum = t.actual_checksum
+    return t
 
 
 class InvalidTelegram(Exception):

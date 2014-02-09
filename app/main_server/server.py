@@ -14,6 +14,7 @@ import model.clock
 from rpc_server import RpcServer, Raspi
 import logger
 from config import GlobalConfig
+import enocean.devices
 
 class MainServer(object):
 

@@ -13,12 +13,14 @@ from model import event
 from model.trigger import Trigger
 
 class Sensor(model.devices.Sensor):
-
     ignored = mongoengine.BooleanField(default=True)
 
     def process_telegram(self, telegram, server):
         raise NotImplementedError
 
+
+class Actuator(model.devices.Actuator):
+    pass
 
 # Sensors
 class Thermometer(Sensor):
@@ -35,7 +37,7 @@ class Thermometer(Sensor):
         data_bytes[3] = 0x01
         return telegram.sensor_telegram(sensor_id=sensor_id, data_bytes=data_bytes)
 
-    def parse_readings(self, data_bytes):
+    def parse_readings(self, data_bytes, server):
         if data_bytes[3] & 0x01 == 0:
             logger.info("EnOcean thermometer #{}'s is no longer available".format(hex(self.device_id)))
             return (False, 0, 0)
@@ -50,7 +52,7 @@ class Thermometer(Sensor):
         return (True, temp_r, humidity_r)
 
     def process_telegram(self, telegram, server):
-        validity, temperature, humidity = self.parse_readings(telegram.data_bytes)
+        validity, temperature, humidity = self.parse_readings(telegram.data_bytes, server)
 
         if validity:
             temperature.save()
@@ -100,7 +102,6 @@ class Switch(Sensor):
         return telegram.sensor_telegram(sensor_id=sensor_id, data_bytes=data_bytes)
 
     def parse_readings(self, data_bytes, server):
-        print "Data bytes = {}".format(data_bytes)
         if data_bytes[0] & 0x10 == 0:
             side = Switch.UNKNOWN
             direction = Switch.UNKNOWN
@@ -154,8 +155,8 @@ class Switch(Sensor):
 class WindowContact(Sensor):
     open = mongoengine.BooleanField(default=True)
 
-    opened  = event.slot()
-    closed  = event.slot()
+    on_opened = event.slot()
+    on_closed = event.slot()
 
     @staticmethod
     def generate_telegram(sensor_id, open):
@@ -164,14 +165,20 @@ class WindowContact(Sensor):
             data_bytes[3] = 0x01
         return telegram.sensor_telegram(sensor_id=sensor_id, data_bytes=data_bytes)
 
-    def parse_readings(self, data_bytes):
+    def parse_readings(self, data_bytes, server):
         self.open = ((data_bytes[3] & 0x01) == 0)
+
+        if self.open:
+            self.on_opened(server)
+        else:
+            self.on_closed(server)
+
         logger.info("EnOcean window contactor #{}'s reading: open = {}".format(hex(self.device_id), self.open))
 
         return model.devices.WindowState(device=self, value=self.open)
 
     def process_telegram(self, telegram, server):
-        window_state = self.parse_readings(telegram.data_bytes)
+        window_state = self.parse_readings(telegram.data_bytes, server)
         window_state.save()
 
         if window_state == True:
@@ -194,7 +201,7 @@ class LightMovementSensor(Sensor):
             data_bytes[3] = 0x01
         return telegram.sensor_telegram(sensor_id=sensor_id, data_bytes=data_bytes)
 
-    def parse_readings(self, data_bytes):
+    def parse_readings(self, data_bytes, server):
         voltage = data_bytes[0] * 5.1 / 255.0
         brightness = data_bytes[1] * 510 / 255.0
         movement = ((data_bytes[3] & 0x01) == 0x00)
@@ -208,7 +215,7 @@ class LightMovementSensor(Sensor):
         return r_volt, r_bright, r_mov
 
     def process_telegram(self, telegram, server):
-        voltage, brightness, movement = self.parse_readings(telegram.data_bytes)
+        voltage, brightness, movement = self.parse_readings(telegram.data_bytes, server)
 
         voltage.save()
         brightness.save()
@@ -216,7 +223,7 @@ class LightMovementSensor(Sensor):
 
 
 # Actuators
-class Lamp(model.devices.Actuator):
+class Lamp(Actuator):
     turned_on = mongoengine.BooleanField(default=False)
 
     def turn_on(self, turned_on):
@@ -234,7 +241,7 @@ class Lamp(model.devices.Actuator):
     def callback_toggle(self, server):
         return self.turn_on(not self.turned_on)
 
-class Socket(model.devices.Actuator):
+class Socket(Actuator):
     activated = mongoengine.BooleanField(default=False)
 
     def activate(self, activated):
@@ -245,11 +252,11 @@ class Socket(model.devices.Actuator):
 
     def callback_activate(self, server):
         if not self.activated:
-            return self.callback_toggle()
+            return self.callback_toggle(server)
 
     def  callback_deactivate(self, server):
         if self.activated:
-            return self.callback_toggle()
+            return self.callback_toggle(server)
 
     def callback_toggle(self, server):
         side = Switch.RIGHT

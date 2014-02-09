@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="container">
+	{% include "header.html" %}
+
+
+<h1>{{category_name}} category</h1>
+
+<ul>
+	{% for article in articles %}
+	<li>
+		<a href={{article.url}}> {{article.title}} </a>
+
+		<p>
+			{{article.summary}}
+		</p>
+
+	</li>
+	{% endfor %}
+</ul> 
+
+</div>
+{% endblock body %}
+
+{% block javascript %}
+
+{% endblock %}

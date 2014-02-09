@@ -4,7 +4,13 @@
 <div class="container">
 	{% include "header.html" %}
 
-http://api.feedzilla.com/v1/cultures.json
+	<ul class="big-menu">
+		{% for category in categories %}
+			<a href="news/{{category.id}}"><li class="news">{{category.englishName}}</li></a>
+			
+		{% endfor %}
+	</ul>
+
 
 </div>
 {% endblock body %}
