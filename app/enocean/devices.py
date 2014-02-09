@@ -6,10 +6,11 @@ import mongoengine
 
 sys.path.insert(0, '..')
 
+import logger
 import telegram
 import model.devices
 from model import event
-import logger
+from model.trigger import Trigger
 
 class Sensor(model.devices.Sensor):
     ignored = mongoengine.BooleanField(default=True)
@@ -23,6 +24,10 @@ class Actuator(model.devices.Actuator):
 
 # Sensors
 class Thermometer(Sensor):
+    temperature_triggers = mongoengine.ListField(mongoengine.ReferenceField(Trigger), default=list)
+    humity_triggers      = mongoengine.ListField(mongoengine.ReferenceField(Trigger), default=list)
+    _old_temperature = None
+    _old_humidity    = None
 
     @staticmethod
     def generate_telegram(sensor_id, temperature, humidity):
@@ -52,6 +57,18 @@ class Thermometer(Sensor):
         if validity:
             temperature.save()
             humidity.save()
+
+        # If there are cached values, trigger events
+        if self._old_temperature != None and self._old_humidity != None:
+            for t in self.temperature_triggers:
+                t.trigger(self._old_temperature, temperature, server)
+
+            for h in self.humidity_triggers:
+                h.trigger(self._old_humidity, humidity, server)
+
+        self._old_temperature = temperature
+        self._old_humidity    = humidity
+
 
 class Switch(Sensor):
     UNKNOWN, TOP, BOTTOM, RIGHT, LEFT = range(5)
@@ -166,6 +183,10 @@ class WindowContact(Sensor):
 
 
 class LightMovementSensor(Sensor):
+    voltage_triggers    = mongoengine.ListField(mongoengine.ReferenceField(Trigger), default=list)
+    brightness_triggers = mongoengine.ListField(mongoengine.ReferenceField(Trigger), default=list)
+
+    on_moved = event.slot()
 
     @staticmethod
     def generate_telegram(sensor_id, voltage, brightness, movement):
@@ -184,6 +205,9 @@ class LightMovementSensor(Sensor):
         r_volt = model.devices.Voltage(device=self, value=voltage).save()
         r_bright = model.devices.Brightness(device=self, value=brightness).save()
         r_mov = model.devices.Movement(device=self, value=movement).save()
+
+        if r_mov:
+            self.on_moved(server)
 
         logger.info("EnOcean light/movement sensor #{}'s reading: Voltage = {}V, brightness = {}, movement = {}.".format(hex(self.device_id), voltage, brightness, movement))
 
@@ -229,7 +253,7 @@ class Socket(Actuator):
         if not self.activated:
             return self.callback_toggle(server)
 
-    def  callback_desactivate(self, server):
+    def  callback_deactivate(self, server):
         if self.activated:
             return self.callback_toggle(server)
 
