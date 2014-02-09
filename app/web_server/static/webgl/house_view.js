@@ -137,6 +137,87 @@ function HouseWallVertexArray(wall_count)
 
 }
 
+function HouseViewCameraControl(view, cursor_x, cursor_y)
+{
+    this.view = view;
+    this.cursor_x = cursor_x;
+    this.cursor_y = cursor_y;
+    this.draging = false;
+
+    this.get_cursor_x = function(e)
+    {
+        var posx = 0;
+
+        if (!e)
+        {
+            var e = window.event;
+        }
+
+        if (e.pageX || e.pageY)
+        {
+            posx = e.pageX;
+        }
+        else if (e.clientX || e.clientY)
+        {
+            posx = e.clientX + document.body.scrollLeft
+                + document.documentElement.scrollLeft;
+        }
+
+        posx -= this.view.canvas.offsetLeft;
+
+        return posx;
+    }
+
+    this.get_cursor_y = function(e)
+    {
+        var posy = 0;
+
+        if (!e)
+        {
+            var e = window.event;
+        }
+
+        if (e.pageX || e.pageY)
+        {
+            posy = e.pageY;
+        }
+        else if (e.clientX || e.clientY)
+        {
+            posy = e.clientY + document.body.scrollTop
+                + document.documentElement.scrollTop;
+        }
+
+        posy -= this.view.canvas.offsetTop;
+
+        return posy;
+    }
+
+    this.event_onmousedown = function(e)
+    {
+        var posx = this.get_cursor_x(e);
+        var posy = this.get_cursor_y(e);
+
+        this.view.select_at_screen_pos(posx, posy);
+        this.draging = true;
+    }
+
+    this.event_onmouseup = function(e)
+    {
+        this.draging = false;
+    }
+
+    this.event_onmousemove = function(e)
+    {
+        if (!this.draging)
+        {
+            return
+        }
+
+        console.info(e.pageX + ", " + e.pageY);
+    }
+
+}
+
 function HouseView(output, canvas_id, house)
 {
     this.output = output;
@@ -372,46 +453,25 @@ function HouseView(output, canvas_id, house)
         this.select_device(selected_device);
     }
 
-    this.event_onclick = function(e)
+    this.mouse_event = new HouseViewCameraControl(this);
+
+    this.canvas.onmousedown = function(e)
     {
-        var posx = 0;
-        var posy = 0;
-
-        if (!e)
-        {
-            var e = window.event;
-        }
-
-        if (e.pageX || e.pageY)
-        {
-            posx = e.pageX;
-            posy = e.pageY;
-        }
-        else if (e.clientX || e.clientY)
-        {
-            posx = e.clientX + document.body.scrollLeft
-                + document.documentElement.scrollLeft;
-            posy = e.clientY + document.body.scrollTop
-                + document.documentElement.scrollTop;
-        }
-
-        posx -= this.canvas.offsetLeft;
-        posy -= this.canvas.offsetTop;
-
-        this.select_at_screen_pos(posx, posy);
+        this.view_context.mouse_event.event_onmousedown(e);
     }
 
-    this.event_onclick_bind = function()
+    this.canvas.onmouseup = function(e)
     {
-        this.canvas.onclick = function(e)
-        {
-            this.view_context.event_onclick(e);
-        }
+        this.view_context.mouse_event.event_onmouseup(e);
+    }
+
+    this.canvas.onmousemove = function(e)
+    {
+        this.view_context.mouse_event.event_onmousemove(e);
     }
 
     this.load();
     this.update_model();
-    this.event_onclick_bind();
 
 }
 
