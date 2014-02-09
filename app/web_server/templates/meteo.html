@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="container">
+	{% include "header.html" %}
+
+	<form id="get-weather" class="form-group" action="/meteo/weather" method="POST">
+            <h4>Lieu de résidence</h4>
+            <input id="location" name="location" type="text" placeholder="Adresse">
+            <button type="submit" class="btn btn-primary btn-sm">Afficher ma météo</button>
+        </form>
+
+	<div id="weather">
+
+	</div>
+
+</div>
+{% endblock body %}
+
+{% block javascript %}
+    <script src="static/js/meteo.js"></script>
+{% endblock javascript %}

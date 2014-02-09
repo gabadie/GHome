@@ -73,6 +73,10 @@ def music():
     combo_options = ["jazzy", "happy", "sad", "worry"] #TODO this in the config file ?
     return render_template("music.html", combo_options=combo_options, user=user)
 
+@app.route('/meteo')
+def meteo_page():
+    return render_template('meteo.html')
+
 @app.route('/fashion')
 def fashion_page():
     return render_template('fashion.html')

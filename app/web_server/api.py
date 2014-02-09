@@ -8,7 +8,8 @@ import calendar
 import json
 import xmlrpclib
 
-
+from geopy import geocoders 
+from metwit import Metwit
 from flask import request, jsonify, Blueprint, current_app
 
 from enocean.devices import Sensor, Actuator, Lamp
@@ -245,3 +246,17 @@ def products_search():
     products = json.loads(Product.objects.to_json())
     result = dict(ok=True, result=products)
     return json.dumps(result)
+
+@rest_api.route('/meteo/weather', methods=['POST','GET'])
+def get_location():
+    if request.method =='POST':
+        location = request.form.get('location')
+
+        g = geocoders.GoogleV3()
+        place, (lat, lon) = g.geocode(location)
+
+	content = Metwit.weather.get(location_lat=lat, location_lng=lon)
+        result = dict(ok=True, location=place, latitude=lat, longitude=lon, weather=content)
+
+        return json.dumps(result)
+
