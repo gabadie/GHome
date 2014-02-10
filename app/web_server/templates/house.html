@@ -22,8 +22,11 @@
 <script type="text/javascript" src="static/webgl/console.js"></script>
 <script type="text/javascript" src="static/webgl/camera.js"></script>
 <script type="text/javascript" src="static/webgl/house_view.js"></script>
+<script src="//js.leapmotion.com/0.3.0/leap.js"></script> 
 
 <script type="text/javascript">
+
+
 
     function main()
     {
@@ -36,13 +39,40 @@
         var house_view = new HouseView(console, "renderingZone", house);
         house_view.camera.from = [-2.0, -5.0, 5.0];
         house_view.update();
+
+
+         //initite variables
+          var firstValidFrame = null
+          var rotateY = 90, rotateX = 0, curY = 0
+
+         Leap.loop(function(frame) {
+                if (frame.valid) {
+                    if (!firstValidFrame) firstValidFrame = frame
+                    var t = firstValidFrame.translation(frame)
+
+                      //assign rotation coordinates
+                      rotateX = t[0]
+
+                      //adjust 3D spherical coordinates of the camera
+                      var positionx =  5*Math.cos(rotateX * Math.PI/180)
+                      var positiony = 5*Math.sin(rotateX * Math.PI/180)
+                      var positionz= house_view.camera.from[2] 
+
+                    house_view.camera.from = [positionx, positiony, positionz];
+                    house_view.update();
+
+                    }
+                });
+
     }
 
     document.body.onload = function()
     {
         main();
+
     }
 
 </script>
+
 
 {% endblock %}
