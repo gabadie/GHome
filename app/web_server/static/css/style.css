@@ -6,20 +6,15 @@
     url("../fonts/Regular/OpenSans-Regular.otf") format("opentype"),
     url("../fonts/Regular/OpenSans-Regular.svg") format("svg");
 }
-@font-face {
-    font-family: 'fjordone';
-    src: url('../fonts/fjordone/fjordone-regular-webfont.eot');
-    src: url('../fonts/fjordone/fjordone-regular-webfont.eot?#iefix') format('embedded-opentype'),
-         url('../fonts/fjordone/fjordone-regular-webfont.woff') format('woff'),
-         url('../fonts/fjordone/fjordone-regular-webfont.ttf') format('truetype'),
-         url('../fonts/fjordone/fjordone-regular-webfont.svg#fjordone') format('svg');
-    font-weight: normal;
-    font-style: normal;
-}
 
 body {
 	font-family: "OpenSans Regular";
 	background: url('../img/triangles.png');
+}
+
+table {
+    table-layout: fixed;
+    word-wrap: break-word;
 }
 
 /* main structure */
@@ -39,6 +34,7 @@ body {
     font-weight: bold;
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
     box-shadow: 1px -1px 25px rgba(0, 0, 0, 0.3);
+    overflow-wrap: break-word;
 }
 
 
@@ -125,18 +121,16 @@ body {
 
 	border-radius: 10px;
 
-    /* Effet de flou */
-    filter: blur(3px) grayscale(0.4);
-    -webkit-filter: blur(3px) grayscale(0.4);
 
     /* Animation de transition */
-    transition: filter 0.6s;
-    -webkit-transition: -webkit-filter 0.6s; /* Safari */
+    transition: all 0.6s ease-out;
+    -webkit-transition: all 0.6s ease-out; /* Safari */
 }
 
 .big-menu li:hover {
-	filter: none;
-    -webkit-filter: blur(0) grayscale(0);
+    /* Effet de saturation */
+    filter: brightness(1.2);
+    -webkit-filter: brightness(1.2);
 }
 
 
@@ -187,6 +181,15 @@ body {
 .big-menu .music::before{
 	content: url('../img/music.png');
     bottom: -30px;
+    right: -15px;
+}
+
+.big-menu .meteo {
+	background-color: #c0392b;
+}
+.big-menu .meteo::before{
+	content: url('../img/meteo.png');
+    bottom: -70px;
     right: -15px;
 }
 

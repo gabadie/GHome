@@ -5,7 +5,7 @@ import event
 import mongoengine
 
 
-class FakeDevice0(event.Object):
+class FakeDevice0(event.Eventable):
     event0 = event.slot()
     name = mongoengine.StringField()
     received_event = mongoengine.BooleanField(default=False)
@@ -18,7 +18,7 @@ class FakeDevice0(event.Object):
         self.save()
 
 
-class FakeDevice1(event.Object):
+class FakeDevice1(event.Eventable):
     devices = mongoengine.ListField(mongoengine.ReferenceField(FakeDevice0))
 
 
@@ -46,6 +46,7 @@ def test_events_list_db():
     assert 'event0' in obj0.events
 
     obj1 = FakeDevice0.objects(name="hello").first()
+    print obj1
     assert isinstance(obj1, FakeDevice0)
     assert 'event0' in obj1.events
 

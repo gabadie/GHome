@@ -108,7 +108,8 @@ var bindSensors = function() {
 
     // Adding an event binding
     $('.sensors').on('click', '.callback-binding .add', function(e) {
-        var cb_form = $(this).closest('.callback-binding');
+        var $this = $(this);
+        var cb_form = $this.closest('.callback-binding');
 
         var sensor = cb_form.find('input[name="sensor"]').val();
         var event = cb_form.find('select[name="event"]').val();
@@ -117,9 +118,12 @@ var bindSensors = function() {
 
         var params = {sensor: sensor, event: event, actuator: actuator, callback: callback};
 
+
         apiCall('/connection', 'POST', params, function(data) {
+
+            THIS = $this;
             if (data.ok) {
-                $(this).closest('table').append(connection_template(data.result));
+                $this.closest('table').find('tr:last').before(connection_template(data.result));
             }
             else {
                 notification.error("Couldn't add a binding between '" + event + "' and '"

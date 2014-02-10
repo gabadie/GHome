@@ -7,7 +7,7 @@ import event
 
 # Generic classes
 
-class Device(event.Object):
+class Device(event.Eventable):
     device_id = mongoengine.IntField(required=True, unique=True)
     name = mongoengine.StringField()
 
@@ -40,13 +40,8 @@ class Actuator(Device):
     pass
 
 class Sensor(Device):
-    ignored = mongoengine.BooleanField(required=True, default=False)
-    actuators = mongoengine.ListField(mongoengine.ReferenceField(Actuator), default=[])
-
-    def activated(self):
-        for actuator in self.actuators:
-            actuator.activate(self)
-
+    pass
+    
 # Numeric reading
 class Temperature(NumericReading):
     pass

@@ -67,7 +67,7 @@ class ReplayServerProtocolFactory(protocol.Factory):
 
     def buildProtocol(self, addr):
         return ReplayServerProtocol(self, addr)
-        
+
     def clientConnectionMade(self, client):
         self.clients.append(client)
 
@@ -90,7 +90,7 @@ class ReplayServerProtocolFactory(protocol.Factory):
             # Waits until next frame
             dt = self.frames[self.index].timestamp - self.frames[oldIndex].timestamp
             if dt < 0: dt = 1
-    
+
             # Ugly...
             while dt > 0:
                 if not self.running: break
