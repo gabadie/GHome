@@ -135,7 +135,7 @@ class Generator:
         socket = enocean.devices.Socket(device_id=socket_id, name="BindedSocket", ignored=False)
         socket.save()
         #self.rpc_server.xmlrpc_bind_devices(switch_id, 'onclick_top_right', socket_id, 'callback_toggle')
-        RpcServer.xmlrpc_bind_devices(wc_id, 'on_opened', socket_id, 'callback_desactivate')
+        RpcServer.xmlrpc_bind_devices(wc_id, 'on_opened', socket_id, 'callback_deactivate')
         RpcServer.xmlrpc_bind_devices(wc_id, 'on_closed', socket_id, 'callback_activate')
 
     @property
