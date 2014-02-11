@@ -610,7 +610,21 @@ function HouseView(output, canvas_id, house)
     {
         this.selected_device = device;
         this.update();
+
+        if (this.callback_selected_device)
+        {
+            if (device == null)
+            {
+                this.callback_selected_device(null);
+            }
+            else
+            {
+                this.callback_selected_device(device.id);
+            }
+        }
     }
+
+    this.callback_selected_device = null;
 
     this.select_at_screen_pos = function(pos_x, pos_y)
     {

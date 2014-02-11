@@ -13,8 +13,9 @@
         </canvas>
 
         <div style="padding: 10px 0;">
+            <input id="deviceName" class="form-control" readonly="readonly" />
             <select id="houseViewType" class="form-control">
-                 <option value="Default" selected="selected">Default view</option>
+                 <option value="Default" selected="selected">Default View</option>
                  <option value="Temperature">Temperature View</option>
                  <option value="Humidity">Humidity View</option>
             </select>
@@ -84,6 +85,20 @@
 
             house_view.set_view_mode(e.value);
         }
+
+        house_view.callback_selected_device = function(device_id)
+        {
+            if (device_id === null)
+            {
+                document.getElementById("deviceName").value = "No selected device";
+            }
+            else
+            {
+                document.getElementById("deviceName").value = "Device " + device_id;
+            }
+        }
+
+        house_view.callback_selected_device(null);
     }
 
     document.body.onload = function()
