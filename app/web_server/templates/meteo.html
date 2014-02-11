@@ -4,16 +4,18 @@
 <div class="container">
 	{% include "header.html" %}
 
-	<form id="get-weather" class="form-group" action="/meteo/weather" method="POST">
-            <h4>Lieu de résidence</h4>
-            <input id="location" name="location" type="text" placeholder="Adresse">
-            <button type="submit" class="btn btn-primary btn-sm">Afficher ma météo</button>
-        </form>
+	<div style="margin: 30;">
 
-	<div id="weather">
+		<form id="get-weather" class="form-group" action="/meteo/weather" method="POST">
+	            <h3>Lieu de résidence</h3>
+	            <input id="location" name="location" type="text" placeholder="Adresse">
+	            <button type="submit" class="btn btn-primary btn-sm">Afficher ma météo</button>
+	        </form>
 
+		<div id="weather">
+
+		</div>
 	</div>
-
 </div>
 {% endblock body %}
 

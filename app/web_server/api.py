@@ -4,6 +4,7 @@ import sys
 sys.path.append('..')
 
 from collections import defaultdict
+from datetime import datetime
 import calendar
 import json
 import xmlrpclib
@@ -254,15 +255,29 @@ def get_location():
     if request.method =='POST':
         location = request.form.get('location')
 
-        g = geocoders.GoogleV3()
-        loc = g.geocode(location)
+        try:
+            g = geocoders.GoogleV3()
+            loc = g.geocode(location)
+        except Exception as e:
+            print e
+            loc = None
 
         if loc is None:
-            result = dict(ok=False, geo=False, meteo=False, location=None)
+            result = dict(ok=False, geo=False, meteo=False, location=loc)
         else:
             place, (lat, lon) = loc
-            content = Metwit.weather.get(location_lat=lat, location_lng=lon)
-            result = dict(ok=True, geo=True, meteo=True, location=place, latitude=lat, longitude=lon, weather=content)
+            try:
+                content = Metwit.weather.get(location_lat=lat, location_lng=lon)
 
+                dt = datetime.strptime(content[0]['timestamp'].split('.')[0], "%Y-%m-%dT%H:%M:%S");
+                content[0]['timestamp'] = dt.strftime("%A %d %B#%H:%M").capitalize()
+
+
+                for i in range(1, len(content)):
+                    dt = datetime.strptime(content[i]['timestamp'].split('.')[0], "%Y-%m-%dT%H:%M:%S");
+                    content[i]['timestamp'] = dt.strftime("%A %d %b#%H:%M").capitalize()
+                result = dict(ok=True, geo=True, meteo=True, location=place, latitude=lat, longitude=lon, weather=content)
+            except Exception as e:
+                print e
+                result = dict(ok=False, geo=True, meteo=False, location=place, latitude=lat, longitude=lon)
         return json.dumps(result)
-
