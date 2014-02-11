@@ -26,9 +26,9 @@ function House()
         this.rooms.push(new HouseRect(x, y, w, h))
     }
 
-    this.addDevice = function(id, x, y, z)
+    this.addDevice = function(id, x, y, z, values)
     {
-        this.devices.push(new HouseDevices(id, x, y, z))
+        this.devices.push(new HouseDevices(id, x, y, z, values))
     }
 
     this.getBoundingBox = function()
@@ -245,6 +245,7 @@ function HouseView(output, canvas_id, house)
     this.camera_oriented = Math.PI * 0.75; // 0 -> camera look to +Z
     this.camera_direction = Math.PI * 0.25; // 0 -> camera look to +Y
     this.selected_device = null;
+    this.view_mode = "Default"; // {Default, Temperature}
 
     try
     {
@@ -314,6 +315,39 @@ function HouseView(output, canvas_id, house)
         return mul4(this.viewport.projectionScreenMatrix, this.camera.spaceProjectionMatrix);
     }
 
+    this.color_mix = function(r0, g0, b0, r1, g1, b1, a)
+    {
+        return new Array(r0 + a * (r1 - r0), g0 + a * (g1 - g0), b0 + a * (b1 - b0));
+    }
+
+    this.color_humidity = function(temperature)
+    {
+        var a = temperature * 0.025;
+
+        a = Math.max(Math.min(a, 40.0), 0.0);
+
+        return this.color_mix(1.0, 1.0, 1.0, 0.45, 0.7, 1.0, a);
+    }
+
+    this.color_temperature = function(temperature)
+    {
+        var a = temperature * 0.025;
+
+        a = Math.max(Math.min(a, 40.0), 0.0);
+
+        return this.color_mix(1.0, 0.5, 0.5, 0.5, 0.5, 1.0, a);
+    }
+
+    this.filter_device = function(device)
+    {
+        if (this.view_mode == "Default")
+        {
+            return false;
+        }
+
+        return !(this.view_mode in device.values);
+    }
+
     this.draw = function()
     {
         var gl = this.gl;
@@ -342,6 +376,12 @@ function HouseView(output, canvas_id, house)
         for (var i = 0; i < this.house.devices.length; i++)
         {
             var device = this.house.devices[i];
+
+            if (this.filter_device(device))
+            {
+                continue;
+            }
+
             var device_matrix = space_screen_matrix.slice(0);
             device_matrix[3 * 4 + 0] += device.x * space_screen_matrix[0 *4 + 0] +  device.y * space_screen_matrix[1 *4 + 0] + device.z * space_screen_matrix[2 *4 + 0];
             device_matrix[3 * 4 + 1] += device.x * space_screen_matrix[0 *4 + 1] +  device.y * space_screen_matrix[1 *4 + 1] + device.z * space_screen_matrix[2 *4 + 1];
@@ -360,16 +400,31 @@ function HouseView(output, canvas_id, house)
             device_matrix[2 *4 + 2] *= 0.3;
             device_matrix[2 *4 + 3] *= 0.3;
 
-            gl.uniformMatrix4fv(this.uniform.model_screen_matrix, false, new Float32Array(device_matrix));
+            if (this.view_mode == "Default")
+            {
+                if (device == this.selected_device)
+                {
+                    gl.uniform4f(this.uniform.albedo, 1.0, 0.4, 0.4, 1.0);
+                }
+                else
+                {
+                    gl.uniform4f(this.uniform.albedo, 1.0, 0.8, 0.8, 1.0);
+                }
+            }
+            else if (this.view_mode == "Temperature")
+            {
+                var colors = this.color_temperature(device.values['Temperature']);
 
-            if (device == this.selected_device)
-            {
-                gl.uniform4f(this.uniform.albedo, 1.0, 0.4, 0.4, 1.0);
+                gl.uniform4f(this.uniform.albedo, colors[0], colors[1], colors[2], 1.0);
             }
-            else
+            else if (this.view_mode == "Humidity")
             {
-                gl.uniform4f(this.uniform.albedo, 1.0, 0.8, 0.8, 1.0);
+                var colors = this.color_humidity(device.values['Humidity']);
+
+                gl.uniform4f(this.uniform.albedo, colors[0], colors[1], colors[2], 1.0);
             }
+
+            gl.uniformMatrix4fv(this.uniform.model_screen_matrix, false, new Float32Array(device_matrix));
 
             gl.bindBuffer(gl.ARRAY_BUFFER, this.cube_buffer);
             gl.vertexAttribPointer(this.attribute.vertex, 3, gl.FLOAT, false, 4 * 6, 4 * 0);
@@ -456,6 +511,11 @@ function HouseView(output, canvas_id, house)
         for (var i = 0; i < this.house.devices.length; i++)
         {
             var device = this.house.devices[i];
+
+            if (this.filter_device(device))
+            {
+                continue;
+            }
 
             var screen_x = device.x * space_screen_matrix[0 * 4 + 0] + device.y * space_screen_matrix[1 * 4 + 0] + device.z * space_screen_matrix[2 * 4 + 0] + space_screen_matrix[3 * 4 + 0];
             var screen_y = device.x * space_screen_matrix[0 * 4 + 1] + device.y * space_screen_matrix[1 * 4 + 1] + device.z * space_screen_matrix[2 * 4 + 1] + space_screen_matrix[3 * 4 + 1];
@@ -550,6 +610,13 @@ function HouseView(output, canvas_id, house)
         this.view_context.event_onkeypress(e);
     }
     this.canvas.tabIndex = 1000;
+
+    this.set_view_mode = function(view_mode)
+    {
+        this.view_mode = view_mode;
+
+        this.update();
+    }
 
     this.load();
     this.update_model();

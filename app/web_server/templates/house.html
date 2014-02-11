@@ -7,9 +7,18 @@
 <div class="container">
     {% include "header.html" %}
 
-    <canvas id="renderingZone" width="512" height="512">
-        WebGL 2 canvas
-    </canvas>
+    <div style="margin: 0 auto; width: 800px;">
+        <canvas id="renderingZone" width="800px" height="600px">
+            WebGL 2 canvas
+        </canvas>
+
+        <select id="houseViewType">
+             <option value="Default" selected="selected">Default view</option>
+             <option value="Temperature">Temperature</option>
+             <option value="Humidity">Humidity</option>
+        </select>
+
+    </div>
 </div>
 
 
@@ -27,7 +36,7 @@
 
     function main()
     {
-        var console = new EngineConsole();
+        var output = new EngineConsole();
 
         var house = new House();
 
@@ -37,7 +46,7 @@
         // house.addDevice("id", 2.5, 2.5, 3, {});
         // house.addDevice("id", -2.5, -2.5, 3, {});
 
-        var house_view = new HouseView(console, "renderingZone", house);
+        var house_view = new HouseView(output, "renderingZone", house);
         house_view.camera.from = [-2.0, -5.0, 5.0];
         house_view.update();
 
@@ -50,11 +59,30 @@
 
         apiCall('/sensor', 'GET', {}, function(data) {
             $.each(data.result, function(i, sensor) {
-                house.addDevice(sensor.device_id, sensor.x, sensor.y, 4, {});
+                if (sensor.ignored)
+                {
+                    return;
+                }
+
+                var values = {};
+
+                if (sensor.type == 'Thermometer')
+                {
+                    values['Temperature'] = Math.random() * 30.0 + 5.0;
+                    values['Humidity'] = Math.random() * 100.0;
+                }
+
+                house.addDevice(sensor.device_id, sensor.x, sensor.y, 4, values);
             });
             house_view.update_model();
         });
 
+        document.getElementById("houseViewType").onchange = function()
+        {
+            e = document.getElementById("houseViewType");
+
+            house_view.set_view_mode(e.value);
+        }
     }
 
     document.body.onload = function()
