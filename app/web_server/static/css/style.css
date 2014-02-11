@@ -254,7 +254,7 @@ span.sensor-status {
 
 .sensors li span.sensor-status::after {
     content: "Activé";
-    background: #53d76a;
+    background: rgb(39, 174, 96);
 }
 
 .sensors li.ignored span.sensor-status::after {

@@ -19,7 +19,7 @@
     -webkit-transform: scale(0.7); /* Adjust size here */
 }
 .modern-toggle:checked {
-    box-shadow: inset 0px 0px 0px 20px #53d76a;
+    box-shadow: inset 0px 0px 0px 20px rgb(39, 174, 96);
 }
 .modern-toggle:after {
     content: '';
