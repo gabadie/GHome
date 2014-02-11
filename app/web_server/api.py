@@ -12,17 +12,21 @@ import math
 from geopy import geocoders
 from metwit import Metwit
 from flask import request, jsonify, Blueprint, current_app
+import mongoengine
 
 from enocean.devices import Sensor, Actuator, Lamp
 from model.event import Connection
 from model.devices import NumericReading
 from model.fashion import Product
+from model.house import Room
 
 from config import GlobalConfig
 config = GlobalConfig()
 
-rpc = xmlrpclib.Server('http://{}:{}/'.format(config.main_server.ip, config.main_server.rpc_port))
+# \ ! / Monkey patching mongoengine to make json dumping easier
+mongoengine.Document.to_dict = lambda s : json.loads(s.to_json())
 
+rpc = xmlrpclib.Server('http://{}:{}/'.format(config.main_server.ip, config.main_server.rpc_port))
 
 rest_api = Blueprint('rest_api', __name__)
 
@@ -225,6 +229,16 @@ def all_sensors():
 
     return json.dumps(resp)
 
+@rest_api.route('/sensor/position', methods=['POST'])
+def set_sensor_position():
+    sensor_id = request.json['sensor_id']
+    x, y = request.json['x'], request.json['y']
+    sensor = Sensor.objects.get(device_id=sensor_id)
+    sensor.x, sensor.y = x, y
+    sensor.save()
+
+    return json.dumps(ok=True, sensor=dump_sensor(sensor))
+
 @rest_api.route('/sensor/<device_id>', methods=['GET', 'DELETE'])
 def sensor(device_id):
     device_id = int(device_id)
@@ -318,3 +332,8 @@ def get_location():
 
         return json.dumps(result)
 
+# House / Rooms
+@rest_api.route('/room', methods=['GET'])
+def get_rooms():
+    rooms = [room.to_dict() for room in Room.objects]
+    return json.dumps(ok=True, result=rooms)
