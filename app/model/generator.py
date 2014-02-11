@@ -7,10 +7,11 @@ from random import randrange
 import sys
 import datetime
 
-sys.path.insert(0, '..')
+sys.path.append('..')
 
 import enocean.devices
 import model.devices
+from model.house import Room
 from config import GlobalConfig
 from main_server.rpc_server import RpcServer
 
@@ -90,7 +91,7 @@ class Generator:
         #Thermometer
         thermometers = self.generate_devices(enocean.devices.Thermometer, 3)
         self.generate_readings(thermometers[0], 10, 60)
-	self.generate_reading_evolution(thermometers[1], model.devices.Temperature, 10, 10, -1, 60)
+        self.generate_reading_evolution(thermometers[1], model.devices.Temperature, 10, 10, -1, 60)
         self.generate_reading_evolution(thermometers[1], model.devices.Humidity, 10, 62, 6, 60)
         self.generate_reading_evolution(thermometers[2], model.devices.Temperature, 10, 15, 2, 60)
         self.generate_reading_evolution(thermometers[2], model.devices.Humidity, 10, 40, -4, 60)
@@ -128,7 +129,7 @@ class Generator:
         #switch_id = int("0021CBE5", 16)
         #switch = enocean.devices.Switch(device_id=switch_id, name="THESWITCH", ignored=False)
         #switch.save()
-	
+
         wc_id = int("0001B593", 16)
         wc = enocean.devices.WindowContact(device_id=wc_id, name="BindedindowContactor", ignored=False)
         wc.save()
@@ -141,6 +142,14 @@ class Generator:
         RpcServer.xmlrpc_bind_devices(wc_id, 'on_opened', socket_id, 'callback_deactivate')
         RpcServer.xmlrpc_bind_devices(wc_id, 'on_closed', socket_id, 'callback_activate')
         RpcServer.xmlrpc_bind_devices(wc_id, 'on_closed', socket_id, 'callback_toggle')
+
+        # Generating rooms
+        self.generate_rooms()
+
+    def generate_rooms(self):
+        Room(x=-2.5, y=-2.5, width=5, height=5).save()
+        Room(x=+2.5, y=-2.5, width=5, height=4).save()
+
 
     @property
     def unique_id(self):

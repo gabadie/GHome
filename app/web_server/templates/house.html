@@ -7,9 +7,20 @@
 <div class="container">
     {% include "header.html" %}
 
-    <canvas id="renderingZone" width="512" height="512">
-        WebGL 2 canvas
-    </canvas>
+    <div style="margin: 0 auto; width: 800px;">
+        <canvas id="renderingZone" width="800px" height="600px">
+            WebGL 2 canvas
+        </canvas>
+
+        <div style="padding: 10px 0;">
+            <input id="deviceName" class="form-control" readonly="readonly" />
+            <select id="houseViewType" class="form-control">
+                 <option value="Default" selected="selected">Default View</option>
+                 <option value="Temperature">Temperature View</option>
+                 <option value="Humidity">Humidity View</option>
+            </select>
+        </div>
+    </div>
 </div>
 
 
@@ -27,17 +38,67 @@
 
     function main()
     {
-        var console = new EngineConsole();
+        var output = new EngineConsole();
 
         var house = new House();
-        house.addRoom(-2.5, -2.5, 5, 5);
-        house.addRoom(+2.5, -2.5, 5, 4);
-        house.addDevice("id", 2.5, 2.5, 3);
-        house.addDevice("id", -2.5, -2.5, 3);
 
-        var house_view = new HouseView(console, "renderingZone", house);
+
+        // house.addRoom(-2.5, -2.5, 5, 5);
+        house.addRoom(+2.5, -2.5, 5, 4);
+        // house.addDevice("id", 2.5, 2.5, 3, {});
+        // house.addDevice("id", -2.5, -2.5, 3, {});
+
+        var house_view = new HouseView(output, "renderingZone", house);
         house_view.camera.from = [-2.0, -5.0, 5.0];
         house_view.update();
+
+        apiCall('/room', 'GET', {}, function(data) {
+            $.each(data.result, function(i, room) {
+                house.addRoom(room.x, room.y, room.width, room.height);
+            });
+            house_view.update_model();
+        });
+
+        apiCall('/sensor', 'GET', {}, function(data) {
+            $.each(data.result, function(i, sensor) {
+                if (sensor.ignored)
+                {
+                    return;
+                }
+
+                var values = {};
+
+                if (sensor.type == 'Thermometer')
+                {
+                    values['Temperature'] = Math.random() * 30.0 + 5.0;
+                    values['Humidity'] = Math.random() * 100.0;
+                }
+
+                house.addDevice(sensor.device_id, sensor.x, sensor.y, 4, values);
+            });
+            house_view.update_model();
+        });
+
+        document.getElementById("houseViewType").onchange = function()
+        {
+            e = document.getElementById("houseViewType");
+
+            house_view.set_view_mode(e.value);
+        }
+
+        house_view.callback_selected_device = function(device_id)
+        {
+            if (device_id === null)
+            {
+                document.getElementById("deviceName").value = "No selected device";
+            }
+            else
+            {
+                document.getElementById("deviceName").value = "Device " + device_id;
+            }
+        }
+
+        house_view.callback_selected_device(null);
     }
 
     document.body.onload = function()

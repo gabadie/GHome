@@ -11,6 +11,9 @@ class Device(event.Eventable):
     device_id = mongoengine.IntField(required=True, unique=True)
     name = mongoengine.StringField()
 
+    x = mongoengine.FloatField(default=0.0)
+    y = mongoengine.FloatField(default=0.0)
+
     meta = {'allow_inheritance': True}
 
 
@@ -41,7 +44,7 @@ class Actuator(Device):
 
 class Sensor(Device):
     pass
-    
+
 # Numeric reading
 class Temperature(NumericReading):
     pass
