@@ -346,7 +346,7 @@ function HouseView(output, canvas_id, house)
 
     this.color_temperature = function(temperature)
     {
-        var a = temperature * 0.025;
+        var a = (temperature - 10.0) * 0.04;
 
         a = Math.max(Math.min(a, 1.0), 0.0);
 
