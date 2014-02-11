@@ -7,12 +7,13 @@ function HouseRect(x, y, w, h)
     this.h = h;
 }
 
-function HouseDevices(id, x, y, z)
+function HouseDevices(id, x, y, z, values)
 {
     this.x = x;
     this.y = y;
     this.z = z;
     this.id = id;
+    this.values = values;
 }
 
 function House()
