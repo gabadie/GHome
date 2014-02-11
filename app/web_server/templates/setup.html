@@ -92,11 +92,10 @@
 			<ul class="list-group infos">
 				{{! Sensor's status + a toggle to change it}}
 				<li class="list-group-item">
+					<span class="sensor-status"></span>
 					{{#if ignored}}
-						<span class="sensor-status label-danger">Ignoré</span>
 						<input class="modern-toggle sensor-toggle" type="checkbox" />
 					{{else}}
-						<span class="sensor-status label-success">Activé</span>
 						<input class="modern-toggle sensor-toggle" type="checkbox" checked/>
 					{{/if}}
 				</li>

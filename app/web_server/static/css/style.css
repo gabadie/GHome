@@ -222,29 +222,55 @@ table {
 	color: #FFF;
 	border-bottom: none;
 
-    transition: background-color 2s ease;
+    -webkit-transition: all 0.5s ease-out;
+       -moz-transition: all 0.5s ease-out;
+        -ms-transition: all 0.5s ease-out;
+         -o-transition: all 0.5s ease-out;
+            transition: all 0.5s ease-out;
 }
 
 .sensors li.ignored .heading{
     background-color: rgba(192, 57, 47, 1);
     border-color: #DC4435;
     color: #FF9388;
+
 }
 
+
+span.sensor-status {
+}
+
+.sensors li span.sensor-status::after {
+    padding: 4px 6px;
+    color: #FFF;
+    border-radius: 4px;
+
+    -webkit-transition: all 0.5s ease-out;
+       -moz-transition: all 0.5s ease-out;
+        -ms-transition: all 0.5s ease-out;
+         -o-transition: all 0.5s ease-out;
+            transition: all 0.5s ease-out;
+}
+
+.sensors li span.sensor-status::after {
+    content: "Activé";
+    background: #53d76a;
+}
+
+.sensors li.ignored span.sensor-status::after {
+    content: "Ignoré";
+    background: #d9534f;
+}
+
+
 .sensors li .details {
-	display: none;
-	padding: 10px;
+    display: none;
 }
 
 .sensors li .details .infos .title{
     font-weight: bold;
 }
 
-.sensor-status {
-    padding: 4px 6px;
-    color: #FFF;
-    border-radius: 4px;
-}
 
 input.sensor-toggle {
     margin-bottom: -10px;

@@ -62,20 +62,17 @@ var bindSensors = function() {
 
         var detailed = $li.find('.details').is(':visible');
 
-        apiCall('sensor/' + sensor_id + '/ignored', 'POST', data, function(data) {
-            var sensor = data.result;
-            $li.replaceWith(sensor_template(sensor));
-            $new_li = $("[data-sensor-id='" + sensor.device_id + "']");
-            $new_li.find('.details').show();
-
-        });
-
         if (currently_ignored) {
             $li.removeClass('ignored');
         }
         else {
             $li.addClass('ignored');
         }
+
+        apiCall('/sensor/' + sensor_id + '/ignored', 'POST', data, function(data) {
+            console.log('Ignored/Activated : ');
+            console.log(data);
+        });
 
     });
 
