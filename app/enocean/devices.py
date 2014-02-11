@@ -253,7 +253,7 @@ class Socket(Actuator):
         if not self.activated:
             return self.callback_toggle(server)
 
-    def  callback_deactivate(self, server):
+    def callback_deactivate(self, server):
         if self.activated:
             return self.callback_toggle(server)
 

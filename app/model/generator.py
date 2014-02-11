@@ -89,9 +89,11 @@ class Generator:
     def generate_sample(self):
         #Thermometer
         thermometers = self.generate_devices(enocean.devices.Thermometer, 3)
-        self.generate_readings(thermometers[0], 5, 60)
-        self.generate_reading_evolution(thermometers[1], model.devices.Temperature, 10, 15, 2, 60)
-        self.generate_reading_evolution(thermometers[2], model.devices.Humidity, 10, 62, 6, 60)
+        self.generate_readings(thermometers[0], 10, 60)
+	self.generate_reading_evolution(thermometers[1], model.devices.Temperature, 10, 10, -1, 60)
+        self.generate_reading_evolution(thermometers[1], model.devices.Humidity, 10, 62, 6, 60)
+        self.generate_reading_evolution(thermometers[2], model.devices.Temperature, 10, 15, 2, 60)
+        self.generate_reading_evolution(thermometers[2], model.devices.Humidity, 10, 40, -4, 60)
 
         #Switch
         switches = self.generate_devices(enocean.devices.Switch, 2)
@@ -102,9 +104,10 @@ class Generator:
         self.generate_readings(wc[0], 10, 1800)
 
         #LightMovementSensor
-        lms = self.generate_devices(enocean.devices.LightMovementSensor, 1)
-        self.generate_readings(lms[0], 20, 300)
-        self.generate_reading_evolution(lms[0], model.devices.Brightness, 24, 50, 20, 900)
+        lms = self.generate_devices(enocean.devices.LightMovementSensor, 2)
+        self.generate_readings(lms[0], 24, 900)
+        self.generate_reading_evolution(lms[1], model.devices.Brightness, 24, 50, 20, 900)
+        self.generate_reading_evolution(lms[1], model.devices.Voltage, 24, 1, 0.25, 900)
 
         #Lamp
         lamps = self.generate_devices(enocean.devices.Lamp, 3)
@@ -125,7 +128,7 @@ class Generator:
         #switch_id = int("0021CBE5", 16)
         #switch = enocean.devices.Switch(device_id=switch_id, name="THESWITCH", ignored=False)
         #switch.save()
-
+	
         wc_id = int("0001B593", 16)
         wc = enocean.devices.WindowContact(device_id=wc_id, name="BindedindowContactor", ignored=False)
         wc.save()
@@ -135,8 +138,9 @@ class Generator:
         socket = enocean.devices.Socket(device_id=socket_id, name="BindedSocket", ignored=False)
         socket.save()
         #self.rpc_server.xmlrpc_bind_devices(switch_id, 'onclick_top_right', socket_id, 'callback_toggle')
-        RpcServer.xmlrpc_bind_devices(wc_id, 'on_opened', socket_id, 'callback_desactivate')
+        RpcServer.xmlrpc_bind_devices(wc_id, 'on_opened', socket_id, 'callback_deactivate')
         RpcServer.xmlrpc_bind_devices(wc_id, 'on_closed', socket_id, 'callback_activate')
+        RpcServer.xmlrpc_bind_devices(wc_id, 'on_closed', socket_id, 'callback_toggle')
 
     @property
     def unique_id(self):
