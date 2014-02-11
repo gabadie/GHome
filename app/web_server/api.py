@@ -3,10 +3,11 @@
 import sys
 sys.path.append('..')
 
-from collections import defaultdict
+from collections import defaultdict, Counter
 import calendar
 import json
 import xmlrpclib
+import math
 
 from geopy import geocoders
 from metwit import Metwit
@@ -97,6 +98,57 @@ def event_binding():
         resp = dict(ok=True, result=connection_json)
         return json.dumps(resp)
 
+
+@rest_api.route('/connection/graph')
+def connections_graph():
+    result = dict(nodes=[], edges=[])
+
+    actuators = Actuator.objects
+    sensors = Sensor.objects
+
+    n = len(actuators) + len(sensors)
+    i = 0
+    # Adding actuators
+    for actuator in actuators:
+        i += 1
+        actuator_repr = dict(id=str(actuator.device_id),
+                           label='{}'.format(actuator.name),
+                           x=math.cos(2 * i * math.pi / n),
+                           y=math.sin(2 * i * math.pi / n),
+                           color='#395FBD',
+                           size=6)
+
+        result['nodes'].append(actuator_repr)
+
+    edges_count = Counter()
+
+    # Adding sensors and edges
+    for sensor in sensors:
+        i += 1
+        sensor_repr = dict(id=str(sensor.device_id),
+                           label='{}'.format(sensor.name),
+                           x=math.cos(2 * i * math.pi / n),
+                           y=math.sin(2 * i * math.pi / n),
+                           color='#ec5148',
+                           size=4)
+
+        result['nodes'].append(sensor_repr)
+
+        for e_name, event in sensor.events.iteritems():
+            connections = Connection.objects(triggering_event=event)
+            for c in connections:
+                edges_count[(sensor.device_id, c.receiving_object.device_id)] += 1
+
+    # Adding edges
+    for sensor_id, actuator_id in edges_count:
+        e_repr = dict(id='{}-{}'.format(str(sensor_id), str(actuator_id)),
+                      source=str(sensor_id),
+                      target=str(actuator_id))
+        result['edges'].append(e_repr)
+
+
+
+    return json.dumps(result, indent=4)
 
 @rest_api.route('/connection/<connection_id>', methods=['GET', 'DELETE'])
 def event_connection(connection_id):

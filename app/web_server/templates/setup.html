@@ -12,7 +12,8 @@
 
 	<div>
 
-		<div class="col-md-10">
+		<div class="col-md-9">
+
 			<h2>EnOcean sensors</h2>
 
 			<p>List of all devices in the database:</p>
@@ -41,7 +42,12 @@
 
 
 
-		<div class="col-md-2">
+		<div class="col-md-3">
+			<h2>Devices graph</h2>
+
+			<div id="devices-graph"></div>
+
+
 			<h2>Lamps</h2>
 
 			<ul class="lamps">
@@ -187,5 +193,9 @@
 </script>
 {% endraw %}
 
+
+<!-- Javascript inclusions -->
+<script src="/static/js/sigma.min.js"></script>
+<script src="/static/js/plugins/sigma.parsers.json.min.js"></script>
 <script src="/static/js/setup.js"></script>
 {% endblock %}

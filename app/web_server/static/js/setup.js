@@ -17,7 +17,26 @@ $(document).ready(function() {
         }
     });
 
+    // Drawing the devices' graph
+    drawGraph();
 })
+
+var drawGraph = function() {
+
+
+    apiCall('/connection/graph', 'GET', {}, function(graph_data) {
+        s = new sigma({
+            graph: graph_data,
+            container: 'devices-graph',
+            settings: {
+                showLabels: false
+            }
+        });
+
+    });
+
+
+}
 
 var updateSensors = function() {
     $.getJSON('/sensor', function(data) {

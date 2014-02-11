@@ -206,6 +206,15 @@ table {
 
 /* Sensors */
 
+#devices-graph {
+    height: 280px;
+    width: 100%;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+    margin: auto;
+    display: block;
+}
+
 .sensors {
 	list-style: none;
 	padding: 5px 10px;
