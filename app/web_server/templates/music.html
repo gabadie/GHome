@@ -27,27 +27,38 @@
         <div id=gradPlayer class="container">
             <div class="row">
                 <div class="col-md-4" style="text-align:right;">
-                 <button id="next" class="btn btn-primary btn-lg" > next </button>
                 </div>
-                <div class="col-md-4"  style="text-align:center;">
-                    <div style="position: relative; left: 0; top: 0;">
-                        <img src="image2.jpg" style="position:absolute; top: 80px; left: 25px; z-index: 3;"class="img-circle"//>
-                        <img src="/static/img/player-play.png" style="position:absolute; top: 25px; left: 25px; z-index: 1;"  width="25%"  class="img-thumbnail"/>
-                    </div>
-                    <button id="pausing" class="buttPlayer"> Pause </button>
+                <div class="col-md-4" style="text-align:center;">
+                        <h3 id="tag_text"/>
                 </div>
-                <div class="col-md-4" style="text-align:left;">
-                 <button id="previous" class="buttPlayer"> previous </button>
+                <div class="col-md-4" style="text-align:right;">
                 </div>
             </div>
+             <div class="row">
+                <div class="col-md-4" style="text-align:right;">
+                </div>
+                <div class="col-md-4" style="text-align:center;">
+                        <text id="song_text"/>
+                </div>
+                <div class="col-md-4" style="text-align:right;">
+                </div>
+            </div>
+                        
             <div class="row">
-                <label> Music playing now is = </label>
-                <text id="fileName"> </text>
+                <div class="col-md-4" style="text-align:right;">
+                 <input type="image" src="../static/img/player_backward.png" class="player_button" id="previous"  />
+                </div>
+                <div class="col-md-4"  style="text-align:center;">
+                    <input type="image" src="../static/img/player_play.png" class="player_button" id="pausing"  />
+                </div>
+                <div class="col-md-4" style="text-align:left;">
+                 <input type="image" src="../static/img/player_forward.png" class="player_button" id="next"  />
+                </div>
             </div>
     </div>
     </div>
 {% endblock body %}
 
 {% block javascript %}
-
+<script src="static/js/music.js"></script>
 {% endblock javascript %}

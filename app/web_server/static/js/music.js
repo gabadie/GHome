@@ -5,7 +5,8 @@ $(document).ready(function() {
     $('#play-music').ajaxForm({
         url: '/player', type: 'post',dataType:  'json',
         success : function(data){
-            $('#fileName').text(data.name);
+            $('#song_text').text(data.name);
+            $('#tag_text').text("Catégorie "+ data.tags);
         }
         } );
 
@@ -18,8 +19,7 @@ $(document).ready(function() {
       data: JSON.stringify("data"),
       contentType: 'application/json;charset=UTF-8',
       success : function(data){
-            $('#pausing').text(data.result);
-            $('#fileName').text(data.name);
+            $('#pausing').attr('src',data.src);
         }
     });
     });
@@ -33,7 +33,6 @@ $(document).ready(function() {
       data: JSON.stringify("data"),
       contentType: 'application/json;charset=UTF-8',
       success : function(data){
-            $('#pausing').text(data.result);
             $('#fileName').text(data.name);
         }
     });
@@ -48,7 +47,6 @@ $(document).ready(function() {
       data: JSON.stringify("data"),
       contentType: 'application/json;charset=UTF-8',
       success : function(data){
-            $('#pausing').text(data.result);
             $('#fileName').text(data.name);
         }
     });

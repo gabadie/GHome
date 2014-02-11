@@ -69,8 +69,7 @@ def playMusic():
         tags =  [form.get(val) for val in ['tag']]
         print tags
         urls = rpc.raspi.find_music_url(0,tags)
-        print "qdsf"
-    return jsonify(name=urls)
+    return jsonify(name=urls, tags=tags)
 
 @rest_api.route('/connection', methods=['GET', 'POST'])
 def event_binding():
@@ -288,24 +287,20 @@ def pauseMusic():
     if request.method == 'POST':
         b_result = rpc.raspi.pause_music(0)
         if b_result == True :
-            return jsonify( result="Play")
-        return jsonify("Pausing", result="Pause")
+            return jsonify( src="../static/img/player_play.png")
+        return jsonify( src="../static/img/player_pause.png")
 
 @rest_api.route('/player/next', methods=['POST','GET'])
 def nextMusic():
     if request.method == 'POST':
-        b_result = rpc.raspi.next_music(0)
-        if b_result == True :
-            return jsonify( result="Play")
-        return jsonify("Pausing", result="Pause")
+        result = rpc.raspi.next_music(0)
+        return jsonify( name = result ) 
 
 @rest_api.route('/player/previous', methods=['POST','GET'])
 def previousMusic():
     if request.method == 'POST':
-        b_result = rpc.raspi.previous_music(0)
-        if b_result == True :
-            return jsonify( result="Play")
-        return jsonify("Pausing", result="Pause")
+        result = rpc.raspi.previous_music(0)
+        return jsonify( name = result ) 
 
 
 @rest_api.route('/product/search')
