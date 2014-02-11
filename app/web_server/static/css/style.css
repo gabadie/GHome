@@ -206,6 +206,15 @@ table {
 
 /* Sensors */
 
+#devices-graph {
+    height: 280px;
+    width: 100%;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+    margin: auto;
+    display: block;
+}
+
 .sensors {
 	list-style: none;
 	padding: 5px 10px;
@@ -222,29 +231,55 @@ table {
 	color: #FFF;
 	border-bottom: none;
 
-    transition: background-color 2s ease;
+    -webkit-transition: all 0.5s ease-out;
+       -moz-transition: all 0.5s ease-out;
+        -ms-transition: all 0.5s ease-out;
+         -o-transition: all 0.5s ease-out;
+            transition: all 0.5s ease-out;
 }
 
 .sensors li.ignored .heading{
     background-color: rgba(192, 57, 47, 1);
     border-color: #DC4435;
     color: #FF9388;
+
 }
 
+
+span.sensor-status {
+}
+
+.sensors li span.sensor-status::after {
+    padding: 4px 6px;
+    color: #FFF;
+    border-radius: 4px;
+
+    -webkit-transition: all 0.5s ease-out;
+       -moz-transition: all 0.5s ease-out;
+        -ms-transition: all 0.5s ease-out;
+         -o-transition: all 0.5s ease-out;
+            transition: all 0.5s ease-out;
+}
+
+.sensors li span.sensor-status::after {
+    content: "Activé";
+    background: rgb(39, 174, 96);
+}
+
+.sensors li.ignored span.sensor-status::after {
+    content: "Ignoré";
+    background: #d9534f;
+}
+
+
 .sensors li .details {
-	display: none;
-	padding: 10px;
+    display: none;
 }
 
 .sensors li .details .infos .title{
     font-weight: bold;
 }
 
-.sensor-status {
-    padding: 4px 6px;
-    color: #FFF;
-    border-radius: 4px;
-}
 
 input.sensor-toggle {
     margin-bottom: -10px;
