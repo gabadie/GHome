@@ -320,11 +320,11 @@ function HouseView(output, canvas_id, house)
         return new Array(r0 + a * (r1 - r0), g0 + a * (g1 - g0), b0 + a * (b1 - b0));
     }
 
-    this.color_humidity = function(temperature)
+    this.color_humidity = function(humidity)
     {
-        var a = temperature * 0.025;
+        var a = humidity * 0.01;
 
-        a = Math.max(Math.min(a, 40.0), 0.0);
+        a = Math.max(Math.min(a, 1.0), 0.0);
 
         return this.color_mix(1.0, 1.0, 1.0, 0.45, 0.7, 1.0, a);
     }
@@ -333,7 +333,7 @@ function HouseView(output, canvas_id, house)
     {
         var a = temperature * 0.025;
 
-        a = Math.max(Math.min(a, 40.0), 0.0);
+        a = Math.max(Math.min(a, 1.0), 0.0);
 
         return this.color_mix(1.0, 0.5, 0.5, 0.5, 0.5, 1.0, a);
     }
@@ -362,16 +362,30 @@ function HouseView(output, canvas_id, house)
         var space_screen_matrix = this.screenSpaceMatrix();
 
         gl.useProgram(this.program);
-        gl.uniformMatrix4fv(this.uniform.model_screen_matrix, false, new Float32Array(space_screen_matrix));
-        gl.uniform4f(this.uniform.albedo, 0.85, 0.9, 1.0, 1.0);
 
         gl.enableVertexAttribArray(this.attribute.vertex);
         gl.enableVertexAttribArray(this.attribute.normal);
+
+        this.draw_walls(space_screen_matrix);
+        this.draw_devices(space_screen_matrix);
+    }
+
+    this.draw_walls = function(space_screen_matrix)
+    {
+        var gl = this.gl;
+
+        gl.uniformMatrix4fv(this.uniform.model_screen_matrix, false, new Float32Array(space_screen_matrix));
+        gl.uniform4f(this.uniform.albedo, 0.85, 0.9, 1.0, 1.0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
         gl.vertexAttribPointer(this.attribute.vertex, 3, gl.FLOAT, false, 4 * 6, 4 * 0);
         gl.vertexAttribPointer(this.attribute.normal, 3, gl.FLOAT, false, 4 * 6, 4 * 3);
         gl.drawArrays(gl.TRIANGLES, 0, this.vertices_count);
+    }
+
+    this.draw_devices = function(space_screen_matrix)
+    {
+        var gl = this.gl;
 
         for (var i = 0; i < this.house.devices.length; i++)
         {
@@ -383,22 +397,28 @@ function HouseView(output, canvas_id, house)
             }
 
             var device_matrix = space_screen_matrix.slice(0);
+
+            var size = 0.3;
+
+            if (device == this.selected_device)
+                size = 0.4;
+
             device_matrix[3 * 4 + 0] += device.x * space_screen_matrix[0 *4 + 0] +  device.y * space_screen_matrix[1 *4 + 0] + device.z * space_screen_matrix[2 *4 + 0];
             device_matrix[3 * 4 + 1] += device.x * space_screen_matrix[0 *4 + 1] +  device.y * space_screen_matrix[1 *4 + 1] + device.z * space_screen_matrix[2 *4 + 1];
             device_matrix[3 * 4 + 2] += device.x * space_screen_matrix[0 *4 + 2] +  device.y * space_screen_matrix[1 *4 + 2] + device.z * space_screen_matrix[2 *4 + 2];
             device_matrix[3 * 4 + 3] += device.x * space_screen_matrix[0 *4 + 3] +  device.y * space_screen_matrix[1 *4 + 3] + device.z * space_screen_matrix[2 *4 + 3];
-            device_matrix[0 *4 + 0] *= 0.3;
-            device_matrix[0 *4 + 1] *= 0.3;
-            device_matrix[0 *4 + 2] *= 0.3;
-            device_matrix[0 *4 + 3] *= 0.3;
-            device_matrix[1 *4 + 0] *= 0.3;
-            device_matrix[1 *4 + 1] *= 0.3;
-            device_matrix[1 *4 + 2] *= 0.3;
-            device_matrix[1 *4 + 3] *= 0.3;
-            device_matrix[2 *4 + 0] *= 0.3;
-            device_matrix[2 *4 + 1] *= 0.3;
-            device_matrix[2 *4 + 2] *= 0.3;
-            device_matrix[2 *4 + 3] *= 0.3;
+            device_matrix[0 * 4 + 0] *= size;
+            device_matrix[0 * 4 + 1] *= size;
+            device_matrix[0 * 4 + 2] *= size;
+            device_matrix[0 * 4 + 3] *= size;
+            device_matrix[1 * 4 + 0] *= size;
+            device_matrix[1 * 4 + 1] *= size;
+            device_matrix[1 * 4 + 2] *= size;
+            device_matrix[1 * 4 + 3] *= size;
+            device_matrix[2 * 4 + 0] *= size;
+            device_matrix[2 * 4 + 1] *= size;
+            device_matrix[2 * 4 + 2] *= size;
+            device_matrix[2 * 4 + 3] *= size;
 
             if (this.view_mode == "Default")
             {
