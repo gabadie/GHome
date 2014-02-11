@@ -8,39 +8,61 @@ $(document).ready(function() {
 
             var loc = document.createElement('div'); 
 	    if (data.geo) {
-		loc.innerHTML = data.location + " (" + data.latitude + ", " + data.longitude + ")";
+			loc.innerHTML = "<h4>Météo à <b>" + data.location + "</b></h4>";
 	    } else {
-		loc.innerHTML = "L'adresse spécifiée n'a pu être géolocalisée";
+			loc.innerHTML = "<h4>L'adresse spécifiée n'a pu être géolocalisée</h4>";
 	    }
-            node.appendChild(loc);
+        node.appendChild(loc);
 
-            var prev = document.createElement('div');
+
+        var prev = document.createElement('div');
 	    if (data.meteo) {
-		var actual = document.createElement('div');
-		actual.innerHTML = "Il est " + data.weather[0].timestamp + ", le ciel est " + data.weather[0].weather.status;
-		node.appendChild(actual);
+			var actual = document.createElement('div');
+			var date = data.weather[0].timestamp.split("#");
+			actual.innerHTML = "<h4>Nous sommes le <b>" + date[0]
+				+ "</b></br>Il est actuellement <b>" + date[1]
+				+ "</b><br/>Ciel : <img src=\"" + data.weather[0].icon + "\" width=\"100px\"/></h4>";
+			node.appendChild(actual);
 
-		var table = document.createElement('table');
-		var tbody = document.createElement('tbody');
-		var line = document.createElement('tr');
-		line.innerHTML = "<td>Jour et heure</td><td>Ciel</td><td>Vitesse du vent (km/h)</td><td>Direction du vent (°)</td><td>Température (TODO)</td><td>Humidité (%)</td>";
-		tbody.appendChild(line)
+			var table = document.createElement('table');
+			var tbody = document.createElement('tbody');
+			var line = document.createElement('tr');
+			line.innerHTML = "<td>Date</td>"
+				+ "<td>Heure</td>"
+				+ "<td>Ciel</td>"
+				+ "<td>Température</td>"
+				+ "<td>Humidité</td>"
+				+ "<td>Vitesse du vent</td>"
+				+ "<td>Direction du vent</td>";
+			line.setAttribute("style", "font-weight: bold;");
+			tbody.appendChild(line)
 
-		for(var i = 1; i < data.weather.length; i++)
-		{
-		    var weather = data.weather[i].weather;
-		    var tmpLine = document.createElement('tr');
-		    tmpLine.innerHTML = "<td>" + data.weather[i].timestamp + "</td><td>" + weather.status + "</td><td>" +  weather.measured.wind_speed + "</td><td>" +  weather.measured.wind_direction + "</td><td>" +  weather.measured.temperature + "</td><td>" +  weather.measured.humidity + "</td>";
-		    tbody.appendChild(tmpLine);
-		}
-		table.appendChild(tbody);
-		table.setAttribute("class", "table table-striped");
-		prev.appendChild(table);
-            }
-            else {
-                prev.innerHTML = "Les données météorologiques n'ont pu être récupérées"
-            }
-            node.appendChild(prev);
+			for(var i = 1; i < data.weather.length; i++)
+			{
+				var tmpLine = document.createElement('tr');
+			    var weather = data.weather[i].weather;
+			    var ktemp = parseInt(weather.measured.temperature);
+			    var temperature = Math.round((ktemp - 273.15) * 100) / 100;
+			    var date = data.weather[i].timestamp.split("#");
+
+			    tmpLine.innerHTML = "<td>" + date[0]
+			    	+ "</td><td>" + date[1]
+			    	+ "</td><td><img src=\"" + data.weather[i].icon + "\" width=\"50px\"/></td><td>"
+			    	+  temperature + "°C</td><td>"
+			    	+  weather.measured.humidity + "%</td><td>"
+			    	+  weather.measured.wind_speed + " km/h</td><td>"
+			    	+  weather.measured.wind_direction + "°</td>";
+			    tbody.appendChild(tmpLine);
+			}
+			table.appendChild(tbody);
+			table.setAttribute("class", "table table-striped");
+			table.setAttribute("style", "width: 950px");
+
+			prev.appendChild(table);
+        } else {
+            prev.innerHTML = "<h4>Les données météorologiques n'ont pu être récupérées</h4>"
+        }
+        node.appendChild(prev);
 
         }
         });
