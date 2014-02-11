@@ -341,6 +341,11 @@ input.sensor-toggle {
 	text-shadow: 0px 0px 10px rgba(46, 204, 113, 0.5);
 }
 
+.sensor-readings{
+    width: 500px;
+    height: 200px;
+    margin: 20px auto;
+}
 /* Lamps */
 
 .lamps {

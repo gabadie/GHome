@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block style %}
+<link href="static/css/xcharts.min.css" rel="stylesheet">
 <link href="static/css/iostoggle.css" rel="stylesheet">
 {% endblock %}
 
@@ -178,6 +179,11 @@
 
 
 				{{/if}}
+				{{!--End of events handling--}}
+
+				<li class="list-group-item">
+					<div class="sensor-readings" id="readings-{{device_id}}"></div>
+				</li>
 
 			</ul>
 
@@ -195,7 +201,18 @@
 
 
 <!-- Javascript inclusions -->
+<script src="/static/d3/lib/d3.v3.js"></script>
+<script src="/static/d3/nv.d3.js"></script>
+<script src="/static/d3/src/utils.js"></script>
+<script src="/static/d3/src/models/axis.js"></script>
+<script src="/static/d3/src/tooltip.js"></script>
+<script src="/static/d3/src/interactiveLayer.js"></script>
+<script src="/static/d3/src/models/legend.js"></script>
+<script src="/static/d3/src/models/axis.js"></script>
+
+<script src="/static/js/xcharts.min.js"></script>
 <script src="/static/js/sigma.min.js"></script>
 <script src="/static/js/plugins/sigma.parsers.json.min.js"></script>
+
 <script src="/static/js/setup.js"></script>
 {% endblock %}

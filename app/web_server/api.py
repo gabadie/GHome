@@ -188,13 +188,14 @@ def graph_data():
         for reading in Reading.objects:
             device = reading.device
 
-            key = '{} - {}'.format(device.device_id, device.name)
+            label = '{} - {}'.format(device.device_id, device.name)
             timestamp = calendar.timegm(reading.date.utctimetuple()) * 1000
             data = [timestamp, reading.value]
 
-            readings_map[key].append(data)
+            readings_map[(label, device.device_id)].append(data)
 
-        result[Reading.__name__] = [dict(key=k, values=v) for k, v in readings_map.iteritems()]
+        result[Reading.__name__] = [dict(key=label, values=v, id=device_id)
+                                    for (label, device_id), v in readings_map.iteritems()]
 
     return json.dumps(result)
 
