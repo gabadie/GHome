@@ -377,3 +377,29 @@ input.sensor-toggle {
 .fashion-products .price {
     font-style: italic;
 }
+
+
+/* music */
+
+#gradPlayer
+{
+height:100%;
+width:100%;
+background: -webkit-radial-gradient(ellipse, #07AAFC , #3632FF ); /* Safari */
+background: -o-radial-gradient(ellipse, #07AAFC , #3632FF ); /* For Opera 11.1 to 12.0 */
+background: -moz-radial-gradient(ellipse, #07AAFC , #3632FF ); /* For Firefox 3.6 to 15 */
+background: radial-gradient(ellipse, #07AAFC , #3632FF ); /* Standard syntax (must be last) */
+}
+
+.buttPlayer
+{
+height:30px;
+width: 70px;
+border-radius: 0px;
+color: white;
+border-width: 0px;
+background: -webkit-linear-gradient(#282828, #494949); /* For Safari */
+background: -o-linear-gradient(#282828, #494949); /* For Opera 11.1 to 12.0 */
+background: -moz-linear-gradient(#282828, #494949); /* For Firefox 3.6 to 15 */
+background: linear-gradient(#282828, #494949); /* Standard syntax (must be last) */
+}

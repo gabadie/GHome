@@ -1,5 +1,7 @@
 $(document).ready(function() {
 
+
+
     $('#play-music').ajaxForm({
         url: '/player', type: 'post',dataType:  'json',
         success : function(data){

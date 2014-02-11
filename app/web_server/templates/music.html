@@ -1,32 +1,53 @@
-<html>
-    <head>
-        <title> Music player </title>
-    </head>
-    <body>
-        <h1> Hello, {{ user}}, what do you want to listen to ? </h1>
-        <form id="play-music" class="form-music" >
-            <h4>Choose a category</h4>
 
-            <div class="form-group">
-                <input id="tag" type=text list=browsers name=tag>
-                <datalist id=browsers >
-                    {% for option in combo_options %}
-                    <option> {{option}}
-                    {% endfor %}
-                </datalist>
+{% extends "base.html" %}
+
+{% block body %}
+<div class="container">
+    {% include "header.html" %}
+
+        
+        <h1 > Hello, {{ user}}, what do you want to listen to ? </h1>
+
+            <form id="play-music" class="form-music" >
+                <h4>Choose a category</h4>
+
+                <div class="form-group">
+                    <input id="tag" type=text list=browsers name=tag>
+                    <datalist id=browsers >
+                        {% for option in combo_options %}
+                        <option> {{option}} </option>
+                        {% endfor %}
+                    </datalist>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Search for music</button>
+            </form>
+
+
+
+        <div id=gradPlayer class="container">
+            <div class="row">
+                <div class="col-md-4" style="text-align:right;">
+                 <button id="next" class="btn btn-primary btn-lg" > next </button>
+                </div>
+                <div class="col-md-4"  style="text-align:center;">
+                    <div style="position: relative; left: 0; top: 0;">
+                        <img src="image2.jpg" style="position:absolute; top: 80px; left: 25px; z-index: 3;"class="img-circle"//>
+                        <img src="/static/img/player-play.png" style="position:absolute; top: 25px; left: 25px; z-index: 1;"  width="25%"  class="img-thumbnail"/>
+                    </div>
+                    <button id="pausing" class="buttPlayer"> Pause </button>
+                </div>
+                <div class="col-md-4" style="text-align:left;">
+                 <button id="previous" class="buttPlayer"> previous </button>
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary btn-sm">Search for music</button>
-        </form>
-         <button id="pausing"> Pause </button>
-         <button id="next"> next </button>
-         <button id="previous"> previous </button>
-        <label> Music playing now is = </label>
-        <text id="fileName"> </text>
-    </body>
-</html>
+            <div class="row">
+                <label> Music playing now is = </label>
+                <text id="fileName"> </text>
+            </div>
+    </div>
+    </div>
+{% endblock body %}
 
-    <!-- JS files, placed at the end for faster page loading -->
-    <script src="static/js/jquery-1.10.2.js"></script>
-    <script src="static/js/jquery.form.min.js"></script>
+{% block javascript %}
 
-    <script src="static/js/music.js"></script>
+{% endblock javascript %}
