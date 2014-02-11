@@ -237,7 +237,7 @@ def set_sensor_position():
     sensor.x, sensor.y = x, y
     sensor.save()
 
-    return json.dumps(ok=True, sensor=dump_sensor(sensor))
+    return json.dumps(dict(ok=True, sensor=dump_sensor(sensor)))
 
 @rest_api.route('/sensor/<device_id>', methods=['GET', 'DELETE'])
 def sensor(device_id):
@@ -336,4 +336,4 @@ def get_location():
 @rest_api.route('/room', methods=['GET'])
 def get_rooms():
     rooms = [room.to_dict() for room in Room.objects]
-    return json.dumps(ok=True, result=rooms)
+    return json.dumps(dict(ok=True, result=rooms))

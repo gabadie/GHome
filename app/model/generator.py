@@ -143,6 +143,9 @@ class Generator:
         RpcServer.xmlrpc_bind_devices(wc_id, 'on_closed', socket_id, 'callback_activate')
         RpcServer.xmlrpc_bind_devices(wc_id, 'on_closed', socket_id, 'callback_toggle')
 
+        # Generating rooms
+        self.generate_rooms()
+
     def generate_rooms(self):
         Room(x=-2.5, y=-2.5, width=5, height=5).save()
         Room(x=+2.5, y=-2.5, width=5, height=4).save()

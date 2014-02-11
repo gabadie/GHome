@@ -30,14 +30,31 @@
         var console = new EngineConsole();
 
         var house = new House();
-        house.addRoom(-2.5, -2.5, 5, 5);
+
+
+        // house.addRoom(-2.5, -2.5, 5, 5);
         house.addRoom(+2.5, -2.5, 5, 4);
-        house.addDevice("id", 2.5, 2.5, 3);
-        house.addDevice("id", -2.5, -2.5, 3);
+        // house.addDevice("id", 2.5, 2.5, 3);
+        // house.addDevice("id", -2.5, -2.5, 3);
 
         var house_view = new HouseView(console, "renderingZone", house);
         house_view.camera.from = [-2.0, -5.0, 5.0];
         house_view.update();
+
+        apiCall('/room', 'GET', {}, function(data) {
+            $.each(data.result, function(i, room) {
+                house.addRoom(room.x, room.y, room.width, room.height);
+            });
+            house_view.update_model();
+        });
+
+        apiCall('/sensor', 'GET', {}, function(data) {
+            $.each(data.result, function(i, sensor) {
+                house.addDevice(sensor.device_id, sensor.x, sensor.y, 4);
+            });
+            house_view.update_model();
+        });
+
     }
 
     document.body.onload = function()
