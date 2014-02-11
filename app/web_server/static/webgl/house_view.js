@@ -601,7 +601,7 @@ function HouseView(output, canvas_id, house)
         {
             this.selected_device.x += step;
         }
-        if (code == 'A')
+        if (code == 'Q')
         {
             this.selected_device.x -= step;
         }
@@ -609,7 +609,7 @@ function HouseView(output, canvas_id, house)
         {
             this.selected_device.y += step;
         }
-        if (code == 'Q')
+        if (code == 'S')
         {
             this.selected_device.y -= step;
         }
