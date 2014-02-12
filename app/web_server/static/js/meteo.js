@@ -1,21 +1,28 @@
 $(document).ready(function() {
 
-    $('#get-weather').ajaxForm({
-        dataType:  'json',
-        success : function(data){
-            var node = document.getElementById("weather");
-	    node.innerHTML = "";
+	var displayAll = function() {
+		$.getJSON('/meteo/weather', function(data) {
+	        var node = document.getElementById("weather");
+	    	node.innerHTML = "";
 
-            var loc = document.createElement('div'); 
-	    if (data.geo) {
-			loc.innerHTML = "<h4>Météo à <b>" + data.location + "</b></h4>";
-	    } else {
-			loc.innerHTML = "<h4>L'adresse spécifiée n'a pu être géolocalisée</h4>";
-	    }
+	    	if (data.geo) {
+	    		displayLocation(node, data);
+	    		displayWeather(node, data);
+	    	}
+	    });
+    }
+
+	var displayLocation = function(node, data) {
+		var inputloc = document.getElementById('location');
+		inputloc.setAttribute("value", data.location);
+
+		var loc = document.createElement('div'); 
+		loc.innerHTML = "<h4>Météo à <b>" + data.location + "</b></h4>";
         node.appendChild(loc);
+	}
 
-
-        var prev = document.createElement('div');
+	var displayWeather = function(node, data) {
+		var prev = document.createElement('div');
 	    if (data.meteo) {
 			var actual = document.createElement('div');
 			var date = data.weather[0].timestamp.split("#");
@@ -56,15 +63,28 @@ $(document).ready(function() {
 			}
 			table.appendChild(tbody);
 			table.setAttribute("class", "table table-striped");
-			table.setAttribute("style", "width: 950px");
+			table.setAttribute("style", "width: 1000px");
 
 			prev.appendChild(table);
         } else {
             prev.innerHTML = "<h4>Les données météorologiques n'ont pu être récupérées</h4>"
         }
         node.appendChild(prev);
+	}
 
+    $('#update-location').ajaxForm({
+        dataType:  'json',
+        success : function(data){
+        	var node = document.getElementById("weather");
+	    	node.innerHTML = "";
+
+	    	if (data.ok) {
+	    		displayAll();
+	    	} else {
+	    		node.innerHTML = "<h4>L'adresse spécifiée n'a pu être géolocalisée</h4>";
+	    	}
         }
-        });
+    });
+    displayAll();
 });
 
