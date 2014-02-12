@@ -5,6 +5,7 @@ sys.path.append('..')
 
 from collections import defaultdict
 from datetime import datetime
+from datetime import timedelta
 from collections import defaultdict, Counter
 import calendar
 import json
@@ -327,6 +328,18 @@ def products_search():
     result = dict(ok=True, result=products)
     return json.dumps(result)
 
+@rest_api.route('/meteo/getloc', methods=['POST','GET'])
+def get_location():
+    if len(Location.objects) > 0:
+        location = Location.objects[0]
+        dt = datetime.now()
+        time = dt.strftime("%A %d %b, %H:%M").capitalize()
+        result = dict(ok=True, loc=True, location=location.name, time=time)
+    else:
+        result = dict(ok=False, loc=False)
+
+    return json.dumps(result)
+
 @rest_api.route('/meteo/setloc', methods=['POST','GET'])
 def set_location():
     location = request.form.get('location')
@@ -339,25 +352,79 @@ def set_location():
             name, (lat, lon) = loc
             [location.delete() for location in Location.objects]
             Location(name=name, latitude=lat, longitude=lon).save()
+            update_current_weather()
             result = dict(ok=True)
+        else:
+            result = dict(ok=False)
     except Exception as e:
         print e
         result = dict(ok=False)
 
     return json.dumps(result)
 
+def update_current_weather():
+    if len(Location.objects) > 0:
+        location = Location.objects[0]
+        content = get_json_weather(lat=location.latitude, lon=location.longitude)
+
+        [weather.delete() for weather in Weather.objects]
+
+        td = timedelta(hours=location.hoursdelta)
+        icon = content[0]['icon']
+        humidity = content[0]['weather']['measured']['humidity']
+        temperature = content[0]['weather']['measured']['temperature']
+
+        Weather(expire=get_datetime(content[1]['timestamp']) + td, icon=icon, humidity=humidity, temperature=temperature).save()
+
+
+@rest_api.route('/meteo/currentweather', methods=['POST','GET'])
+def get_curent_weather():
+    if len(Location.objects) > 0:
+        location = Location.objects[0]
+
+        #Update current weather
+        if len(Weather.objects) == 0 or Weather.objects[0].expire < datetime.now():
+            update_current_weather()
+        
+        weather = Weather.objects[0]
+
+        icon = weather.icon
+        humidity = weather.humidity
+        temperature = weather.temperature
+
+        result = dict(ok=False, geo=True, meteo=True, icon=icon,
+            humidity=humidity, temperature=temperature)
+
+    else:
+        result = dict(ok=False, geo=False, meteo=False)
+
+    return json.dumps(result)
+
+def get_json_weather(lat, lon):
+    return Metwit.weather.get(location_lat=lat, location_lng=lon)
+
+def get_datetime(utcstring):
+    return datetime.strptime(utcstring.split('.')[0], "%Y-%m-%dT%H:%M:%S")
+
+
+def get_timedelta(distantDateTime):
+    return datetime.now().hour - distantDateTime.hour;
+
 @rest_api.route('/meteo/weather', methods=['POST','GET'])
 def get_weather():
     if len(Location.objects) > 0:
         location = Location.objects[0]
         try:
-            content = Metwit.weather.get(location_lat=location.latitude, location_lng=location.longitude)
+            content = get_json_weather(lat=location.latitude, lon=location.longitude)
 
-            dt = datetime.strptime(content[0]['timestamp'].split('.')[0], "%Y-%m-%dT%H:%M:%S");
-            content[0]['timestamp'] = dt.strftime("%A %d %B#%H:%M").capitalize()
+            hoursdelta = get_timedelta(get_datetime(content[0]['timestamp']))
+            location.hoursdelta = hoursdelta;
+            location.save()
+            print hoursdelta
+            td = timedelta(hours=hoursdelta)
 
-            for i in range(1, len(content)):
-                dt = datetime.strptime(content[i]['timestamp'].split('.')[0], "%Y-%m-%dT%H:%M:%S");
+            for i in range(0, len(content)):
+                dt = get_datetime(content[i]['timestamp']) + td;
                 content[i]['timestamp'] = dt.strftime("%A %d %b#%H:%M").capitalize()
             result = dict(ok=True, geo=True, meteo=True, location=location.name, latitude=location.latitude, longitude=location.longitude, weather=content)
         except Exception as e:
