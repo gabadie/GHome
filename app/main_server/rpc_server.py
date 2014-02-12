@@ -58,16 +58,16 @@ class Raspi(xmlrpc.XMLRPC):
             print tags_low
             mixset = api.mixset(tags=tags_low, sort='popular')
             urls=search_music_generator(mixset)
-            print "http://{}:{}".format(self.rpi[id].ip,self.rpi[id].port)
-            server = xmlrpclib.Server("http://{}:{}".format(self.rpi[id].ip,self.rpi[id].port))
-            server.init_play_music(json.dumps(urls),tags)
-            print urls
-            if len(urls)>0:
-                return urls[0]['name']
+            if len(urls) >0 :
+                print "http://{}:{}".format(self.rpi[id].ip,self.rpi[id].port)
+                server = xmlrpclib.Server("http://{}:{}".format(self.rpi[id].ip,self.rpi[id].port))
+                server.init_play_music(json.dumps(urls),tags)
+                print urls
+                return urls[0]['name'], urls[0]['img_url']
             else :
-                return "no url found"
+                return "no url found", "Err"
         else :
-            return "Failed, no raspi get this ID"
+            return "Failed, no raspi get this ID" , "Err"
        
 
     def xmlrpc_next_music(self, id):
@@ -153,8 +153,9 @@ def search_music_generator(mixset):
         try:
             for song in mix:
                 if(i<5):
-                    urls.append({'name': song.data['name'], 'stream_url' : song.data['track_file_stream_url']})# ou track_file_stream_url
+                    urls.append({'name': song.data['name'], 'stream_url' : song.data['track_file_stream_url'], 'img_url': song.data['buy_icon']})# ou track_file_stream_url
                     print song.data['track_file_stream_url']
+                    print song.data
                     i+=1
         except requests.HTTPError as err:
             print err
