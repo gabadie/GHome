@@ -49,11 +49,14 @@ def dump_sensor(sensor):
     s_json['actuators'] = [dump_actuator(actuator) for actuator in Actuator.objects]
 
     # TODO : Dirty hack to get events' name
-    connections = dict()
+    connections = list()
     for e_name, e in sensor.events.iteritems():
-        connections = [dump_connection(c) for c in Connection.objects(triggering_event=e)]
-        for c in connections:
+        e_connections = [dump_connection(c) for c in Connection.objects(triggering_event=e)]
+
+        for c in e_connections:
             c['triggering_event'] = e_name
+
+        connections.extend(e_connections)
 
     s_json['connections'] = connections
 
@@ -308,13 +311,13 @@ def pauseMusic():
 def nextMusic():
     if request.method == 'POST':
         result = rpc.raspi.next_music(0)
-        return jsonify( name = result ) 
+        return jsonify( name = result )
 
 @rest_api.route('/player/previous', methods=['POST','GET'])
 def previousMusic():
     if request.method == 'POST':
         result = rpc.raspi.previous_music(0)
-        return jsonify( name = result ) 
+        return jsonify( name = result )
 
 
 @rest_api.route('/product/search')
