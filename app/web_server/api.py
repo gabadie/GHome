@@ -58,6 +58,12 @@ def dump_sensor(sensor):
 
     s_json['connections'] = connections
 
+    last_readings = dict()
+    for reading_name, reading in sensor.last_readings.iteritems():
+        last_readings[reading_name] = json.loads(reading.to_json())
+
+    s_json['last_readings'] = last_readings
+
     return s_json
 
 def dump_connection(connection):
