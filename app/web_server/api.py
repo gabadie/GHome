@@ -21,6 +21,8 @@ from model.event import Connection
 from model.devices import NumericReading
 from model.fashion import Product
 from model.house import Room
+from model.meteo import Location
+from model.meteo import Weather
 
 from config import GlobalConfig
 config = GlobalConfig()
@@ -322,36 +324,46 @@ def products_search():
     result = dict(ok=True, result=products)
     return json.dumps(result)
 
-@rest_api.route('/meteo/weather', methods=['POST','GET'])
-def get_location():
-    if request.method =='POST':
-        location = request.form.get('location')
+@rest_api.route('/meteo/setloc', methods=['POST','GET'])
+def set_location():
+    location = request.form.get('location')
+    
+    try:
+        g = geocoders.GoogleV3()
+        loc = g.geocode(location)
 
+        if loc:
+            name, (lat, lon) = loc
+            [location.delete() for location in Location.objects]
+            Location(name=name, latitude=lat, longitude=lon).save()
+            result = dict(ok=True)
+    except Exception as e:
+        print e
+        result = dict(ok=False)
+
+    return json.dumps(result)
+
+@rest_api.route('/meteo/weather', methods=['POST','GET'])
+def get_weather():
+    if len(Location.objects) > 0:
+        location = Location.objects[0]
         try:
-            g = geocoders.GoogleV3()
-            loc = g.geocode(location)
+            content = Metwit.weather.get(location_lat=location.latitude, location_lng=location.longitude)
+
+            dt = datetime.strptime(content[0]['timestamp'].split('.')[0], "%Y-%m-%dT%H:%M:%S");
+            content[0]['timestamp'] = dt.strftime("%A %d %B#%H:%M").capitalize()
+
+            for i in range(1, len(content)):
+                dt = datetime.strptime(content[i]['timestamp'].split('.')[0], "%Y-%m-%dT%H:%M:%S");
+                content[i]['timestamp'] = dt.strftime("%A %d %b#%H:%M").capitalize()
+            result = dict(ok=True, geo=True, meteo=True, location=location.name, latitude=location.latitude, longitude=location.longitude, weather=content)
         except Exception as e:
             print e
-            loc = None
+            result = dict(ok=False, geo=True, meteo=False, location=location.name, latitude=location.latitude, longitude=location.longitude)
+    else:
+        result = dict(ok=False, geo=False, meteo=False)
 
-        if loc is None:
-            result = dict(ok=False, geo=False, meteo=False, location=loc)
-        else:
-            place, (lat, lon) = loc
-            try:
-                content = Metwit.weather.get(location_lat=lat, location_lng=lon)
-
-                dt = datetime.strptime(content[0]['timestamp'].split('.')[0], "%Y-%m-%dT%H:%M:%S");
-                content[0]['timestamp'] = dt.strftime("%A %d %B#%H:%M").capitalize()
-
-                for i in range(1, len(content)):
-                    dt = datetime.strptime(content[i]['timestamp'].split('.')[0], "%Y-%m-%dT%H:%M:%S");
-                    content[i]['timestamp'] = dt.strftime("%A %d %b#%H:%M").capitalize()
-                result = dict(ok=True, geo=True, meteo=True, location=place, latitude=lat, longitude=lon, weather=content)
-            except Exception as e:
-                print e
-                result = dict(ok=False, geo=True, meteo=False, location=place, latitude=lat, longitude=lon)
-        return json.dumps(result)
+    return json.dumps(result)
 
 # House / Rooms
 @rest_api.route('/room', methods=['GET'])

@@ -4,12 +4,12 @@
 <div class="container">
 	{% include "header.html" %}
 
-	<div style="margin: 30;">
+	<div style="margin: 20;">
 
-		<form id="get-weather" class="form-group" action="/meteo/weather" method="POST">
+		<form id="update-location" class="form-group" action="/meteo/setloc" method="POST">
 	            <h3>Lieu de résidence</h3>
 	            <input id="location" name="location" type="text" placeholder="Adresse">
-	            <button type="submit" class="btn btn-primary btn-sm">Afficher ma météo</button>
+	            <button type="submit" class="btn btn-primary btn-sm">Modifier</button>
 	        </form>
 
 		<div id="weather">
