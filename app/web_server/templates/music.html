@@ -6,19 +6,19 @@
     {% include "header.html" %}
         <div id=gradPlayer class="container">
             <div class="row" style="text-align:center;">
-                <h1> Hello, {{ user}}, what do you want to listen to ? </h1>
+                <h1 class="white_text"> Hello, {{ user}}, what do you want to listen to ? </h1>
             </div>
             <div class="row">  
-                <div class="col-md-4" style="text-align:center;">
+                <div class="col-md-4" style="text-align:center;vertical-align:center; ">
                     {% for option in left_tags %}
                         <div class="row"> 
-                            <button class="btn btn-primary btn-sm" name={{ option }} onclick='on_tag_click(this.name)' >{{ option }}</button>
+                            <button class="btn btn-primary btn-sm" name={{ option }} onclick='on_tag_click(this.name)' style="width:30%">{{ option }}</button>
                         </div>
                     {% endfor %}
                 </div>
                 <div class="col-md-4" style="text-align:center;">
                     <form id="play-music" class="form-music" >
-                        <h4>Choose a category</h4>
+                        <h4 class="white_text">Choose a category</h4>
 
                         <div class="form-group">
                             <input id="tag" type=text list=browsers name=tag>
@@ -34,14 +34,14 @@
                 <div class="col-md-4" style="text-align:center;">
                     {% for option in right_tags %}
                         <div class="row"> 
-                            <button class="btn btn-primary btn-sm"  name={{ option }} onclick='on_tag_click(this.name)'>{{ option }}</button>
+                            <button class="btn btn-primary btn-sm"  name={{ option }} onclick='on_tag_click(this.name)' style="width:30%">{{ option }}</button>
                         </div>
                     {% endfor %}
                 </div>
             </div>
 
 
-            <div class="row">
+            <div class="row" style="min-height:10%">
                 <div class="col-md-4" style="text-align:right;">
                 </div>
                 <div class="col-md-4" style="text-align:center;">

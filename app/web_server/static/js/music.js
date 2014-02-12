@@ -5,6 +5,7 @@ $(document).ready(function() {
     $('#play-music').ajaxForm({
         url: '/player', type: 'post',dataType:  'json',
         success : function(data){
+            $('#pausing').attr('src',"../static/img/player_pause.png");
             $('#song_text').text(data.name);
             $('#tag_text').text("Catégorie "+ data.tags);
         }
@@ -66,6 +67,7 @@ $(document).ready(function() {
       data: JSON.stringify(this_button),
       contentType: 'application/json;charset=UTF-8',
       success : function(data){
+            $('#pausing').attr('src',"../static/img/player_pause.png");
             $('#song_text').text(data.name);
             $('#tag_text').text("Catégorie "+ data.tags);
         }
