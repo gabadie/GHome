@@ -28,7 +28,7 @@ $(document).ready(function() {
 			var date = data.weather[0].timestamp.split("#");
 			var temperature = Math.round((data.weather[0].weather.measured.temperature - 273.15) * 100) / 100; 
 			actual.innerHTML = "<h4>We are <b>" + date[0] + ", " + date[1]
-				+ "</b><br/><br/>Temperature : <b>" + temperature + "°c</b><br/>"
+				+ "</b><br/><br/>Temperature : <b>" + temperature + "°C</b><br/>"
 				+ "Humidity : <b>" + data.weather[0].weather.measured.humidity + "%</b>"
 				+ "<br/><img src=\"" + data.weather[0].icon + "\" width=\"100px\"/><br/></h4><h3>Forecasts</h3>";
 			node.appendChild(actual);

@@ -337,13 +337,20 @@ def products_search():
 
 @rest_api.route('/meteo/getloc', methods=['POST','GET'])
 def get_location():
+    dt = datetime.now()
+    time = dt.strftime("%A %d %b, %H:%M").capitalize()
+
     if len(Location.objects) > 0:
         location = Location.objects[0]
-        dt = datetime.now()
-        time = dt.strftime("%A %d %b, %H:%M").capitalize()
-        result = dict(ok=True, loc=True, location=location.name, time=time)
+        name = location.name
+        ok = True
+        loc = True
     else:
-        result = dict(ok=False, loc=False)
+        name = ''
+        ok = False
+        loc = False
+        
+    result = dict(ok=ok, loc=loc, location=name, time=time)
 
     return json.dumps(result)
 
