@@ -567,7 +567,7 @@ function HouseView(output, canvas_id, house)
             "uniform vec4 albedo;",
             "void main() {",
                 "float factor = 0.1 * max(dot(normal, vec3(-3.0, -5.0, 7.0)), 0.0);",
-                "gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0) * (0.5 + 0.4 * factor);",
+                "gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0) * (0.6 + 0.5 * factor);",
                 "gl_FragColor *= albedo;",
                 //"gl_FragColor.xyz = 0.5 + 0.5 * normal;",
                 "gl_FragColor.a = 1.0;",
