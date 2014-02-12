@@ -61,6 +61,12 @@ def dump_sensor(sensor):
 
     s_json['connections'] = connections
 
+    last_readings = dict()
+    for reading_name, reading in sensor.last_readings.iteritems():
+        last_readings[reading_name] = json.loads(reading.to_json())
+
+    s_json['last_readings'] = last_readings
+
     return s_json
 
 def dump_connection(connection):
@@ -70,14 +76,6 @@ def dump_connection(connection):
     return c_json
 
 ## API
-@rest_api.route('/player', methods=['POST','GET'])
-def playMusic():
-    if request.method == 'POST':
-        form = request.form
-        tags =  [form.get(val) for val in ['tag']]
-        print tags
-        urls = rpc.raspi.find_music_url(0,tags)
-    return jsonify(name=urls, tags=tags)
 
 @rest_api.route('/connection', methods=['GET', 'POST'])
 def event_binding():
@@ -292,12 +290,21 @@ def lamps():
     return json.dumps(resp)
 
 ## API
+@rest_api.route('/player', methods=['POST','GET'])
+def playMusic():
+    if request.method == 'POST':
+        form = request.form
+        tags =  [form.get(val) for val in ['tag']]
+        print tags
+        urls_name, urls_img = rpc.raspi.find_music_url(0,tags)
+    return jsonify(name=urls_name,  tags=tags, img=urls_img)
+
 @rest_api.route('/player/tags', methods=['POST','GET'])
 def playMusicViaTag():
     if request.method == 'POST':
         tags = [json.loads(request.data)]
-        urls = rpc.raspi.find_music_url(0,tags)
-    return jsonify(name=urls, tags=tags)
+        urls_name, urls_img = rpc.raspi.find_music_url(0,tags)
+    return jsonify(name=urls_name,  tags=tags, img=urls_img)
 
 
 @rest_api.route('/player/pause', methods=['POST','GET'])

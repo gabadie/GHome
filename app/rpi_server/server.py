@@ -16,7 +16,7 @@ class MusicPlayer(object):
 
     def __init__(self):
         self.mplayer=pymplb.MPlayer()
-        self.musics=[] # [{'name':     ,'stream_url':    }, { ...... }]
+        self.musics=[] # [{'name':     ,'stream_url':    , 'img_url':      }, { ...... }]
         self.current_music=0
         self.is_pausing=False
         self.tags=[]

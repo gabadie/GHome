@@ -34,6 +34,19 @@ def test_mongoengine():
     assert temp_reading == Temperature.objects.get(device=thermometer)
     assert humidity_reading == Humidity.objects.get(device=thermometer)
 
+def test_last_reading():
+    db = mongoengine.connect('ghome_enocean_test')
+    db.drop_database('ghome_enocean_test')
+
+    thermometer = Thermometer(device_id=442)
+    thermometer.save()
+
+    tel = thermometer.generate_telegram(sensor_id=442, temperature=24.48, humidity=52.8)
+    thermometer.process_telegram(tel, None)
+
+    assert 'Temperature' in thermometer.last_readings
+    assert 'Humidity' in thermometer.last_readings
+
 def test_thermometer():
     thermometer = Thermometer(device_id="50")
 
@@ -104,7 +117,7 @@ def test_has_events():
     switch = Switch(device_id=405, ignored=False)
     wc = WindowContact(device_id=406, ignored=False, open=False)
     lms = LightMovementSensor(device_id=407, ignored=False)
-    
+
     print "Thermometer events : {} ".format(thermometer.events)
     print "Switch events : {} ".format(switch.events)
     print "Window contact events : {} ".format(wc.events)
@@ -140,6 +153,7 @@ def test_has_events():
 
 if __name__ == "__main__":
     test_mongoengine()
+    test_last_reading()
     test_thermometer()
     test_lamp()
     test_switch()

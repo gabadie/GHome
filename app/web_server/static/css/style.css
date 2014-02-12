@@ -145,7 +145,7 @@ table {
 .big-menu .house::before{
 	content: url('../img/home.png');
     bottom: -50px;
-    right: -15px;
+    right: -35px;
 }
 
 .big-menu .monitoring {
