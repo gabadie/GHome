@@ -72,8 +72,11 @@ def house():
 @app.route('/music')
 def music():
     user="Adrien"
-    combo_options = ["jazzy", "happy", "sad", "worry"] #TODO this in the config file ?
-    return render_template("music.html", combo_options=combo_options, user=user)
+    combo_options = ["jazz", "rock", "rap", "happy", "sad", "tired"] #TODO this in the config file ?
+    size_tags = int(round(len(combo_options)/2))
+    left_tags = [i for i in combo_options[:size_tags]]
+    right_tags = [i for i in combo_options[size_tags:int(2*size_tags)]]
+    return render_template("music.html", combo_options = combo_options, user = user, left_tags = left_tags, right_tags = right_tags)
 
 @app.route('/meteo')
 def meteo_page():

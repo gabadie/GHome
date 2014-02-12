@@ -285,6 +285,15 @@ def lamps():
 
     return json.dumps(resp)
 
+## API
+@rest_api.route('/player/tags', methods=['POST','GET'])
+def playMusicViaTag():
+    if request.method == 'POST':
+        tags = [json.loads(request.data)]
+        urls = rpc.raspi.find_music_url(0,tags)
+    return jsonify(name=urls, tags=tags)
+
+
 @rest_api.route('/player/pause', methods=['POST','GET'])
 def pauseMusic():
     if request.method == 'POST':

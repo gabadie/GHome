@@ -10,6 +10,7 @@ $(document).ready(function() {
         }
         } );
 
+
   $('#pausing').click(function(){
       $.ajax({
       url: '/player/pause',
@@ -33,7 +34,7 @@ $(document).ready(function() {
       data: JSON.stringify("data"),
       contentType: 'application/json;charset=UTF-8',
       success : function(data){
-            $('#fileName').text(data.name);
+            $('#song_text').text(data.name);
         }
     });
     });
@@ -47,10 +48,26 @@ $(document).ready(function() {
       data: JSON.stringify("data"),
       contentType: 'application/json;charset=UTF-8',
       success : function(data){
-            $('#fileName').text(data.name);
+            $('#song_text').text(data.name);
         }
     });
     });
 
 
 });
+
+
+  function on_tag_click(this_button){
+      $.ajax({
+      url: '/player/tags',
+      type: 'POST',
+      async: true,
+      dataType: "json",
+      data: JSON.stringify(this_button),
+      contentType: 'application/json;charset=UTF-8',
+      success : function(data){
+            $('#song_text').text(data.name);
+            $('#tag_text').text("Catégorie "+ data.tags);
+        }
+    });
+    };

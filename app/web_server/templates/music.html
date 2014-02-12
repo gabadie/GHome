@@ -4,27 +4,43 @@
 {% block body %}
 <div class="container">
     {% include "header.html" %}
-
-        
-        <h1 > Hello, {{ user}}, what do you want to listen to ? </h1>
-
-            <form id="play-music" class="form-music" >
-                <h4>Choose a category</h4>
-
-                <div class="form-group">
-                    <input id="tag" type=text list=browsers name=tag>
-                    <datalist id=browsers >
-                        {% for option in combo_options %}
-                        <option> {{option}} </option>
-                        {% endfor %}
-                    </datalist>
-                </div>
-                <button type="submit" class="btn btn-primary btn-sm">Search for music</button>
-            </form>
-
-
-
         <div id=gradPlayer class="container">
+            <div class="row" style="text-align:center;">
+                <h1> Hello, {{ user}}, what do you want to listen to ? </h1>
+            </div>
+            <div class="row">  
+                <div class="col-md-4" style="text-align:center;">
+                    {% for option in left_tags %}
+                        <div class="row"> 
+                            <button class="btn btn-primary btn-sm" name={{ option }} onclick='on_tag_click(this.name)' >{{ option }}</button>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-4" style="text-align:center;">
+                    <form id="play-music" class="form-music" >
+                        <h4>Choose a category</h4>
+
+                        <div class="form-group">
+                            <input id="tag" type=text list=browsers name=tag>
+                            <datalist id=browsers >
+                                {% for option in combo_options %}
+                                    <option> {{option}} </option>
+                                {% endfor %}
+                            </datalist>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lm">Search for music</button>
+                    </form>
+                </div>
+                <div class="col-md-4" style="text-align:center;">
+                    {% for option in right_tags %}
+                        <div class="row"> 
+                            <button class="btn btn-primary btn-sm"  name={{ option }} onclick='on_tag_click(this.name)'>{{ option }}</button>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+
             <div class="row">
                 <div class="col-md-4" style="text-align:right;">
                 </div>
@@ -55,7 +71,6 @@
                  <input type="image" src="../static/img/player_forward.png" class="player_button" id="next"  />
                 </div>
             </div>
-    </div>
     </div>
 {% endblock body %}
 
