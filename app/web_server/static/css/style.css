@@ -204,6 +204,15 @@ table {
 }
 
 
+.big-menu .calendar {
+    background-color: #309100;
+}
+.big-menu .calendar::before{
+    content: url('../img/menu_calendar.png');
+    bottom: -20px;
+    right: 5px;
+}
+
 /* Sensors */
 
 #devices-graph {
