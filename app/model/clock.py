@@ -62,7 +62,6 @@ class Server(object):
 
             if clock_event.week_day_mask(week_day):
                 clock_event.event(self.main_server)
-  nhjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjnnh u
         return
 
     def looping_callback(self):
