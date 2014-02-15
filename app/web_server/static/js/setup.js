@@ -36,71 +36,50 @@ var drawGraph = function() {
     });
 }
 
-var drawChart = function(figure_id) {
+var drawChart = function(device_id, xcharts_data) {
+    var figure_id = '#readings-' + device_id;
 
-    var tt = document.createElement('div'),
+    tt = document.createElement('div'),
       leftOffset = -(~~$('html').css('padding-left').replace('px', '') + ~~$('body').css('margin-left').replace('px', '')),
       topOffset = -32;
     tt.className = 'ex-tooltip';
     document.body.appendChild(tt);
 
-    var data = {
-      "xScale": "time",
-      "yScale": "linear",
-      "main": [
-        {
-          "className": ".pizza",
-          "data": [
-            {
-              "x": "2012-11-05",
-              "y": 6
-            },
-            {
-              "x": "2012-11-06",
-              "y": 6
-            },
-            {
-              "x": "2012-11-07",
-              "y": 8
-            },
-            {
-              "x": "2012-11-08",
-              "y": 3
-            },
-            {
-              "x": "2012-11-09",
-              "y": 4
-            },
-            {
-              "x": "2012-11-10",
-              "y": 9
-            },
-            {
-              "x": "2012-11-11",
-              "y": 6
-            }
-          ]
+    apiCall('/sensor/' + device_id + '/xcharts_data', 'GET', {}, function(d) {
+        if (!d.ok || !d.result.length) {
+            $(figure_id).hide();
+            return;
         }
-      ]
-    };
+        var data = {
+          "xScale": "time",
+          "yScale": "linear",
+          "main": d.result
 
-    DATA = data;
-    var opts = {
-      "dataFormatX": function (x) { return d3.time.format('%Y-%m-%d').parse(x); },
-      "tickFormatX": function (x) { return d3.time.format('%A')(x); },
-      "mouseover": function (d, i) {
-        console.log('lol');
-        var pos = $(this).offset();
-        $(tt).text(d3.time.format('%A')(d.x) + ': ' + d.y)
-          .css({top: topOffset + pos.top, left: pos.left + leftOffset})
-          .show();
-      },
-      "mouseout": function (x) {
-        $(tt).hide();
-      }
-    };
+        };
 
-    var myChart = new xChart('line-dotted', data, figure_id, opts);
+        DATA = data;
+        console.log('------------------------');
+        console.log(device_id);
+        console.log(data);
+        var opts = {
+          "dataFormatX": function (x) { return d3.time.format('%Y-%m-%dT%H:%M:%S').parse(x); },
+          "tickFormatX": function (x) { return d3.time.format('%A')(x); },
+          "mouseover": function (d, i) {
+            console.log('lol');
+            var pos = $(this).offset();
+            $(tt).text(d3.time.format('%A')(d.x) + ': ' + d.y)
+              .css({top: topOffset + pos.top, left: pos.left + leftOffset})
+              .show();
+          },
+          "mouseout": function (x) {
+            $(tt).hide();
+          }
+        };
+
+        var myChart = new xChart('line-dotted', data, figure_id, opts);
+        $(figure_id).show();
+    });
+
 
 
 }
@@ -110,7 +89,7 @@ var updateSensors = function() {
             $('.sensors').html('');
             $.each(data.result, function(i, s) {
                 $('.sensors').append(sensor_template(s));
-                drawChart('#readings-' + s.device_id);
+                drawChart(s.device_id);
             });
     });
 }
