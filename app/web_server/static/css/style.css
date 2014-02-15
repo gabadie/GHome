@@ -99,7 +99,10 @@ table {
 }
 
 /* Main menu */
-
+.jumbotron {
+    padding-left: 4% !important;
+    padding-right: 4% !important;
+}
 .big-menu {
 	list-style: none;
 	font-size: 0;
@@ -115,13 +118,13 @@ table {
 	padding: 35px 15px;
 	color: #FFF;
 	font-weight: bold;
-	text-shadow: 0px -1px 0 rgba(0, 0, 0, 0.5);
+	text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.4);
 	position: relative;
 	overflow: hidden;
 
 	border-radius: 10px;
 
-
+    z-index:0;
     /* Animation de transition */
     transition: all 0.6s ease-out;
     -webkit-transition: all 0.6s ease-out; /* Safari */
@@ -136,7 +139,7 @@ table {
 
 .big-menu li::before {
 	position: absolute;
-	z-index: 0;
+	z-index: -1;
 }
 
 .big-menu .house {
