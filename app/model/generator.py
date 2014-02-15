@@ -12,6 +12,7 @@ sys.path.append('..')
 import enocean.devices
 import model.devices
 from model.house import Room
+from model.meteo import Location
 from config import GlobalConfig
 from main_server.rpc_server import RpcServer
 
@@ -21,6 +22,10 @@ class Generator:
             self.db = mongoengine.connect(config.mongo_db)
             self.db.drop_database(config.mongo_db)
             self.id = 1337
+
+    def generate_location(self, name, lat, lon):
+        Location(name=name, latitude=lat, longitude=lon).save()
+
 
     def generate_devices(self, device_class, device_number):
         sensors = []
@@ -130,21 +135,25 @@ class Generator:
         #switch = enocean.devices.Switch(device_id=switch_id, name="THESWITCH", ignored=False)
         #switch.save()
 
-        wc_id = int("0001B593", 16)
-        wc = enocean.devices.WindowContact(device_id=wc_id, name="BindedindowContactor", ignored=False)
+        wc_id = int("0001B592", 16)
+        wc = enocean.devices.WindowContact(device_id=wc_id, name="BindedWindowContactor", ignored=False)
         wc.save()
 
 
-        socket_id = int("FF9F1E05", 16)
+        socket_id = int("FF9F1E04", 16)
         socket = enocean.devices.Socket(device_id=socket_id, name="BindedSocket", ignored=False)
         socket.save()
         #self.rpc_server.xmlrpc_bind_devices(switch_id, 'onclick_top_right', socket_id, 'callback_toggle')
         RpcServer.xmlrpc_bind_devices(wc_id, 'on_opened', socket_id, 'callback_deactivate')
         RpcServer.xmlrpc_bind_devices(wc_id, 'on_closed', socket_id, 'callback_activate')
-        RpcServer.xmlrpc_bind_devices(wc_id, 'on_closed', socket_id, 'callback_toggle')
 
         # Generating rooms
         self.generate_rooms()
+
+        #Setting current location
+        self.generate_location(name="Villeurbanne, France", lat=45.771944, lon=4.8901709)
+
+
 
     def generate_rooms(self):
         Room(x=-2.5, y=-2.5, width=5, height=5).save()

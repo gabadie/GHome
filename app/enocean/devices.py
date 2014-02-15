@@ -18,6 +18,16 @@ class Sensor(model.devices.Sensor):
     def process_telegram(self, telegram, server):
         raise NotImplementedError
 
+    @property
+    def last_readings(self):
+        readings = model.devices.Reading.objects()
+        readings_dict = dict()
+
+        for r in readings:
+            readings_dict[r.__class__.__name__] = r
+
+        return readings_dict
+
 
 class Actuator(model.devices.Actuator):
     pass

@@ -5,6 +5,7 @@ from twisted.web import xmlrpc, server
 from config_rpi_serv import RpiGlobalConfig
 import pymplb
 import socket
+import json
 
 #from py8tracks import API8tracks
 
@@ -15,26 +16,31 @@ class MusicPlayer(object):
 
     def __init__(self):
         self.mplayer=pymplb.MPlayer()
-        self.musics=[]
+        self.musics=[] # [{'name':     ,'stream_url':    , 'img_url':      }, { ...... }]
         self.current_music=0
         self.is_pausing=False
+        self.tags=[]
 
     def next(self):
         if self.current_music+1 < len(self.musics):
+            print "next music"
             self.current_music+=1
             self.mplayer.stop()
-            self.mplayer.loadfile(self.musics[self.current_music])
+            self.mplayer.loadfile(str(self.musics[self.current_music]['stream_url']))
             return True
         else:
+            print "end reach"
             return False
 
     def previous(self):
-        if self.current_music-1 >0 and self.current_music-1<len(self.musics) :
+        if self.current_music-1 >=0 and self.current_music-1<len(self.musics) :
+            print "previous music"
             self.current_music-=1
             self.mplayer.stop()
-            self.mplayer.loadfile(self.musics[self.current_music])
+            self.mplayer.loadfile(str(self.musics[self.current_music]['stream_url']))
             return True
         else :
+            print "end reach"
             return False
 
 class RpiServer(xmlrpc.XMLRPC):
@@ -48,23 +54,27 @@ class RpiServer(xmlrpc.XMLRPC):
         self.macAddress=str(get_mac())
         self.music_player=MusicPlayer()
 
-    def xmlrpc_init_play_music(self,urls):
-        urls_splitted=urls.split(',')
-        print "ok, music is playing"  + str(urls_splitted[0])
+    def xmlrpc_init_play_music(self,urls,tags):
+        urls_splitted=json.loads(urls)
+        print "ok, music is playing"  #+ str(urls_splitted[0])
         self.music_player.musics=urls_splitted
+        self.music_player.tags.append(tags)
+        print urls_splitted
+        print urls
         if len(urls_splitted)>0:
-            self.music_player.mplayer.loadfile(urls_splitted[0])
-        return "ok, music is playing "  + str(urls_splitted[0])
+            self.music_player.mplayer.loadfile(str(urls_splitted[0]['stream_url']))
+        return str(urls_splitted[0]['name'])
 
     def xmlrpc_next_music(self):
         self.music_player.next()
-        return True
+        return str(self.music_player.musics[self.music_player.current_music]['name'])
 
     def xmlrpc_previous_music(self):
         self.music_player.previous()
-        return True
+        return str(self.music_player.musics[self.music_player.current_music]['name'])
 
     def xmlrpc_stop_music(self):
+        print "stop music"
         self.music_player.mplayer.stop()
         return True
 

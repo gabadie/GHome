@@ -14,6 +14,7 @@ $(document).ready(function() {
         dataType:  'json',
         success: function(data) {
             updateSensors();
+            drawGraph();
         }
     });
 
@@ -23,6 +24,7 @@ $(document).ready(function() {
 
 var drawGraph = function() {
     apiCall('/connection/graph', 'GET', {}, function(graph_data) {
+        $("#devices-graph").html("");
         s = new sigma({
             graph: graph_data,
             container: 'devices-graph',
@@ -169,6 +171,7 @@ var bindSensors = function() {
         apiCall('/sensor/' + sensor_id, 'DELETE', {}, function(data) {
             $this.hide(200, function() {
                 $this.remove();
+                drawGraph();
             });
         });
 
@@ -184,6 +187,7 @@ var bindSensors = function() {
         apiCall('/connection/' + connection_id, 'DELETE', {}, function(data) {
             if (data.ok) {
                 connection_li.hide(300, function() { connection_li.remove(); });
+                drawGraph();
             }
         });
     });
@@ -206,6 +210,7 @@ var bindSensors = function() {
             THIS = $this;
             if (data.ok) {
                 $this.closest('table').find('tr:last').before(connection_template(data.result));
+                drawGraph();
             }
             else {
                 notification.error("Couldn't add a binding between '" + event + "' and '"
