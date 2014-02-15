@@ -87,6 +87,7 @@ var drawChart = function(figure_id) {
       "dataFormatX": function (x) { return d3.time.format('%Y-%m-%d').parse(x); },
       "tickFormatX": function (x) { return d3.time.format('%A')(x); },
       "mouseover": function (d, i) {
+        console.log('lol');
         var pos = $(this).offset();
         $(tt).text(d3.time.format('%A')(d.x) + ': ' + d.y)
           .css({top: topOffset + pos.top, left: pos.left + leftOffset})

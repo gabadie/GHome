@@ -309,11 +309,13 @@ def previousMusic():
         return jsonify("Pausing", result="Pause")
 
 
-@rest_api.route('/product/search')
+@rest_api.route('/product/')
 def products_search():
-    # TODO : implement this
-    products = json.loads(Product.objects.to_json())
-    result = dict(ok=True, result=products)
+    top = [p.to_dict() for p in Product.objects(top=True)]
+    bottom = [p.to_dict() for p in Product.objects(bottom=True)]
+    feet = [p.to_dict() for p in Product.objects(feet=True)]
+
+    result = dict(ok=True, result=dict(top=top, bottom=bottom, feet=feet))
     return json.dumps(result)
 
 @rest_api.route('/meteo/weather', methods=['POST','GET'])

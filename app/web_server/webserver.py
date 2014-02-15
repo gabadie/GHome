@@ -82,14 +82,6 @@ def meteo_page():
 def fashion_page():
     return render_template('fashion.html')
 
-@app.route('/product/')
-def products():
-    products = json.loads(Product.objects.to_json())
-    result = dict(ok=True, result=products)
-    return json.dumps(result)
-
-
-
 if __name__ == "__main__":
 
     if len(sys.argv) > 1:
