@@ -459,3 +459,9 @@ background: linear-gradient(#282828, #494949); /* Standard syntax (must be last)
     color: white;
     
 }
+
+.slider
+{
+  width: 100% !important;
+}
+

@@ -3,6 +3,7 @@
 {% block style %}
 <link href="static/css/xcharts.min.css" rel="stylesheet">
 <link href="static/css/iostoggle.css" rel="stylesheet">
+<link href="static/css/bootstrap-slider.css" rel="stylesheet">
 {% endblock %}
 
 
@@ -111,9 +112,9 @@
 				{{! Sensor's type (Thermometer, Switch, ...)}}
 				<li class="list-group-item">
 					<span class="title">Type:</span> {{type}}
-				</li>
+                </li>
 
-				{{#if events}}
+                {{#if events}}
 
 					<li class="list-group-item">
 						{{! List of existing event bindings}}
@@ -177,14 +178,40 @@
 
 					</li>
 
-
 				{{/if}}
 				{{!--End of events handling--}}
 
+                {{#if is_thermometer}}
+                    <li class="list-group-item">
+						<table class="table table-striped binding-table">
+					      <thead>
+                            <tr>
+                              <th>Name</th>
+                              <th>Min</th>
+                              <th>Max</th>
+                            </tr>
+                         </thead>
+					     <tbody>
+                         {{#each temperature_triggers}}
+                            <tr>
+                                <td>{{name}}</td>
+                                <td>{{min}}</td>
+                                <td>{{max}}</td>
+                            </tr>
+                        {{/each}}
+					     </tbody>
+					   </table>
+
+                        <input type="text" class="trigger-slider" value="" data-slider-min="10" data-slider-max="1000" data-slider-step="5" data-slider-value="[250,450]"/>
+                    </li>
+                {{/if}}
+
+
+
 				<li class="list-group-item">
 					<div class="sensor-readings" id="readings-{{device_id}}"></div>
-				</li>
 
+				</li>
 			</ul>
 
 
@@ -215,4 +242,5 @@
 <script src="/static/js/plugins/sigma.parsers.json.min.js"></script>
 
 <script src="/static/js/setup.js"></script>
+<script src="/static/js/bootstrap-slider.js"></script>
 {% endblock %}

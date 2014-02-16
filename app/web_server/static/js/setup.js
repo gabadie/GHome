@@ -99,6 +99,7 @@ var drawChart = function(figure_id) {
 
     var myChart = new xChart('line-dotted', data, figure_id, opts);
 
+    $('.trigger-slider').slider()
 
 }
 
@@ -202,7 +203,6 @@ var bindSensors = function() {
 
         apiCall('/connection', 'POST', params, function(data) {
 
-            THIS = $this;
             if (data.ok) {
                 $this.closest('table').find('tr:last').before(connection_template(data.result));
             }
