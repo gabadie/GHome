@@ -7,16 +7,52 @@
 <div class="container">
 	{% include "header.html" %}
 
-	<ul class="big-menu">
-		<a href="house"><li class="house">House view</li></a>
-		<a href="monitoring"><li class="monitoring">Monitoring</li></a>
-		<a href="news"><li class="news">News</li></a>
-		<a href="fashion"><li class="clothes">Clothes</li></a>
-		<a href="music"><li class="music">Music</li></a>
-		<a href="meteo"><li class="meteo">Weather</li></a>
-		<a href="calendar"><li class="calendar">Calendar</li></a>		
-		<a href="setup"><li class="setup">Configuration</li></a>
-	</ul>
+	<div class="jumbotron">
+
+	  <h1>Hello, John!</h1>
+	  <p>Welcome to GHome</p>
+	  <p><a class="btn btn-primary btn-lg" role="button" href="news">Start your day with some fresh news!</a></p>
+
+	  <p>Or access the menu directly :</p>
+		<ul class="big-menu">
+
+			<a href="news">
+				<li class="news">News</li>
+			</a>
+
+			<a href="meteo">
+				<li class="meteo">Weather</li>
+			</a>
+
+			<a href="house">
+				<li class="house">House view</li>
+			</a>
+
+
+
+			<a href="fashion">
+				<li class="clothes">Wardrobe</li>
+			</a>
+
+			<a href="music">
+				<li class="music">Music</li>
+			</a>
+
+			<a href="calendar">
+				<li class="calendar">Calendar</li>
+			</a>
+
+			<a href="monitoring">
+				<li class="monitoring">Monitoring</li>
+			</a>
+
+			<a href="setup">
+				<li class="setup">Setup</li>
+			</a>
+
+		</ul>
+
+	</div>
 
 </div>
 {% endblock body %}

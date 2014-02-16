@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import json
 import sys
-import locale
 sys.path.append('..')
 sys.path.append('../../libs')
 
@@ -11,7 +9,6 @@ from flask import Flask, render_template
 import mongoengine
 
 from enocean.devices import Sensor, Actuator
-from model.fashion import Product
 from model.devices import NumericReading
 
 from feedzilla import feedzilla
@@ -89,14 +86,6 @@ def calendar_page():
 @app.route('/fashion')
 def fashion_page():
     return render_template('fashion.html')
-
-@app.route('/product/')
-def products():
-    products = json.loads(Product.objects.to_json())
-    result = dict(ok=True, result=products)
-    return json.dumps(result)
-
-
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:

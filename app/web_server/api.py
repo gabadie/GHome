@@ -3,7 +3,6 @@
 import sys
 sys.path.append('..')
 
-from collections import defaultdict
 from datetime import datetime
 from datetime import timedelta
 from collections import defaultdict, Counter
@@ -184,7 +183,7 @@ def sensor_connections(sensor_id):
 
     return json.dumps(resp)
 
-# Monitoring
+# Monitoring (nvd3)
 @rest_api.route('/graph_data', methods=['GET'])
 def graph_data():
     result = dict()
@@ -204,6 +203,25 @@ def graph_data():
 
     return json.dumps(result)
 
+# xCharts data
+@rest_api.route('/sensor/<device_id>/xcharts_data', methods=['GET'])
+def xcharts_data(device_id):
+    sensor = Sensor.objects.get(device_id=device_id)
+    result = list()
+
+    for Reading in NumericReading.__subclasses__():
+        readings_map = dict(className='.{}'.format(Reading.__name__))
+        readings_map['data'] = list()
+        for reading in Reading.objects(device=sensor):
+
+            label = datetime.strftime(reading.date, '%Y-%m-%dT%H:%M:%S')
+            data = dict(x=label, y=reading.value)
+
+            readings_map['data'].append(data)
+
+        if readings_map['data']:
+            result.append(readings_map)
+    return jsonify(ok=True, result=result)
 
 # Devices
 @rest_api.route('/sensor', methods=['POST', 'GET'])
@@ -328,11 +346,13 @@ def previousMusic():
         return jsonify( name = result )
 
 
-@rest_api.route('/product/search')
+@rest_api.route('/product/')
 def products_search():
-    # TODO : implement this
-    products = json.loads(Product.objects.to_json())
-    result = dict(ok=True, result=products)
+    top = [p.to_dict() for p in Product.objects(top=True)]
+    bottom = [p.to_dict() for p in Product.objects(bottom=True)]
+    feet = [p.to_dict() for p in Product.objects(feet=True)]
+
+    result = dict(ok=True, result=dict(top=top, bottom=bottom, feet=feet))
     return json.dumps(result)
 
 @rest_api.route('/meteo/getloc', methods=['POST','GET'])
@@ -349,7 +369,7 @@ def get_location():
         name = ''
         ok = False
         loc = False
-        
+
     result = dict(ok=ok, loc=loc, location=name, time=time)
 
     return json.dumps(result)
@@ -357,7 +377,7 @@ def get_location():
 @rest_api.route('/meteo/setloc', methods=['POST','GET'])
 def set_location():
     location = request.form.get('location')
-    
+
     try:
         g = geocoders.GoogleV3()
         loc = g.geocode(location)
@@ -406,7 +426,7 @@ def get_curent_weather():
             if not update_current_weather():
                 result = dict(ok=False, geo=True, meteo=False)
                 return json.dumps(result)
-        
+    
         weather = Weather.objects[0]
 
         icon = weather.icon
