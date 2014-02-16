@@ -47,7 +47,7 @@ var drawChart = function(device_id, xcharts_data) {
 
     apiCall('/sensor/' + device_id + '/xcharts_data', 'GET', {}, function(d) {
         if (!d.ok || !d.result.length) {
-            $(figure_id).hide();
+            $(figure_id).parent().hide();
             return;
         }
         var data = {
@@ -57,15 +57,10 @@ var drawChart = function(device_id, xcharts_data) {
 
         };
 
-        DATA = data;
-        console.log('------------------------');
-        console.log(device_id);
-        console.log(data);
         var opts = {
           "dataFormatX": function (x) { return d3.time.format('%Y-%m-%dT%H:%M:%S').parse(x); },
           "tickFormatX": function (x) { return d3.time.format('%A')(x); },
           "mouseover": function (d, i) {
-            console.log('lol');
             var pos = $(this).offset();
             $(tt).text(d3.time.format('%A')(d.x) + ': ' + d.y)
               .css({top: topOffset + pos.top, left: pos.left + leftOffset})
@@ -77,9 +72,8 @@ var drawChart = function(device_id, xcharts_data) {
         };
 
         var myChart = new xChart('line-dotted', data, figure_id, opts);
-        $(figure_id).show();
+        $(figure_id).parent().show();
     });
-
 
     $('.trigger-slider').slider()
 
@@ -205,15 +199,16 @@ var bindSensors = function() {
         $('select[name="callback"][data-actuator-id="' + $(this).val() + '"]').prop('disabled', false);
     });
 
-
-
-
     // s = $('select[name="callback"][data-actuator-id="889977"]')
 
+
+    $('.sensors').on('slideStop', '.trigger-slider', function(ev){
+        THIS = $(this);
+        console.log('Just slided !');
+        console.log($(this).val());
+        console.log($(this));
+        $(this).parent().parent().find('.trigger-threshold-min').val($(this).val());
+    });
+
+
 }
-
-$('.trigger-slider').on('slide', function(ev){
-    //alert("Slider on slide");
-
-    $this.closest('.trigger-threshold-min').val(ev.value);
-});
