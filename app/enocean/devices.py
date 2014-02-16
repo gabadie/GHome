@@ -26,6 +26,7 @@ class Actuator(model.devices.Actuator):
 class Thermometer(Sensor):
     temperature_triggers = mongoengine.ListField(mongoengine.ReferenceField(Trigger), default=list)
     humity_triggers      = mongoengine.ListField(mongoengine.ReferenceField(Trigger), default=list)
+
     _old_temperature = None
     _old_humidity    = None
 
@@ -69,6 +70,9 @@ class Thermometer(Sensor):
         self._old_temperature = temperature
         self._old_humidity    = humidity
 
+    def add_temperature_trigger(self, trigger):
+        trigger.save()
+        self.temperature_triggers.append(trigger)
 
 class Switch(Sensor):
     UNKNOWN, TOP, BOTTOM, RIGHT, LEFT = range(5)
