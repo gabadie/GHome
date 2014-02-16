@@ -211,3 +211,9 @@ var bindSensors = function() {
     // s = $('select[name="callback"][data-actuator-id="889977"]')
 
 }
+
+$('.trigger-slider').slider().on('slide', function(ev){
+    //alert("Slider on slide");
+
+    $this.closest('.trigger-threshold-min').val(ev.value);
+});
