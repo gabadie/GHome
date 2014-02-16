@@ -1,11 +1,9 @@
 $(document).ready(function() {
 
 	var displayAll = function() {
-		waitMode(true);
 		$.getJSON('/meteo/weather', function(data) {
 	        var node = document.getElementById("weather");
 	    	node.innerHTML = "";
-	    	waitMode(false);
 
 	    	if (data.geo) {
 	    		displayLocation(node, data);
@@ -76,8 +74,25 @@ $(document).ready(function() {
         node.appendChild(prev);
 	}
 
+    var waitMode = function(enable) {
+    	if(enable) {
+	    	$("#location").attr("readonly", "true");
+	    	$("#update").attr("disabled", "disabled");
+    		$.getScript("static/js/jquery.activity-indicator-1.0.0.js", function() {
+				$('#busy').activity({align: 'left'});
+			});
+    	} else {
+	    	$("#location").removeAttr("readonly");
+	    	$("#update").removeAttr("disabled");
+    		$.getScript("static/js/jquery.activity-indicator-1.0.0.js", function() {
+				$('#busy').activity(false);
+			});
+    	}		
+    }
+
     $('#update-location').ajaxForm({
         dataType:  'json',
+        beforeSubmit:  waitMode(true),
         success : function(data){
         	var node = document.getElementById("weather");
 	    	node.innerHTML = "";
@@ -90,24 +105,11 @@ $(document).ready(function() {
 	    	} else {
 	    		node.innerHTML = "<h4>The specified address cannot be geolocalized.</h4>";
 	    	}
+	    	waitMode(false);
         }
     });
 
-    var waitMode = function(enable) {
-    	if(enable) {
-	    	$("#location").attr("readonly", "true");
-	    	$("#update").attr("disabled", "disabled");
-    		$.getScript("static/js/jquery.activity-indicator-1.0.0.js", function() {
-				$('#busy').activity({align: 'left'});
-			});
-    	} else {
-	    	$("#location").removeAttr("readonly");
-	    	$("#update").removeAttr("disabled");
-    		$.getScript("static/js/jquery.activity-indicator-1.0.0.js", function() {
-				('#busy').activity(false);
-			});
-    	}		
-    }
-
+	waitMode(true);
     displayAll();
+	waitMode(false);
 });
