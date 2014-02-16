@@ -16,7 +16,7 @@ from metwit import Metwit
 from flask import request, jsonify, Blueprint, current_app
 import mongoengine
 
-from enocean.devices import Sensor, Actuator, Lamp
+from enocean.devices import Sensor, Actuator, Lamp, Thermometer
 from model.event import Connection
 from model.devices import NumericReading
 from model.fashion import Product
@@ -54,6 +54,11 @@ def dump_sensor(sensor):
             c['triggering_event'] = e_name
 
     s_json['connections'] = connections
+
+    if s_json['type'] == "Thermometer":
+        s_json['is_thermometer'] = True
+        s_json['temperature_triggers'] = [json.loads(trigger.to_json()) for trigger in sensor.temperature_triggers]
+        print s_json['temperature_triggers'][0]['name']
 
     return s_json
 
