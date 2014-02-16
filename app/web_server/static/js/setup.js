@@ -202,7 +202,16 @@ var bindSensors = function() {
     // s = $('select[name="callback"][data-actuator-id="889977"]')
 
 
-    $('.sensors').on('slideStop', '.trigger-slider', function(ev){
+    $('.sensors').on('slideStop', '.trigger-slider.modify', function(ev){
+        var $this = $(this);
+        var min = $this.data('slider').value[0];
+        var max = $this.data('slider').value[1];
+        console.log('min = ' + min + '; max = ' + max);
+        $(this).parent().parent().find('.trigger-threshold-min').val($(this).val());
+    });
+
+
+    $('.sensors').on('slideStop', '.trigger-slider.new', function(ev){
         var $this = $(this);
         var min = $this.data('slider').value[0];
         var max = $this.data('slider').value[1];
