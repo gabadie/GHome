@@ -16,6 +16,7 @@ from model.house import Room
 from model.meteo import Location
 from config import GlobalConfig
 from main_server.rpc_server import RpcServer
+from fashion import fetch_fashion
 
 class Generator:
     def __init__(self, config):
@@ -178,3 +179,6 @@ class Generator:
 if __name__ == '__main__':
     g = Generator(GlobalConfig())
     g.generate_sample()
+
+    if 'fashion' in sys.argv:
+        fetch_fashion()

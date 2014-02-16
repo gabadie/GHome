@@ -5,9 +5,8 @@ sys.path.append('../../libs')
 from shopsense.shopstyle import ShopStyle
 from config import GlobalConfig
 import mongoengine
-
 config = GlobalConfig()
-mongoengine.connect(config.mongo_db)
+
 shopstyle = ShopStyle(config.api_shopsense)
 
 top_categories = ['shirt', 'dress', 'jacket', 't-shirt', 'pull']
@@ -58,10 +57,10 @@ class Product(mongoengine.Document):
         query_result = shopstyle.search(query)
         return [Product.from_data(data) for data in query_result['products']]
 
-if __name__ == '__main__':
     # mens-clothes
     # 'women'
 
+def fetch_fashion():
     Product.drop_collection()
 
     # Adding products
@@ -82,3 +81,8 @@ if __name__ == '__main__':
             p.feet = True
             p = p.save()
             print 'Added "{}"'.format(p.name)
+
+
+if __name__ == '__main__':
+    mongoengine.connect(config.mongo_db)
+    fetch_fashion()

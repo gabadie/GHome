@@ -21,6 +21,12 @@ $(document).ready(function() {
 
     });
 
+    $('.fashion-products').on('click', 'li', function() {
+        $(this).siblings('li').removeClass('active');
+        $(this).addClass('active');
+    });
+
+
 });
 
 renderProducts = function(products) {
@@ -34,6 +40,8 @@ renderProducts = function(products) {
         $('.fashion-products.' + type + ' li').eq(0).addClass('active');
     });
 
-    $('.carousel').carousel()
-
+    $( '.slider' ).lemmonSlider();
+    $( '.fashion-products' ).width(function(i, width) {
+        return width * 2;
+    })
 }
