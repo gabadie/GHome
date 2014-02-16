@@ -485,3 +485,35 @@ def get_weather():
 def get_rooms():
     rooms = [room.to_dict() for room in Room.objects]
     return json.dumps(dict(ok=True, result=rooms))
+
+# Threslhold
+@rest_api.route('/threshold', methods=['POST'])
+def new_threshold():
+    thermometer_id = request.json['thermometer_id']
+    m, M = request.json['min'], request.json['max']
+    threshold_name = request['threshold_name']
+    thermometer = Thermometer.objects.get(device_id=thermometer_id)
+    t = ThresholdTrigger(name=threshold_name, min=m, max=M);
+
+    return json.dumps(dict(ok=True, sensor=dump_sensor(sensor)))
+
+@rest_api.route('/threshold/<threshold_id>', methods=['GET'])
+def threshold(threshold_id):
+    threshold_id = int(threshold_id)
+    if request.method == 'GET':
+        t = ThresholdTrigger.objects.get(id=threshold_id)
+        if t is None:
+            resp = dict(ok=True, result="Couldn't find threshold")
+        else:
+            threshold = json.loads(t.to_json())
+            resp = dict(ok=True, result=threshold)
+    elif request.method == 'DELETE':
+        threshold = ThresholdTrigger.objects(id=threshold_id).first()
+        print threshold
+        if threshold:
+            threshold.delete()
+        resp = dict(ok=True, threshold_id=threshold_id)
+
+    return json.dumps(resp)
+
+
