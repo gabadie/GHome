@@ -1,12 +1,17 @@
-
 {% extends "base.html" %}
 
 {% block body %}
+
 <div class="container">
-    {% include "header.html" %}
+	{% include "header.html" %}
+	
+	Prochainement sur vos écrans : Gestion d'une alarme et d'un calendrier
+	</div>
+</div>
 
 {% endblock body %}
 
 {% block javascript %}
+<script src="static/js/calendar.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/fullcalendar/1.6.4/fullcalendar.min.js"></script>
 {% endblock javascript %}

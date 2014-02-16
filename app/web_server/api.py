@@ -366,29 +366,34 @@ def set_location():
             name, (lat, lon) = loc
             [location.delete() for location in Location.objects]
             Location(name=name, latitude=lat, longitude=lon).save()
-            update_current_weather()
-            result = dict(ok=True)
-        else:
-            result = dict(ok=False)
+            if update_current_weather():
+                result = dict(ok=True)
+                return json.dumps(result)
     except Exception as e:
         print e
-        result = dict(ok=False)
+
+    result = dict(ok=False)
 
     return json.dumps(result)
 
 def update_current_weather():
     if len(Location.objects) > 0:
         location = Location.objects[0]
-        content = get_json_weather(lat=location.latitude, lon=location.longitude)
+        try:
+            content = get_json_weather(lat=location.latitude, lon=location.longitude)
 
-        [weather.delete() for weather in Weather.objects]
+            [weather.delete() for weather in Weather.objects]
 
-        td = timedelta(hours=location.hoursdelta)
-        icon = content[0]['icon']
-        humidity = content[0]['weather']['measured']['humidity']
-        temperature = content[0]['weather']['measured']['temperature']
+            td = timedelta(hours=location.hoursdelta)
+            icon = content[0]['icon']
+            humidity = content[0]['weather']['measured']['humidity']
+            temperature = content[0]['weather']['measured']['temperature']
 
-        Weather(expire=get_datetime(content[1]['timestamp']) + td, icon=icon, humidity=humidity, temperature=temperature).save()
+            Weather(expire=get_datetime(content[1]['timestamp']) + td, icon=icon, humidity=humidity, temperature=temperature).save()
+            return True
+        except Exception as e:
+            print e
+            return False
 
 
 @rest_api.route('/meteo/currentweather', methods=['POST','GET'])
@@ -398,7 +403,9 @@ def get_curent_weather():
 
         #Update current weather
         if len(Weather.objects) == 0 or Weather.objects[0].expire < datetime.now():
-            update_current_weather()
+            if not update_current_weather():
+                result = dict(ok=False, geo=True, meteo=False)
+                return json.dumps(result)
         
         weather = Weather.objects[0]
 

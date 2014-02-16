@@ -460,11 +460,9 @@ background: linear-gradient(#282828, #494949); /* Standard syntax (must be last)
 .player_button:hover
 {
     opacity: 1;
-
 }
 
 .white_text
 {
-    color: white;
-    
+    color: white;   
 }

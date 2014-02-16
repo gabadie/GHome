@@ -82,6 +82,10 @@ def music():
 def meteo_page():
     return render_template('meteo.html')
 
+@app.route('/calendar')
+def calendar_page():
+    return render_template('calendar.html')
+
 @app.route('/fashion')
 def fashion_page():
     return render_template('fashion.html')
