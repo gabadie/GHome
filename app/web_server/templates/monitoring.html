@@ -8,7 +8,7 @@
 <div class='container with-3d-shadow with-transitions'>
     {% include "header.html" %}
 
-    <select id="reading-type">
+    <select class="form-control" id="reading-type">
         {% for reading_cls in reading_classes %}
         <option value="{{reading_cls.__name__}}"> {{reading_cls.__name__}} </option>
         {% endfor %}

@@ -3,8 +3,8 @@
 import sys
 sys.path.append('..')
 
-from collections import defaultdict
 from datetime import datetime
+from datetime import timedelta
 from collections import defaultdict, Counter
 import calendar
 import json
@@ -21,6 +21,8 @@ from model.event import Connection
 from model.devices import NumericReading
 from model.fashion import Product
 from model.house import Room
+from model.meteo import Location
+from model.meteo import Weather
 
 from config import GlobalConfig
 config = GlobalConfig()
@@ -47,11 +49,14 @@ def dump_sensor(sensor):
     s_json['actuators'] = [dump_actuator(actuator) for actuator in Actuator.objects]
 
     # TODO : Dirty hack to get events' name
-    connections = dict()
+    connections = list()
     for e_name, e in sensor.events.iteritems():
-        connections = [dump_connection(c) for c in Connection.objects(triggering_event=e)]
-        for c in connections:
+        e_connections = [dump_connection(c) for c in Connection.objects(triggering_event=e)]
+
+        for c in e_connections:
             c['triggering_event'] = e_name
+
+        connections.extend(e_connections)
 
     s_json['connections'] = connections
 
@@ -59,6 +64,12 @@ def dump_sensor(sensor):
         s_json['is_thermometer'] = True
         s_json['temperature_triggers'] = [json.loads(trigger.to_json()) for trigger in sensor.temperature_triggers]
         print s_json['temperature_triggers'][0]['name']
+
+    last_readings = dict()
+    for reading_name, reading in sensor.last_readings.iteritems():
+        last_readings[reading_name] = json.loads(reading.to_json())
+
+    s_json['last_readings'] = last_readings
 
     return s_json
 
@@ -69,14 +80,6 @@ def dump_connection(connection):
     return c_json
 
 ## API
-@rest_api.route('/player', methods=['POST','GET'])
-def playMusic():
-    if request.method == 'POST':
-        form = request.form
-        tags =  [form.get(val) for val in ['tag']]
-        print tags
-        urls = rpc.raspi.find_music_url(0,tags)
-    return jsonify(name=urls, tags=tags)
 
 @rest_api.route('/connection', methods=['GET', 'POST'])
 def event_binding():
@@ -185,7 +188,7 @@ def sensor_connections(sensor_id):
 
     return json.dumps(resp)
 
-# Monitoring
+# Monitoring (nvd3)
 @rest_api.route('/graph_data', methods=['GET'])
 def graph_data():
     result = dict()
@@ -205,6 +208,25 @@ def graph_data():
 
     return json.dumps(result)
 
+# xCharts data
+@rest_api.route('/sensor/<device_id>/xcharts_data', methods=['GET'])
+def xcharts_data(device_id):
+    sensor = Sensor.objects.get(device_id=device_id)
+    result = list()
+
+    for Reading in NumericReading.__subclasses__():
+        readings_map = dict(className='.{}'.format(Reading.__name__))
+        readings_map['data'] = list()
+        for reading in Reading.objects(device=sensor):
+
+            label = datetime.strftime(reading.date, '%Y-%m-%dT%H:%M:%S')
+            data = dict(x=label, y=reading.value)
+
+            readings_map['data'].append(data)
+
+        if readings_map['data']:
+            result.append(readings_map)
+    return jsonify(ok=True, result=result)
 
 # Devices
 @rest_api.route('/sensor', methods=['POST', 'GET'])
@@ -291,12 +313,21 @@ def lamps():
     return json.dumps(resp)
 
 ## API
+@rest_api.route('/player', methods=['POST','GET'])
+def playMusic():
+    if request.method == 'POST':
+        form = request.form
+        tags =  [form.get(val) for val in ['tag']]
+        print tags
+        urls_name, urls_img = rpc.raspi.find_music_url(0,tags)
+    return jsonify(name=urls_name,  tags=tags, img=urls_img)
+
 @rest_api.route('/player/tags', methods=['POST','GET'])
 def playMusicViaTag():
     if request.method == 'POST':
         tags = [json.loads(request.data)]
-        urls = rpc.raspi.find_music_url(0,tags)
-    return jsonify(name=urls, tags=tags)
+        urls_name, urls_img = rpc.raspi.find_music_url(0,tags)
+    return jsonify(name=urls_name,  tags=tags, img=urls_img)
 
 
 @rest_api.route('/player/pause', methods=['POST','GET'])
@@ -311,52 +342,144 @@ def pauseMusic():
 def nextMusic():
     if request.method == 'POST':
         result = rpc.raspi.next_music(0)
-        return jsonify( name = result ) 
+        return jsonify( name = result )
 
 @rest_api.route('/player/previous', methods=['POST','GET'])
 def previousMusic():
     if request.method == 'POST':
         result = rpc.raspi.previous_music(0)
-        return jsonify( name = result ) 
+        return jsonify( name = result )
 
 
-@rest_api.route('/product/search')
+@rest_api.route('/product/')
 def products_search():
-    # TODO : implement this
-    products = json.loads(Product.objects.to_json())
-    result = dict(ok=True, result=products)
+    top = [p.to_dict() for p in Product.objects(top=True)]
+    bottom = [p.to_dict() for p in Product.objects(bottom=True)]
+    feet = [p.to_dict() for p in Product.objects(feet=True)]
+
+    result = dict(ok=True, result=dict(top=top, bottom=bottom, feet=feet))
     return json.dumps(result)
 
-@rest_api.route('/meteo/weather', methods=['POST','GET'])
+@rest_api.route('/meteo/getloc', methods=['POST','GET'])
 def get_location():
-    if request.method =='POST':
-        location = request.form.get('location')
+    dt = datetime.now()
+    time = dt.strftime("%A %d %b, %H:%M").capitalize()
 
+    if len(Location.objects) > 0:
+        location = Location.objects[0]
+        name = location.name
+        ok = True
+        loc = True
+    else:
+        name = ''
+        ok = False
+        loc = False
+
+    result = dict(ok=ok, loc=loc, location=name, time=time)
+
+    return json.dumps(result)
+
+@rest_api.route('/meteo/setloc', methods=['POST','GET'])
+def set_location():
+    location = request.form.get('location')
+
+    try:
+        g = geocoders.GoogleV3()
+        loc = g.geocode(location)
+
+        if loc:
+            name, (lat, lon) = loc
+            [location.delete() for location in Location.objects]
+            Location(name=name, latitude=lat, longitude=lon).save()
+            if update_current_weather():
+                result = dict(ok=True)
+                return json.dumps(result)
+    except Exception as e:
+        print e
+
+    result = dict(ok=False)
+
+    return json.dumps(result)
+
+def update_current_weather():
+    if len(Location.objects) > 0:
+        location = Location.objects[0]
         try:
-            g = geocoders.GoogleV3()
-            loc = g.geocode(location)
+            content = get_json_weather(lat=location.latitude, lon=location.longitude)
+
+            [weather.delete() for weather in Weather.objects]
+
+            td = timedelta(hours=location.hoursdelta)
+            icon = content[0]['icon']
+            humidity = content[0]['weather']['measured']['humidity']
+            temperature = content[0]['weather']['measured']['temperature']
+
+            Weather(expire=get_datetime(content[1]['timestamp']) + td, icon=icon, humidity=humidity, temperature=temperature).save()
+            return True
         except Exception as e:
             print e
-            loc = None
+            return False
 
-        if loc is None:
-            result = dict(ok=False, geo=False, meteo=False, location=loc)
-        else:
-            place, (lat, lon) = loc
-            try:
-                content = Metwit.weather.get(location_lat=lat, location_lng=lon)
 
-                dt = datetime.strptime(content[0]['timestamp'].split('.')[0], "%Y-%m-%dT%H:%M:%S");
-                content[0]['timestamp'] = dt.strftime("%A %d %B#%H:%M").capitalize()
+@rest_api.route('/meteo/currentweather', methods=['POST','GET'])
+def get_curent_weather():
+    if len(Location.objects) > 0:
+        location = Location.objects[0]
 
-                for i in range(1, len(content)):
-                    dt = datetime.strptime(content[i]['timestamp'].split('.')[0], "%Y-%m-%dT%H:%M:%S");
-                    content[i]['timestamp'] = dt.strftime("%A %d %b#%H:%M").capitalize()
-                result = dict(ok=True, geo=True, meteo=True, location=place, latitude=lat, longitude=lon, weather=content)
-            except Exception as e:
-                print e
-                result = dict(ok=False, geo=True, meteo=False, location=place, latitude=lat, longitude=lon)
-        return json.dumps(result)
+        #Update current weather
+        if len(Weather.objects) == 0 or Weather.objects[0].expire < datetime.now():
+            if not update_current_weather():
+                result = dict(ok=False, geo=True, meteo=False)
+                return json.dumps(result)
+
+        weather = Weather.objects[0]
+
+        icon = weather.icon
+        humidity = weather.humidity
+        temperature = weather.temperature
+
+        result = dict(ok=False, geo=True, meteo=True, icon=icon,
+            humidity=humidity, temperature=temperature)
+
+    else:
+        result = dict(ok=False, geo=False, meteo=False)
+
+    return json.dumps(result)
+
+def get_json_weather(lat, lon):
+    return Metwit.weather.get(location_lat=lat, location_lng=lon)
+
+def get_datetime(utcstring):
+    return datetime.strptime(utcstring.split('.')[0], "%Y-%m-%dT%H:%M:%S")
+
+
+def get_timedelta(distantDateTime):
+    return datetime.now().hour - distantDateTime.hour;
+
+@rest_api.route('/meteo/weather', methods=['POST','GET'])
+def get_weather():
+    if len(Location.objects) > 0:
+        location = Location.objects[0]
+        try:
+            content = get_json_weather(lat=location.latitude, lon=location.longitude)
+
+            hoursdelta = get_timedelta(get_datetime(content[0]['timestamp']))
+            location.hoursdelta = hoursdelta;
+            location.save()
+            print hoursdelta
+            td = timedelta(hours=hoursdelta)
+
+            for i in range(0, len(content)):
+                dt = get_datetime(content[i]['timestamp']) + td;
+                content[i]['timestamp'] = dt.strftime("%A %d %b#%H:%M").capitalize()
+            result = dict(ok=True, geo=True, meteo=True, location=location.name, latitude=location.latitude, longitude=location.longitude, weather=content)
+        except Exception as e:
+            print e
+            result = dict(ok=False, geo=True, meteo=False, location=location.name, latitude=location.latitude, longitude=location.longitude)
+    else:
+        result = dict(ok=False, geo=False, meteo=False)
+
+    return json.dumps(result)
 
 # House / Rooms
 @rest_api.route('/room', methods=['GET'])

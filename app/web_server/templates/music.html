@@ -9,7 +9,8 @@
                 <h1 class="white_text"> Hello, {{ user}}, what do you want to listen to ? </h1>
             </div>
             <div class="row">  
-                <div class="col-md-4" style="text-align:center;vertical-align:center; ">
+                <div class="col-md-4" style="text-align:right;vertical-align:bottom; ">
+                <br />
                     {% for option in left_tags %}
                         <div class="row"> 
                             <button class="btn btn-primary btn-sm" name={{ option }} onclick='on_tag_click(this.name)' style="width:30%">{{ option }}</button>
@@ -31,7 +32,8 @@
                         <button type="submit" class="btn btn-primary btn-lm">Search for music</button>
                     </form>
                 </div>
-                <div class="col-md-4" style="text-align:center;">
+                <div class="col-md-4" style="text-align:left;">
+                    <br />
                     {% for option in right_tags %}
                         <div class="row"> 
                             <button class="btn btn-primary btn-sm"  name={{ option }} onclick='on_tag_click(this.name)' style="width:30%">{{ option }}</button>
@@ -70,6 +72,9 @@
                 <div class="col-md-4" style="text-align:left;">
                  <input type="image" src="../static/img/player_forward.png" class="player_button" id="next"  />
                 </div>
+            </div>
+            <div class="row">  
+                <img src=""  class="img-rounded">
             </div>
     </div>
 {% endblock body %}

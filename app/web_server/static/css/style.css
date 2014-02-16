@@ -66,7 +66,7 @@ table {
 .header {
   width: 100%;
   padding: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 0px;
 
   background: #2B3C67;
   color: #FFF;
@@ -99,6 +99,10 @@ table {
 }
 
 /* Main menu */
+.jumbotron {
+    padding-left: 4% !important;
+    padding-right: 4% !important;
+}
 
 .big-menu {
 	list-style: none;
@@ -115,13 +119,13 @@ table {
 	padding: 35px 15px;
 	color: #FFF;
 	font-weight: bold;
-	text-shadow: 0px -1px 0 rgba(0, 0, 0, 0.5);
+	text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.4);
 	position: relative;
 	overflow: hidden;
 
 	border-radius: 10px;
 
-
+    z-index:0;
     /* Animation de transition */
     transition: all 0.6s ease-out;
     -webkit-transition: all 0.6s ease-out; /* Safari */
@@ -136,7 +140,7 @@ table {
 
 .big-menu li::before {
 	position: absolute;
-	z-index: 0;
+	z-index: -1;
 }
 
 .big-menu .house {
@@ -145,7 +149,7 @@ table {
 .big-menu .house::before{
 	content: url('../img/home.png');
     bottom: -50px;
-    right: -15px;
+    right: -35px;
 }
 
 .big-menu .monitoring {
@@ -204,6 +208,15 @@ table {
 }
 
 
+.big-menu .calendar {
+    background-color: #309100;
+}
+.big-menu .calendar::before{
+    content: url('../img/menu_calendar.png');
+    bottom: -20px;
+    right: 5px;
+}
+
 /* Sensors */
 
 #devices-graph {
@@ -220,8 +233,6 @@ table {
 	padding: 5px 10px;
 }
 
-.sensors li {
-}
 
 .sensors li .heading{
 	background-color: rgba(39, 174, 96, 1);
@@ -384,6 +395,9 @@ input.sensor-toggle {
 /* Fashion */
 .fashion-products {
     list-style: none;
+    max-height: 350px;
+    overflow: auto;
+    white-space: nowrap;
 }
 
 .fashion-products li {
@@ -418,6 +432,9 @@ input.sensor-toggle {
     font-style: italic;
 }
 
+#renderingZone {
+    outline: 0;
+}
 
 /* music */
 
@@ -451,17 +468,15 @@ background: linear-gradient(#282828, #494949); /* Standard syntax (must be last)
 .player_button:hover
 {
     opacity: 1;
-
 }
 
 .white_text
 {
     color: white;
-    
+
 }
 
 .slider
 {
   width: 100% !important;
 }
-

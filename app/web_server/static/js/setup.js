@@ -14,6 +14,7 @@ $(document).ready(function() {
         dataType:  'json',
         success: function(data) {
             updateSensors();
+            drawGraph();
         }
     });
 
@@ -23,6 +24,7 @@ $(document).ready(function() {
 
 var drawGraph = function() {
     apiCall('/connection/graph', 'GET', {}, function(graph_data) {
+        $("#devices-graph").html("");
         s = new sigma({
             graph: graph_data,
             container: 'devices-graph',
@@ -34,70 +36,50 @@ var drawGraph = function() {
     });
 }
 
-var drawChart = function(figure_id) {
+var drawChart = function(device_id, xcharts_data) {
+    var figure_id = '#readings-' + device_id;
 
-    var tt = document.createElement('div'),
+    tt = document.createElement('div'),
       leftOffset = -(~~$('html').css('padding-left').replace('px', '') + ~~$('body').css('margin-left').replace('px', '')),
       topOffset = -32;
     tt.className = 'ex-tooltip';
     document.body.appendChild(tt);
 
-    var data = {
-      "xScale": "time",
-      "yScale": "linear",
-      "main": [
-        {
-          "className": ".pizza",
-          "data": [
-            {
-              "x": "2012-11-05",
-              "y": 6
-            },
-            {
-              "x": "2012-11-06",
-              "y": 6
-            },
-            {
-              "x": "2012-11-07",
-              "y": 8
-            },
-            {
-              "x": "2012-11-08",
-              "y": 3
-            },
-            {
-              "x": "2012-11-09",
-              "y": 4
-            },
-            {
-              "x": "2012-11-10",
-              "y": 9
-            },
-            {
-              "x": "2012-11-11",
-              "y": 6
-            }
-          ]
+    apiCall('/sensor/' + device_id + '/xcharts_data', 'GET', {}, function(d) {
+        if (!d.ok || !d.result.length) {
+            $(figure_id).hide();
+            return;
         }
-      ]
-    };
+        var data = {
+          "xScale": "time",
+          "yScale": "linear",
+          "main": d.result
 
-    DATA = data;
-    var opts = {
-      "dataFormatX": function (x) { return d3.time.format('%Y-%m-%d').parse(x); },
-      "tickFormatX": function (x) { return d3.time.format('%A')(x); },
-      "mouseover": function (d, i) {
-        var pos = $(this).offset();
-        $(tt).text(d3.time.format('%A')(d.x) + ': ' + d.y)
-          .css({top: topOffset + pos.top, left: pos.left + leftOffset})
-          .show();
-      },
-      "mouseout": function (x) {
-        $(tt).hide();
-      }
-    };
+        };
 
-    var myChart = new xChart('line-dotted', data, figure_id, opts);
+        DATA = data;
+        console.log('------------------------');
+        console.log(device_id);
+        console.log(data);
+        var opts = {
+          "dataFormatX": function (x) { return d3.time.format('%Y-%m-%dT%H:%M:%S').parse(x); },
+          "tickFormatX": function (x) { return d3.time.format('%A')(x); },
+          "mouseover": function (d, i) {
+            console.log('lol');
+            var pos = $(this).offset();
+            $(tt).text(d3.time.format('%A')(d.x) + ': ' + d.y)
+              .css({top: topOffset + pos.top, left: pos.left + leftOffset})
+              .show();
+          },
+          "mouseout": function (x) {
+            $(tt).hide();
+          }
+        };
+
+        var myChart = new xChart('line-dotted', data, figure_id, opts);
+        $(figure_id).show();
+    });
+
 
     $('.trigger-slider').slider()
 
@@ -108,7 +90,7 @@ var updateSensors = function() {
             $('.sensors').html('');
             $.each(data.result, function(i, s) {
                 $('.sensors').append(sensor_template(s));
-                drawChart('#readings-' + s.device_id);
+                drawChart(s.device_id);
             });
     });
 }
@@ -169,6 +151,7 @@ var bindSensors = function() {
         apiCall('/sensor/' + sensor_id, 'DELETE', {}, function(data) {
             $this.hide(200, function() {
                 $this.remove();
+                drawGraph();
             });
         });
 
@@ -184,6 +167,7 @@ var bindSensors = function() {
         apiCall('/connection/' + connection_id, 'DELETE', {}, function(data) {
             if (data.ok) {
                 connection_li.hide(300, function() { connection_li.remove(); });
+                drawGraph();
             }
         });
     });
@@ -205,6 +189,7 @@ var bindSensors = function() {
 
             if (data.ok) {
                 $this.closest('table').find('tr:last').before(connection_template(data.result));
+                drawGraph();
             }
             else {
                 notification.error("Couldn't add a binding between '" + event + "' and '"

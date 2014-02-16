@@ -6,21 +6,6 @@ $(document).ready(function() {
         renderProducts(data.result);
     });
 
-    // $('#fashion-query').keypress(function(e) {
-    //     $this = $(this)
-    //     if (e.which != 13) {
-    //         return;
-    //     }
-
-    //     var params = {query: $this.val()};
-
-    //     apiCall('/product/search', 'GET', params, function(data) {
-    //         renderProducts(data.result);
-    //     });
-
-    // });
-
-
     $('#fashion-query').on('keyup', function(e) {
         var $this = $('#fashion-query')
         var query = $this.val();
@@ -40,7 +25,15 @@ $(document).ready(function() {
 
 renderProducts = function(products) {
     $('.fashion-products').html('');
-    $.each(products, function(i, p) {
-        $('.fashion-products').append(product_template(p));
+    $.each(['top', 'bottom', 'feet'], function(i, type) {
+        console.log(products);
+        $.each(products[type], function(i, p) {
+            $('.fashion-products.' + type).append(product_template(p));
+        });
+
+        $('.fashion-products.' + type + ' li').eq(0).addClass('active');
     });
+
+    $('.carousel').carousel()
+
 }
