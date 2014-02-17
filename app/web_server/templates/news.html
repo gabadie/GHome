@@ -4,9 +4,10 @@
 <div class="container">
 	{% include "header.html" %}
 
-	<ul class="big-menu">
-		{% for category in categories %}
-			<a href="news/{{category.id}}"><li class="news">{{category.englishName}}</li></a>
+	<ul class="list">
+		{% for article in articles %}
+            <h2> {{article.title}} </h2>
+			{{article.description}}
 			
 		{% endfor %}
 	</ul>

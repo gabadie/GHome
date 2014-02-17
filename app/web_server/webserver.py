@@ -11,11 +11,13 @@ import mongoengine
 from enocean.devices import Sensor, Actuator
 from model.devices import NumericReading
 
-from feedzilla import feedzilla
+from reuters import reuters
+
 
 from config import GlobalConfig
 config = GlobalConfig()
-news_api = feedzilla.APIFeedzilla()
+
+news_api = reuters.APIReuters()
 
 ## Initializing the app
 app = Flask(__name__)
@@ -44,22 +46,8 @@ def monitoring():
 
 @app.route('/news')
 def news():
-    # category_id = news_api.categories()[0].id
-    # category_name = news_api.categories()[0].englishName
-    # articles = news_api.articles(category_id)
-    # #articles_dump = [json.dumps(article.__dict__) for article in articles]
-    # return render_template('news.html', category = category_name, articles=articles)
-    categories = news_api.categories()
-    return render_template('news.html', categories = categories)
-
-
-@app.route('/news/<category_id>')
-def newsCategory(category_id):
-    # category_id = news_api.categories()[0].id
-    category_name = news_api.categorieById(int(category_id)).englishName
-    articles = news_api.articles(category_id)
-    # #articles_dump = [json.dumps(article.__dict__) for article in articles]
-    return render_template('newsCategory.html', category_name = category_name, articles = articles)
+    articles = Article_base.objects()
+    return render_template('news.html', articles = articles)
 
 
 @app.route('/house')
