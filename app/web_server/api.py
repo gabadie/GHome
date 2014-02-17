@@ -388,7 +388,8 @@ def set_location():
 
         if loc:
             name, (lat, lon) = loc
-            [location.delete() for location in Location.objects]
+            for location in Location.objects:
+                location.delete()
             Location(name=name, latitude=lat, longitude=lon).save()
             if update_current_weather():
                 result = dict(ok=True)
@@ -423,7 +424,6 @@ def update_current_weather():
 @rest_api.route('/meteo/currentweather', methods=['POST','GET'])
 def get_curent_weather():
     if len(Location.objects) > 0:
-        location = Location.objects[0]
 
         #Update current weather
         if len(Weather.objects) == 0 or Weather.objects[0].expire < datetime.now():
@@ -450,7 +450,6 @@ def get_json_weather(lat, lon):
 
 def get_datetime(utcstring):
     return datetime.strptime(utcstring.split('.')[0], "%Y-%m-%dT%H:%M:%S")
-
 
 def get_timedelta(distantDateTime):
     return datetime.now().hour - distantDateTime.hour;

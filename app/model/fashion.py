@@ -2,9 +2,13 @@ import sys
 sys.path.append('..')
 sys.path.append('../../libs')
 
+from datetime import datetime
+
+import mongoengine
+
 from shopsense.shopstyle import ShopStyle
 from config import GlobalConfig
-import mongoengine
+from meteo import Weather, get_current_weather
 config = GlobalConfig()
 
 shopstyle = ShopStyle(config.api_shopsense)
@@ -59,6 +63,20 @@ class Product(mongoengine.Document):
 
     # mens-clothes
     # 'women'
+
+class OutfitChoice(mongoengine.Document):
+
+    top = mongoengine.ReferenceField(Product, required=True)
+    bottom = mongoengine.ReferenceField(Product, required=True)
+    feet = mongoengine.ReferenceField(Product, required=True)
+
+    weather = mongoengine.ReferenceField(Weather, default=get_current_weather)
+    date = mongoengine.DateTimeField(required=True, default=datetime.now)
+    weekday = mongoengine.IntField(required=True)
+
+    def clean(self):
+        self.weekday = self.date.weekday()
+
 
 def fetch_fashion():
     Product.drop_collection()
