@@ -3,7 +3,7 @@
 
 import sys
 sys.path.append('..')
-sys.path.append('../../libs')
+sys.path.append('../../app')
 
 import requests
 import feedparser
