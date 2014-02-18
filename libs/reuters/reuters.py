@@ -7,6 +7,7 @@ sys.path.append('../../app')
 
 import requests
 import feedparser
+
 from config import GlobalConfig
 import mongoengine
 
@@ -52,6 +53,16 @@ class APIReuters(object):
 
 		return article_list
 
+import re
+from htmlentitydefs import name2codepoint
+# for some reason, python 2.5.2 doesn't have this one (apostrophe)
+name2codepoint['#39'] = 39
+
+def unescape(s):
+    "unescape HTML code refs; c.f. http://wiki.python.org/moin/EscapingHtml"
+    return re.sub('&(%s);' % '|'.join(name2codepoint),
+              lambda m: unichr(name2codepoint[m.group(1)]), s)
+
 class Article_base(mongoengine.Document):
 	title = mongoengine.fields.StringField(required=False)
 	link = mongoengine.fields.StringField(required=False)
@@ -70,4 +81,4 @@ if __name__ == '__main__':
     for article in api.articles("reuters/topNews"):
         arti = Article_base(article.title, article.link, article.description, article.category)
         arti.save()
-        print '       Article : "{}" added to the database'.format(arti.title.encode('utf-8'))
+        # print '       Article : "{}" added to the database'.format(arti.title.encode('utf-8'))
