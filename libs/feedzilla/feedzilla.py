@@ -11,7 +11,6 @@ class Categorie(object):
 		self.englishName = englishName
 		self.urlName = urlName
 
-
 class Article(object):
 	def __init__(self, publish_date, source, source_url, summary, author, title, url, **kwargs):
 		self.publish_date = publish_date
@@ -21,6 +20,11 @@ class Article(object):
 		self.author = author
 		self.title = title
 		self.url = url
+
+	def __str__(self):
+		attrs = vars(self)
+		return ', '.join("%s: %s" % item for item in attrs())
+		# return 'date :' + self.publish_date + '\n' + 'source : ' +  self.source + '\n' + 'source_url : ' + self.source_url + '\n'+ 'resume : ' + self.summary + '\n'+ ' auteur : ' + self.author + '\n'+ 'titre : ' + self.title + '\n' + 'url :' + self.url
 
 class APIFeedzilla(object):
 	BASE_URL = 'http://api.feedzilla.com'
@@ -34,6 +38,7 @@ class APIFeedzilla(object):
 		if not response.ok:
 			raise requests.HTTPError("Error while consuming the API with query: {}".format(response.request.path_url))
 		else:
+			print response.json()
 			return response.json()
 
 	def categories(self):
@@ -70,7 +75,7 @@ class APIFeedzilla(object):
 
 
 		for article_data in article_data_list:
-			data = {field : article_data.get(field, None) for field in APIFeedzilla.article_fields}
+			data = {field : article_data.get(field, '') for field in APIFeedzilla.article_fields}
 			article = Article(**data)
 			article_list.append(article)
 
@@ -81,11 +86,4 @@ if __name__ == '__main__':
 
 	# Initializing the API
 	api = APIFeedzilla()
-
-	# cat = api.categories()
-	# for caty in cat:
-	# 	print(caty.englishName)
-
-	# articles = api.articles(13)
-	# for art in articles:
-	# 	print art.source_url
+	api.categories()

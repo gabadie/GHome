@@ -11,10 +11,12 @@ sys.path.append('..')
 
 import enocean.devices
 import model.devices
+from model.trigger import ThresholdTrigger
 from model.house import Room
 from model.meteo import Location
 from config import GlobalConfig
 from main_server.rpc_server import RpcServer
+from fashion import fetch_fashion
 
 class Generator:
     def __init__(self, config):
@@ -101,6 +103,15 @@ class Generator:
         self.generate_reading_evolution(thermometers[2], model.devices.Temperature, 10, 15, 2, 60)
         self.generate_reading_evolution(thermometers[2], model.devices.Humidity, 10, 40, -4, 60)
 
+        ## Temperature triggers
+        for idx, t in enumerate(thermometers):
+            for i in xrange(5):
+                trigger = ThresholdTrigger(name="Threshold{}{}".format(idx, i),
+                    min=idx*10+i, max=2*idx*10+i+1)
+                t.add_temperature_trigger(trigger)
+                t.save()
+
+
         #Switch
         switches = self.generate_devices(enocean.devices.Switch, 2)
         self.generate_readings(switches[0], 5, 120)
@@ -168,3 +179,6 @@ class Generator:
 if __name__ == '__main__':
     g = Generator(GlobalConfig())
     g.generate_sample()
+
+    if 'fashion' in sys.argv:
+        fetch_fashion()

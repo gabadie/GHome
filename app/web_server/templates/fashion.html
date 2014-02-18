@@ -4,14 +4,61 @@
 {% endblock %}
 
 {% block body %}
-<div class="container">
+<div class="container fashion">
     {% include "header.html" %}
 
 
     <input id="fashion-query" type="text" name="query" class="form-control" />
 
-    <ul class="fashion-products">
-    </ul>
+
+    <div class="page-header">
+      <h1>Top <small>Shirts, Pullovers, t-shirts, dresses, ...</small></h1>
+    </div>
+
+    <div class="slider">
+        <ul class="fashion-products top">
+        </ul>
+    </div>
+    <div class="controls">
+        <a href="#" class="prev-page">Prev Page</a> |
+        <a href="#" class="prev-slide">Prev Product</a> |
+        <a href="#" class="next-slide">Next Product</a> |
+        <a href="#" class="next-page">Next Page</a>
+    </div>
+
+
+    <div class="page-header">
+      <h1>Bottom <small>Pants, jeans, skirts, shorts, ...</small></h1>
+    </div>
+
+    <div class="slider">
+        <ul class="fashion-products bottom">
+        </ul>
+    </div>
+    <div class="controls">
+        <a href="#" class="prev-page">Prev Page</a> |
+        <a href="#" class="prev-slide">Prev Product</a> |
+        <a href="#" class="next-slide">Next Product</a> |
+        <a href="#" class="next-page">Next Page</a>
+    </div>
+
+
+    <div class="page-header">
+      <h1>Feet <small>Shoes, sneakers, sandals, ...</small></h1>
+    </div>
+
+    <div class="slider">
+        <ul class="fashion-products feet">
+        </ul>
+    </div>
+    <div class="controls">
+        <a href="#" class="prev-page">Prev Page</a> |
+        <a href="#" class="prev-slide">Prev Product</a> |
+        <a href="#" class="next-slide">Next Product</a> |
+        <a href="#" class="next-page">Next Page</a>
+    </div>
+
+    <p><a class="btn btn-primary btn-lg" role="button" href="#">Select outfit</a></p>
 
 
 </div>
@@ -32,5 +79,6 @@
     </script>
     {% endraw %}
 
+    <script src="/static/js/lemmon-slider.js"></script>
     <script src="/static/js/fashion.js"></script>
 {% endblock %}

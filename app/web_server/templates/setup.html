@@ -3,6 +3,7 @@
 {% block style %}
 <link href="static/css/xcharts.min.css" rel="stylesheet">
 <link href="static/css/iostoggle.css" rel="stylesheet">
+<link href="static/css/bootstrap-slider.css" rel="stylesheet">
 {% endblock %}
 
 
@@ -111,12 +112,21 @@
 				{{! Sensor's type (Thermometer, Switch, ...)}}
 				<li class="list-group-item">
 					<span class="title">Type:</span> {{type}}
+                </li>
+
+
+                {{! Chart showing the latest readings}}
+				<li class="list-group-item">
+					<h4>Readings</h4>
+					<div class="sensor-readings" id="readings-{{device_id}}"></div>
 				</li>
 
-				{{#if events}}
+                {{#if events}}
 
 					<li class="list-group-item">
 						{{! List of existing event bindings}}
+						<h4>Events' bindings</h4>
+
 						<table class="table table-striped binding-table">
 					      <thead>
 					        <tr>
@@ -177,13 +187,38 @@
 
 					</li>
 
-
 				{{/if}}
 				{{!--End of events handling--}}
 
-				<li class="list-group-item">
-					<div class="sensor-readings" id="readings-{{device_id}}"></div>
-				</li>
+                {{#if is_thermometer}}
+                    <li class="list-group-item">
+						<h4>Temperature thresholds</h4>
+
+						<table class="table table-striped binding-table">
+					      <thead>
+                            <tr>
+                              <th>Name</th>
+                              <th>Threshold</th>
+                            </tr>
+                         </thead>
+					     <tbody>
+                         {{#each temperature_triggers}}
+                            <tr>
+                                <td>{{name}}</td>
+                                <td><input type="text" class="trigger-slider modify" data-slider-min="{{min}}" data-slider-max="{{max}}" data-slider-step="1" data-slider-value="{{min}}" data-threshold-id="{{_id.$oid}}"/></td>
+                            </tr>
+                        {{/each}}
+					     </tbody>
+					   </table>
+
+   						<h4>Add a new threshold</h4>
+
+
+                        <input type="text" class="trigger-slider new" data-slider-min="-10" data-slider-max="50" data-slider-step="1" data-slider-value="20"/>
+                        <input type="text" class="trigger-threshold-min">
+                    </li>
+                {{/if}}
+
 
 			</ul>
 
@@ -215,4 +250,5 @@
 <script src="/static/js/plugins/sigma.parsers.json.min.js"></script>
 
 <script src="/static/js/setup.js"></script>
+<script src="/static/js/bootstrap-slider.js"></script>
 {% endblock %}

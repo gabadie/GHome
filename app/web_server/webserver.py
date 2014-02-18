@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import json
 import sys
-import locale
 sys.path.append('..')
 sys.path.append('../../libs')
 
@@ -11,15 +9,16 @@ from flask import Flask, render_template
 import mongoengine
 
 from enocean.devices import Sensor, Actuator
-from model.fashion import Product
 from model.devices import NumericReading
 import model.clock
 
-from feedzilla import feedzilla
+from reuters import reuters
+
 
 from config import GlobalConfig
 config = GlobalConfig()
-news_api = feedzilla.APIFeedzilla()
+
+news_api = reuters.APIReuters()
 
 ## Initializing the app
 app = Flask(__name__)
@@ -48,22 +47,8 @@ def monitoring():
 
 @app.route('/news')
 def news():
-    # category_id = news_api.categories()[0].id
-    # category_name = news_api.categories()[0].englishName
-    # articles = news_api.articles(category_id)
-    # #articles_dump = [json.dumps(article.__dict__) for article in articles]
-    # return render_template('news.html', category = category_name, articles=articles)
-    categories = news_api.categories()
-    return render_template('news.html', categories = categories)
-
-
-@app.route('/news/<category_id>')
-def newsCategory(category_id):
-    # category_id = news_api.categories()[0].id
-    category_name = news_api.categorieById(int(category_id)).englishName
-    articles = news_api.articles(category_id)
-    # #articles_dump = [json.dumps(article.__dict__) for article in articles]
-    return render_template('newsCategory.html', category_name = category_name, articles = articles)
+    articles = Article_base.objects()
+    return render_template('news.html', articles = articles)
 
 
 @app.route('/house')
@@ -83,10 +68,15 @@ def music():
 def meteo_page():
     return render_template('meteo.html')
 
+@app.route('/calendar')
+def calendar_page():
+    return render_template('calendar.html')
+
 @app.route('/fashion')
 def fashion_page():
     return render_template('fashion.html')
 
+<<<<<<< HEAD
 @app.route('/product/')
 def products():
     products = json.loads(Product.objects.to_json())
@@ -100,6 +90,8 @@ def calendar():
     # database = mongoengine.connect(config.mongo_db)
     return render_template('clock.html', alarms = model.clock.Event.objects())
 
+=======
+>>>>>>> 57db844e6685aee1dd92eb2912f4a7dee6678138
 if __name__ == "__main__":
     if len(sys.argv) > 1: 
         config = GlobalConfig.from_json(sys.argv[1])
