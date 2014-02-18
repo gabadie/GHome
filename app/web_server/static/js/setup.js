@@ -166,6 +166,18 @@ var bindSensors = function() {
         });
     });
 
+    // Triggering an event
+    $('.sensors').on('click', '.event-connection .btn', function(e) {
+        var connection_li = $(this).closest('.event-connection');
+        var connection_id = connection_li.attr('data-connection-id');
+
+        apiCall('/connection/' + connection_id, 'TRIGGER', {}, function(data) {
+            if(!data.ok) {
+                notification.error("Could not trigger event '" + event);
+            }
+        });
+    });
+
     // Adding an event binding
     $('.sensors').on('click', '.callback-binding .add', function(e) {
         var $this = $(this);

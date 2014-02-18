@@ -178,6 +178,26 @@ def event_connection(connection_id):
 
     return json.dumps(resp)
 
+@rest_api.route('/connection/<connection_id>', methods=['GET', 'TRIGGER'])
+def trigger_event(connection_id):
+    resp = dict(ok=False)
+    connection = Connection.objects.get(id=connection_id)
+
+    if connection is None:
+        return json.dumps(resp)
+    elif request.method == 'GET':
+        c_json = dump_connection(connection)
+        resp = dict(ok=True, result=c_json)
+    elif request.method == 'TRIGGER':
+        try:
+            #TODO : server parameter required
+            connection.trigger()
+            resp = dict(ok=True)
+        except Exception as e:
+            current_app.logger.exception(e)
+
+    return json.dumps(resp)
+
 @rest_api.route('/sensor/<sensor_id>/connections', methods=['GET'])
 def sensor_connections(sensor_id):
     resp = dict(ok=False)
