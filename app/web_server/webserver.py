@@ -76,7 +76,6 @@ def calendar_page():
 def fashion_page():
     return render_template('fashion.html')
 
-<<<<<<< HEAD
 @app.route('/product/')
 def products():
     products = json.loads(Product.objects.to_json())
@@ -90,8 +89,6 @@ def calendar():
     # database = mongoengine.connect(config.mongo_db)
     return render_template('clock.html', alarms = model.clock.Event.objects())
 
-=======
->>>>>>> 57db844e6685aee1dd92eb2912f4a7dee6678138
 if __name__ == "__main__":
     if len(sys.argv) > 1: 
         config = GlobalConfig.from_json(sys.argv[1])

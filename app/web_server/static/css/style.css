@@ -490,7 +490,13 @@ background: linear-gradient(#282828, #494949); /* Standard syntax (must be last)
 .white_text
 {
     color: white;
-<<<<<<< HEAD
+}
+
+.slider
+{
+  width: 100% !important;
+}
+
     
 }
 
@@ -551,10 +557,3 @@ background: radial-gradient(ellipse, #07AAFC , #3632FF ); /* Standard syntax (mu
 }
 =======
 
-}
-
-.slider
-{
-  width: 100% !important;
-}
->>>>>>> 57db844e6685aee1dd92eb2912f4a7dee6678138
