@@ -468,3 +468,59 @@ background: linear-gradient(#282828, #494949); /* Standard syntax (must be last)
     color: white;
     
 }
+
+.input_time
+{
+    height: 25%;
+    width: 70%;
+    border-radius: 25px;
+    text-align: center;
+    color: #FFFFFF;
+    font-size : 700%;
+    font-weight: bold;
+    background: -webkit-radial-gradient(ellipse, #07AAFC , #3632FF ); /* Safari */
+    background: -o-radial-gradient(ellipse, #07AAFC , #3632FF ); /* For Opera 11.1 to 12.0 */
+    background: -moz-radial-gradient(ellipse, #07AAFC , #3632FF ); /* For Firefox 3.6 to 15 */
+    background: radial-gradient(ellipse, #07AAFC , #3632FF ); /* Standard syntax (must be last) */
+}
+
+input : invalid
+{
+
+    color: #EEEEEE;
+    background: #24F278;
+}
+
+
+/* Calendar */ 
+.gradCalendar
+{
+height:100%;
+width:100%;
+background: -webkit-radial-gradient(ellipse, #07AAFC , #3632FF ); /* Safari */
+background: -o-radial-gradient(ellipse, #07AAFC , #3632FF ); /* For Opera 11.1 to 12.0 */
+background: -moz-radial-gradient(ellipse, #07AAFC , #3632FF ); /* For Firefox 3.6 to 15 */
+background: radial-gradient(ellipse, #07AAFC , #3632FF ); /* Standard syntax (must be last) */
+}
+
+
+.alarm_header
+{
+    background-color: blue;
+    box-shadow: 0 0 80px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    border-radius: 5px;
+    color: #FFF;
+    border-bottom: none;
+
+    -webkit-transition: all 0.5s ease-out;
+       -moz-transition: all 0.5s ease-out;
+        -ms-transition: all 0.5s ease-out;
+         -o-transition: all 0.5s ease-out;
+            transition: all 0.5s ease-out;
+}
+
+.hours_minutes_sep{
+    font-size: 800%;
+    color: white;
+}

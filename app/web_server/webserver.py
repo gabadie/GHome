@@ -13,6 +13,7 @@ import mongoengine
 from enocean.devices import Sensor, Actuator
 from model.fashion import Product
 from model.devices import NumericReading
+import model.clock
 
 from feedzilla import feedzilla
 
@@ -92,10 +93,15 @@ def products():
     result = dict(ok=True, result=products)
     return json.dumps(result)
 
-
+@app.route('/calendar')
+def calendar():
+    #  if len(sys.argv) > 1:
+    #     config = GlobalConfig.from_json(sys.argv[1])
+    # database = mongoengine.connect(config.mongo_db)
+    return render_template('clock.html', alarms = model.clock.Event.objects())
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
+    if len(sys.argv) > 1: 
         config = GlobalConfig.from_json(sys.argv[1])
     db = mongoengine.connect(config.mongo_db)
 

@@ -53,7 +53,7 @@ class Server(object):
 
         self.looping_task = twisted.internet.task.LoopingCall(self.looping_callback)
         self.looping_task.start(Server.quantum)
-
+        
     def trigger_events(self, week_day, minutes, previous_minute):
         clock_events = Event.objects(minutes__gt=previous_minute, minutes__lte=minutes)
 

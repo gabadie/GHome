@@ -454,3 +454,10 @@ def get_weather():
 def get_rooms():
     rooms = [room.to_dict() for room in Room.objects]
     return json.dumps(dict(ok=True, result=rooms))
+
+# Calendar clock
+#@rest_api.route('/calendar', methods=['GET'])
+#def get_rooms():
+#    rooms = [room.to_dict() for room in Room.objects]
+#    return json.dumps(dict(ok=True, result=rooms))
+#
