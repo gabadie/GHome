@@ -7,10 +7,12 @@
 <div class="container">
 	{% include "header.html" %}
 
-	<ul class="list">
+	<ul class="articles">
 		{% for article in articles %}
             <h2> {{article.title}} </h2>
-			{{html_parser.unescape(article.description)}}
+			<p class="description">
+                {{article.description|safe}}
+            </p>
 		{% endfor %}
 	</ul>
 
@@ -20,5 +22,4 @@
 
 {% block javascript %}
     
-    <script src="/static/js/unescape.js"></script>
 {% endblock %}

@@ -497,3 +497,9 @@ background: linear-gradient(#282828, #494949); /* Standard syntax (must be last)
 {
   width: 100% !important;
 }
+
+
+/* news */
+.articles .description br, .articles .feedflare {
+    display: none;
+}
