@@ -10,7 +10,7 @@
 	<ul class="list">
 		{% for article in articles %}
             <h2> {{article.title}} </h2>
-			<p id="descriptionArticle">{{html_parser.unescape(article.description)}}</p>
+			<p id="descriptionArticle">{{article.description|safe}}</p>
 		{% endfor %}
 	</ul>
 
@@ -19,6 +19,6 @@
 {% endblock body %}
 
 {% block javascript %}
-    
+
     <script src="/static/js/unescape.js"></script>
 {% endblock %}
