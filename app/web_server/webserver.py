@@ -7,7 +7,6 @@ sys.path.append('../../libs')
 
 from flask import Flask, render_template
 import mongoengine
-import HTMLParser
 
 from enocean.devices import Sensor, Actuator
 from model.devices import NumericReading
@@ -19,7 +18,6 @@ from config import GlobalConfig
 config = GlobalConfig()
 
 news_api = reuters.APIReuters()
-html_parser = HTMLParser.HTMLParser()
 
 ## Initializing the app
 app = Flask(__name__)
@@ -48,8 +46,10 @@ def monitoring():
 
 @app.route('/news')
 def news():
-    articles = reuters.Article_base.objects()
-    return render_template('news.html', html_parser = html_parser, articles = articles)
+    articles = {}
+    for category in reuters.category_list:
+        articles[category] = reuters.Article.objects(category=category)[:3]
+    return render_template('news.html', categories = reuters.category_list, articles = articles)
 
 
 @app.route('/house')

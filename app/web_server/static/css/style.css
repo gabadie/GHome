@@ -503,3 +503,14 @@ background: linear-gradient(#282828, #494949); /* Standard syntax (must be last)
 .articles .description br, .articles .feedflare {
     display: none;
 }
+
+.articles .img-thumbnail {
+    margin: 0 auto;
+    display: block;
+}
+
+.articles .category {
+    font-weight: bold;
+    font-size: 51px;
+    letter-spacing: -3px;
+}
