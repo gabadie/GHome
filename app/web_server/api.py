@@ -16,13 +16,15 @@ from metwit import Metwit
 from flask import request, jsonify, Blueprint, current_app
 import mongoengine
 
-from enocean.devices import Sensor, Actuator, Lamp
+from enocean.devices import Sensor, Actuator, Lamp, Thermometer
+from model.trigger import ThresholdTrigger
 from model.event import Connection
 from model.devices import NumericReading
-from model.fashion import Product
+from model.fashion import Product, OutfitChoice
 from model.house import Room
 from model.meteo import Location
 from model.meteo import Weather
+from model.devices import Device
 
 from config import GlobalConfig
 config = GlobalConfig()
@@ -30,14 +32,16 @@ config = GlobalConfig()
 # \ ! / Monkey patching mongoengine to make json dumping easier
 mongoengine.Document.to_dict = lambda s : json.loads(s.to_json())
 
-rpc = xmlrpclib.Server('http://{}:{}/'.format(config.main_server.ip, config.main_server.rpc_port))
+from config import GlobalConfig
 
 rest_api = Blueprint('rest_api', __name__)
+rpc = xmlrpclib.Server('http://{}:{}/'.format(GlobalConfig().main_server.ip, GlobalConfig().main_server.rpc_port))
 
 ## Utility functions
 def dump_actuator(actuator):
     a_json = json.loads(actuator.to_json())
     a_json['callbacks'] = actuator.callbacks.keys()
+    a_json['type'] = actuator.__class__.__name__
     return a_json
 
 def dump_sensor(sensor):
@@ -124,7 +128,7 @@ def connections_graph():
     for actuator in actuators:
         i += 1
         actuator_repr = dict(id=str(actuator.device_id),
-                           label='{}'.format(actuator.name),
+                           label='{}'.format(actuator.name.encode('utf-8')),
                            x=math.cos(2 * i * math.pi / n),
                            y=math.sin(2 * i * math.pi / n),
                            color='#395FBD',
@@ -175,6 +179,22 @@ def event_connection(connection_id):
     elif request.method == 'DELETE':
         connection.delete()
         resp = dict(ok=True)
+
+    return json.dumps(resp)
+
+@rest_api.route('/trigger/<connection_id>', methods=['GET', 'POST'])
+def trigger_connection(connection_id):
+    resp = dict(ok=False)
+
+    print request.method
+
+    if request.method == 'GET':
+        connection = Connection.objects.get(id=connection_id)
+        c_json = dump_connection(connection)
+        resp = dict(ok=True, result=c_json)
+    elif request.method == 'POST':
+        if rpc.trigger_connection(connection_id):
+            resp = dict(ok=True)
 
     return json.dumps(resp)
 
@@ -234,24 +254,40 @@ def all_sensors():
         result = [dump_sensor(sensor) for sensor in Sensor.objects]
         resp = dict(ok=True, result=result)
     elif request.method == 'POST':
+        #Adding a device (sensor or actuator)
         form = request.form
-        s_id, s_name, s_type = [form.get(val) for val in ['id', 'name', 'type']]
+        d_id, d_name, d_type, d_class = [form.get(val) for val in ['id', 'name', 'device-type', 'device-class']]
 
-        current_app.logger.info((s_id, s_name, s_type))
+        current_app.logger.info((d_id, d_name, d_class))
 
         # Converting from hexadecimal representation
-        s_id = int(s_id, 16)
+        d_id = int(d_id, 16)
+
+        if Device.objects(device_id=d_id):
+            print "already exist"
+            resp = dict(ok=False)
+            return json.dumps(resp)
 
         # Finding the sensor class
-        SensorClass = [s_cls for s_cls in Sensor.__subclasses__() if s_cls.__name__ == s_type][0]
+        subclasses = []
+        for sub in Sensor.__subclasses__():
+            subclasses.append(sub)
+
+        for sub in Actuator.__subclasses__():
+            subclasses.append(sub)
+
+        DeviceClass = [d_cls for d_cls in subclasses if d_cls.__name__ == d_class][0]
 
         # Creating the new device
-        s = SensorClass(device_id=s_id, name=s_name, ignored=False)
-        s.save()
+        d = DeviceClass(device_id=d_id, name=d_name, ignored=False)
+        d.save()
 
-        sensors = json.loads(Sensor.objects(device_id=s_id).to_json())
-        if sensors:
-            resp = dict(ok=True, result=sensors[0])
+        devices = json.loads(Device.objects(device_id=d_id).to_json())
+        if devices:
+            if d_type == "Sensor":
+                resp = dict(ok=True, sensor=True, result=devices[0])
+            else:
+                resp = dict(ok=True, sensor=False, result=devices[0])
         else:
             resp = dict(ok=False)
 
@@ -260,9 +296,9 @@ def all_sensors():
 @rest_api.route('/sensor/position', methods=['POST'])
 def set_sensor_position():
     sensor_id = request.json['sensor_id']
-    x, y = request.json['x'], request.json['y']
+    x, y, z = request.json['x'], request.json['y'], request.json['z']
     sensor = Sensor.objects.get(device_id=sensor_id)
-    sensor.x, sensor.y = x, y
+    sensor.x, sensor.y, sensor.z = x, y, z
     sensor.save()
 
     return json.dumps(dict(ok=True, sensor=dump_sensor(sensor)))
@@ -303,11 +339,31 @@ def sensor_ignored(device_id):
 
     return json.dumps(resp)
 
-@rest_api.route('/lamp/', methods=['GET'])
-def lamps():
+@rest_api.route('/actuator/', methods=['GET', 'POST'])
+def actuators():
+    actuators = [dump_actuator(actuator) for actuator in Actuator.objects]
+    resp = dict(ok=True, result=actuators)
+
+    return json.dumps(resp)
+
+@rest_api.route('/actuator/<device_id>', methods=['GET', 'DELETE'])
+def actuator(device_id):
+    device_id = int(device_id)
     if request.method == 'GET':
-        lamps = json.loads(Lamp.objects().to_json())
-        resp = dict(ok=True, result=lamps)
+        a = Actuator.objects.get(device_id=device_id)
+        if a is None:
+            resp = dict(ok=True, result="Couldn't find actuator")
+        else:
+            actuator = json.loads(a.to_json())
+            resp = dict(ok=True, result=actuator)
+    elif request.method == 'DELETE':
+        device = Actuator.objects(device_id=device_id).first()
+        if device:
+            device.delete()
+            connections = Connection.objects(receiving_object=device)
+            for c in connections:
+                c.delete()
+        resp = dict(ok=True, device_id=device_id)
 
     return json.dumps(resp)
 
@@ -489,12 +545,17 @@ def get_rooms():
 @rest_api.route('/threshold', methods=['POST'])
 def new_threshold():
     thermometer_id = request.json['thermometer_id']
-    m, M = request.json['min'], request.json['max']
-    threshold_name = request['threshold_name']
-    thermometer = Thermometer.objects.get(device_id=thermometer_id)
-    t = ThresholdTrigger(name=threshold_name, min=m, max=M);
+    threshold_name = request.json['threshold_name']
+    minimum, maximum = request.json['min'], request.json['max']
 
-    return json.dumps(dict(ok=True, sensor=dump_sensor(sensor)))
+    print request.json
+
+    thermometer = Thermometer.objects.get(device_id=thermometer_id)
+    t = ThresholdTrigger(name=threshold_name, min=minimum, max=maximum);
+    thermometer.add_temperature_trigger(t)
+    thermometer.save()
+
+    return json.dumps(dict(ok=True, result=json.loads(t.to_json())))
 
 @rest_api.route('/threshold/<threshold_id>', methods=['GET'])
 def threshold(threshold_id):
@@ -515,4 +576,25 @@ def threshold(threshold_id):
 
     return json.dumps(resp)
 
+@rest_api.route('/device/<device_type>', methods=['GET', 'POST'])
+def device_types(device_type):
+    device_types = []
 
+    for cls in eval(device_type).__subclasses__():
+        device_types.append(cls.__name__)
+
+    resp = dict(ok=True, types=device_types)
+
+    return json.dumps(resp)
+
+# Threslhold
+@rest_api.route('/outfit', methods=['POST'])
+def new_outfit():
+    outfit = OutfitChoice()
+
+    outfit.top = Product.objects(id=request.json['top']).first()
+    outfit.bottom = Product.objects(id=request.json['bottom']).first()
+    outfit.feet = Product.objects(id=request.json['feet']).first()
+    outfit.save()
+
+    return json.dumps(dict(ok=True))

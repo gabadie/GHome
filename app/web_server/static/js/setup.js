@@ -1,25 +1,51 @@
 $(document).ready(function() {
     sensor_template = loadTemplate('#sensor-template');
-    lamp_template = loadTemplate('#lamp-template');
+    actuator_template = loadTemplate('#lamp-template');
     connection_template = loadTemplate('#connection-template');
+    threshold_template = loadTemplate('#threshold-template');
 
     Handlebars.registerPartial("connection-template", $("#connection-template").html());
+    Handlebars.registerPartial("threshold-template", $("#threshold-template").html());
 
     updateSensors();
     bindSensors();
-    updateLamps();
-    //setInterval(updateLamps, 500);
+    updateActuators();
+    //setInterval(updateActuators, 500);
 
     $('#add-sensor').ajaxForm({
         dataType:  'json',
         success: function(data) {
-            updateSensors();
-            drawGraph();
+            if(!data.ok) {
+                notification.error("Could not add the specified device. Please check the ID is not already used.");
+            }
+            else {
+                if(data.sensor) {
+                    updateSensors();
+                } else {
+                    updateSensors();
+                    updateActuators();
+                }
+                drawGraph();
+            }
         }
+    });
+
+    //Change the device class list when updating the device type list
+    $('#device-type').on('change', function() {
+
+        apiCall('/device/' + this.value, 'GET', {}, function(data) {
+            $('#device-class').html("");
+
+            for(var i = 0; i < data.types.length; i++)
+            {
+                $('#device-class').append("<option value=" + data.types[i] + ">" + data.types[i] + "</option>");
+            }
+        });
     });
 
     // Drawing the devices' graph
     drawGraph();
+    $('#device-type').val('Sensor');
 })
 
 var drawGraph = function() {
@@ -89,11 +115,11 @@ var updateSensors = function() {
     });
 }
 
-var updateLamps = function() {
-    $.getJSON('/lamp', function(data) {
-        $('.lamps').html('');
+var updateActuators = function() {
+    $.getJSON('/actuator', function(data) {
+        $('.actuators').html('');
         $.each(data.result, function(i, l) {
-            $('.lamps').append(lamp_template(l));
+            $('.actuators').append(actuator_template(l));
         });
     });
 
@@ -166,6 +192,38 @@ var bindSensors = function() {
         });
     });
 
+    // Deleting an actuator
+    $('.actuators').on('click', '.heading .delete', function(e) {
+        $this = $(this).closest('li');
+        var sensor_id = $this.attr('data-sensor-id');
+
+        apiCall('/actuator/' + sensor_id, 'DELETE', {}, function(data) {
+            $this.hide(200, function() {
+                $this.remove();
+                drawGraph();
+            });
+        });
+
+        updateSensors();
+
+        // Avoid triggering an event on the parent li
+        e.stopPropagation();
+    });
+
+    // Triggering an event
+    $('.sensors').on('click', '.event-connection .btn', function(e) {
+        var connection_li = $(this).closest('.event-connection');
+        var connection_id = connection_li.attr('data-connection-id');
+
+        apiCall('/trigger/' + connection_id, 'POST', {}, function(data) {
+            if(!data.ok) {
+                notification.error("Could not trigger event '" + event);
+            }
+        });
+
+        updateActuators();
+    });
+
     // Adding an event binding
     $('.sensors').on('click', '.callback-binding .add', function(e) {
         var $this = $(this);
@@ -202,22 +260,53 @@ var bindSensors = function() {
     // s = $('select[name="callback"][data-actuator-id="889977"]')
 
 
-    $('.sensors').on('slideStop', '.trigger-slider.modify', function(ev){
+    $('.sensors').on('slide', '.trigger-slider', function(ev){
         var $this = $(this);
         var min = $this.data('slider').value[0];
         var max = $this.data('slider').value[1];
-        console.log('min = ' + min + '; max = ' + max);
-        $(this).parent().parent().find('.trigger-threshold-min').val($(this).val());
+        $(this).parent().parent().find('.threshold-trigger-min').text(min);
+        $(this).parent().parent().find('.threshold-trigger-max').text(max);
     });
 
 
-    $('.sensors').on('slideStop', '.trigger-slider.new', function(ev){
+    $('.sensors').on('slideStop', '.trigger-slider .modify', function(ev){
         var $this = $(this);
         var min = $this.data('slider').value[0];
         var max = $this.data('slider').value[1];
-        console.log('min = ' + min + '; max = ' + max);
-        $(this).parent().parent().find('.trigger-threshold-min').val($(this).val());
+        var thermometer_id = $this.closest('.sensor').data('sensor-id')
+        $(this).parent().parent().find('.threshold-trigger-min').text(min);
+        $(this).parent().parent().find('.threshold-trigger-max').text(max);
+
+        //apiCall(...)
+        //
     });
 
+    $('.sensors').on('click', '.threshold-trigger .add', function(ev){
+        var $this = $(this);
+        var thermometer_id = $this.closest('.sensor').data('sensor-id')
+        var threshold_name = $(this).closest('li').find('.threshold-trigger .name').val();
+        var min = $(this).closest('li').find('.trigger-slider').data('slider').value[0]
+        var max = $(this).closest('li').find('.trigger-slider').data('slider').value[1]
 
+        console.log("min = " + min + "; max = " + max + "; thermometer_id = " + thermometer_id + "; threshold_name = " + threshold_name);
+
+        $(this).closest('tr').find('.threshold-trigger-min').text(min);
+        $(this).closest('tr').find('.threshold-trigger-max').text(max);
+
+        $(this).closest('li').find('.threshold-trigger .name').val("");
+        //$(this).closest('li').find('.trigger-slider').data('slider').value[0] = -1
+        //$(this).closest('li').find('.trigger-slider').data('slider').value[1] = 50
+
+        var params = {thermometer_id: thermometer_id, threshold_name: threshold_name, min: min, max: max}
+
+        apiCall('/threshold', 'POST', params, function(data) {
+
+            if (data.ok) {
+                $this.closest('table').find('tr:last').before(threshold_template(data.result));
+            }
+            else {
+                notification.error("Failed to add threshold : " + data.result);
+            }
+        });
+    });
 }

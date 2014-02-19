@@ -7,12 +7,27 @@
 <div class="container">
 	{% include "header.html" %}
 
+    <h1> News </h1>
 	<ul class="articles">
-		{% for article in articles %}
-            <h2> {{article.title}} </h2>
-			<p class="description">
-                {{article.description|safe}}
-            </p>
+		{% for category in categories %}
+            <h2 class="category"> {{category}} </h2>
+                {% for article in articles[category] %}
+                    <h3 class="title"> <a href="{{article.link}}" > {{article.title}} </a> </h3>
+
+                    {% if article.image %}
+                        <img class="img-thumbnail" src="{{article.image}}"> 
+                    {% endif %}
+                    <p class = "description">
+                        {{article.description|safe}}
+                    </p>
+
+                    <p class="summary">
+                        {{article.summary|safe}}
+                        <a class="more" href="{{article.link}}"> ...More </a> </p> 
+                    </p>
+
+                {% endfor %}
+            <br/>
 		{% endfor %}
 	</ul>
 
@@ -21,4 +36,5 @@
 {% endblock body %}
 
 {% block javascript %}
+    
 {% endblock %}

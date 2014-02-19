@@ -25,20 +25,11 @@
 			</ul>
 
 
-			<form id="add-sensor" class="form-inline" action="/sensor" method="POST">
-				<h4>Add a sensor</h4>
+			<h2>Actuators</h2>
 
-				<input type="text" class="form-control" name="id" placeholder="Sensor ID (hexa)">
-				<input type="text" class="form-control" name="name" placeholder="Sensor name">
-	            <select class="form-control" data-width="auto" data-title="Sensor type" name="type"
-	                    placeholder="Sensor type">
-	            	{% for sensor_type in sensor_types %}
-	            	<option value="{{sensor_type.__name__}}">{{sensor_type.__name__}}</option>
-	            	{% endfor %}
-	            </select>
-
-				<button type="submit" class="btn btn-primary form-control">Add device</button>
-			</form>
+			<ul class="actuators">
+				<!-- Populated by JS Handlebars -->
+			</ul>
 
 		</div>
 
@@ -49,12 +40,37 @@
 
 			<div id="devices-graph"></div>
 
+			<br/>
 
-			<h2>Lamps</h2>
+			<form id="add-sensor" class="form-horizontal" action="/sensor" method="POST">
+				<h4 style="padding:5px;">Add a device</h4>
+				<div style="padding:5px;">
+					<input type="text" class="form-control" name="id" placeholder="Device ID (hexa)">
+				</div>
+				
+				<div style="padding:5px;">
+					<input type="text" class="form-control" name="name" placeholder="Device name">
+				</div>
+				
+				<div style="padding:5px;">
+					<select class="form-control" id="device-type" data-width="auto" data-title="Device type" name="device-type"
+	                    placeholder="Sensor type">
+		            	<option value="Sensor">Sensor</option>
+		            	<option value="Actuator">Actuator</option>
+	            	</select>
 
-			<ul class="lamps">
-				<!-- Populated by JS Handlebars -->
-			</ul>
+		            <select class="form-control" id="device-class" data-width="auto" data-title="Device class" name="device-class"
+		                    placeholder="Sensor type">
+		            	{% for sensor_type in sensor_types %}
+		            	<option value="{{sensor_type.__name__}}">{{sensor_type.__name__}}</option>
+		            	{% endfor %}
+		            </select>
+				</div>
+
+				<div style="padding:5px;">
+					<button type="submit" class="btn btn-primary form-control">Add device</button>
+				</div>
+			</form>
 
 		</div>
 
@@ -64,7 +80,7 @@
 
 {% block javascript %}
 
-<!-- Handlebars templates for sensors / lamps -->
+<!-- Handlebars templates for sensors / actuators -->
 {% raw %}
 <script id="connection-template" type="text/x-handlebars-template">
 	<tr class="event-connection" data-connection-id="{{_id.$oid}}">
@@ -85,14 +101,27 @@
 			<span class="delete glyphicon glyphicon-remove"></span>
 		</td>
 
+		<td style="width:100px;">
+			<button class="btn btn-primary btn-trigger">Trigger</button>
+		</td>
+
 	</tr>
+</script>
+
+<script id="threshold-template" type="text/x-handlebars-template">
+    <tr class='threshold-trigger'>
+        <td>{{name}}</td>
+        <td><span class="badge threshold-trigger-min">{{min}}</span><input type="text" class="trigger-slider modify" data-slider-min="-10" data-slider-max="50" data-slider-step="1" data-slider-value="[{{min}}, {{max}}]" data-threshold-id="{{_id.$oid}}"/><span class="badge threshold-trigger-max">{{max}}</span></td>
+        <td><span class="delete glyphicon glyphicon-remove"></span></td>
+    </tr>
 </script>
 
 <script id="sensor-template" type="text/x-handlebars-template">
 	<li class="sensor{{#if ignored}} ignored{{/if}}" data-sensor-id="{{device_id}}">
 		<div class="heading">
-			<span class="device_id">{{device_id}}</span> <span class="name">{{name}}</span>
-
+			<span class="device_id">{{device_id}}</span>
+			<span style="padding:20px;">{{type}}</span>
+			<span class="name">{{name}}</span>
 			<span class="delete glyphicon glyphicon-remove"></span>
 		</div>
 
@@ -133,7 +162,7 @@
 					          <th>Event</th>
 					          <th>Actuator</th>
 					          <th>Callback</th>
-					          <th> </th>
+					          <th style="width:100px;"> </th>
 					        </tr>
 					      </thead>
 					      <tbody>
@@ -199,23 +228,20 @@
                             <tr>
                               <th>Name</th>
                               <th>Threshold</th>
+                              <th></th>
                             </tr>
                          </thead>
 					     <tbody>
-                         {{#each temperature_triggers}}
-                            <tr>
-                                <td>{{name}}</td>
-                                <td><input type="text" class="trigger-slider modify" data-slider-min="{{min}}" data-slider-max="{{max}}" data-slider-step="1" data-slider-value="{{min}}" data-threshold-id="{{_id.$oid}}"/></td>
+                            <tr class='threshold-trigger'>
+                                <td><input type="text" class="form-control name" /></td>
+                                <td><input type="text" class="trigger-slider new" data-slider-min="-10" data-slider-max="50" data-slider-step="1" data-slider-value="[-10, 50]" data-threshold-id="{{_id.$oid}}"/></td>
+                                <td><span class="add glyphicon glyphicon-plus"></span>
                             </tr>
+                         {{#each temperature_triggers}}
+					        {{> threshold-template}}
                         {{/each}}
 					     </tbody>
 					   </table>
-
-   						<h4>Add a new threshold</h4>
-
-
-                        <input type="text" class="trigger-slider new" data-slider-min="-10" data-slider-max="50" data-slider-step="1" data-slider-value="20"/>
-                        <input type="text" class="trigger-threshold-min">
                     </li>
                 {{/if}}
 
@@ -228,11 +254,17 @@
 </script>
 
 <script id="lamp-template" type="text/x-handlebars-template">
-	<li {{#if turned_on}}class="turned_on"{{/if}} data-sensor-id="{{device_id}}">
-		<span class="device_id">{{device_id}}</span> <span class="name">{{name}}</span>
+	<li {{#if activated}}class="activated"{{/if}} data-sensor-id="{{device_id}}">
+		<div class="heading">
+			<span class="device_id">{{device_id}}</span>
+			<span style="padding:20px;">{{type}}</span>
+			<span class="name">{{name}}</span>
+			<span class="delete glyphicon glyphicon-remove"></span>
+		</div>
 	</li>
 </script>
 {% endraw %}
+
 
 
 <!-- Javascript inclusions -->

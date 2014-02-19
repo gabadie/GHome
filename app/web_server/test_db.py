@@ -20,7 +20,7 @@ def init(config):
     db.drop_database(config.mongo_db)
 
     # Actuators
-    l1 = Lamp(device_id=889977, name='The main lamp', turned_on=True).save()
+    l1 = Lamp(device_id=889977, name='The main lamp', activated=True).save()
     l2 = Lamp(device_id=85654, name='Another lamp').save()
 
     # Sensors

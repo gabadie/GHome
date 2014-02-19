@@ -7,11 +7,11 @@ from datetime import datetime
 import mongoengine
 
 from shopsense.shopstyle import ShopStyle
-from config import GlobalConfig
 from meteo import Weather, get_current_weather
-config = GlobalConfig()
 
-shopstyle = ShopStyle(config.api_shopsense)
+from config import GlobalConfig
+
+shopstyle = ShopStyle(GlobalConfig().api_shopsense)
 
 top_categories = ['shirt', 'dress', 'jacket', 't-shirt', 'pullover']
 bottom_categories = ['jeans', 'pants', 'trouser', 'skirt', 'shorts']
@@ -99,8 +99,3 @@ def fetch_fashion():
             p.feet = True
             p = p.save()
             print 'Added "{}"'.format(p.name)
-
-
-if __name__ == '__main__':
-    mongoengine.connect(config.mongo_db)
-    fetch_fashion()
