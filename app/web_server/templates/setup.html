@@ -25,25 +25,11 @@
 			</ul>
 
 
-			<form id="add-sensor" class="form-inline" action="/sensor" method="POST">
-				<h4>Add a device</h4>
+			<h2>Actuators</h2>
 
-				<input type="text" class="form-control" name="id" placeholder="Device ID (hexa)">
-				<input type="text" class="form-control" name="name" placeholder="Device name">
-				<select class="form-control" id="device-type" data-width="auto" data-title="Device type" name="device-type"
-	                    placeholder="Sensor type">
-	            	<option value="Sensor">Sensor</option>
-	            	<option value="Actuator">Actuator</option>
-	            </select>
-	            <select class="form-control" id="device-class" data-width="auto" data-title="Device class" name="device-class"
-	                    placeholder="Sensor type">
-	            	{% for sensor_type in sensor_types %}
-	            	<option value="{{sensor_type.__name__}}">{{sensor_type.__name__}}</option>
-	            	{% endfor %}
-	            </select>
-
-				<button type="submit" class="btn btn-primary form-control">Add device</button>
-			</form>
+			<ul class="actuators">
+				<!-- Populated by JS Handlebars -->
+			</ul>
 
 		</div>
 
@@ -54,12 +40,37 @@
 
 			<div id="devices-graph"></div>
 
+			<br/>
 
-			<h2>Lamps</h2>
+			<form id="add-sensor" class="form-horizontal" action="/sensor" method="POST">
+				<h4 style="padding:5px;">Add a device</h4>
+				<div style="padding:5px;">
+					<input type="text" class="form-control" name="id" placeholder="Device ID (hexa)">
+				</div>
+				
+				<div style="padding:5px;">
+					<input type="text" class="form-control" name="name" placeholder="Device name">
+				</div>
+				
+				<div style="padding:5px;">
+					<select class="form-control" id="device-type" data-width="auto" data-title="Device type" name="device-type"
+	                    placeholder="Sensor type">
+		            	<option value="Sensor">Sensor</option>
+		            	<option value="Actuator">Actuator</option>
+	            	</select>
 
-			<ul class="lamps">
-				<!-- Populated by JS Handlebars -->
-			</ul>
+		            <select class="form-control" id="device-class" data-width="auto" data-title="Device class" name="device-class"
+		                    placeholder="Sensor type">
+		            	{% for sensor_type in sensor_types %}
+		            	<option value="{{sensor_type.__name__}}">{{sensor_type.__name__}}</option>
+		            	{% endfor %}
+		            </select>
+				</div>
+
+				<div style="padding:5px;">
+					<button type="submit" class="btn btn-primary form-control">Add device</button>
+				</div>
+			</form>
 
 		</div>
 
@@ -69,7 +80,7 @@
 
 {% block javascript %}
 
-<!-- Handlebars templates for sensors / lamps -->
+<!-- Handlebars templates for sensors / actuators -->
 {% raw %}
 <script id="connection-template" type="text/x-handlebars-template">
 	<tr class="event-connection" data-connection-id="{{_id.$oid}}">
@@ -108,8 +119,9 @@
 <script id="sensor-template" type="text/x-handlebars-template">
 	<li class="sensor{{#if ignored}} ignored{{/if}}" data-sensor-id="{{device_id}}">
 		<div class="heading">
-			<span class="device_id">{{device_id}}</span> <span class="name">{{name}}</span>
-
+			<span class="device_id">{{device_id}}</span>
+			<span style="padding:20px;">{{type}}</span>
+			<span class="name">{{name}}</span>
 			<span class="delete glyphicon glyphicon-remove"></span>
 		</div>
 
@@ -242,11 +254,17 @@
 </script>
 
 <script id="lamp-template" type="text/x-handlebars-template">
-	<li {{#if turned_on}}class="turned_on"{{/if}} data-sensor-id="{{device_id}}">
-		<span class="device_id">{{device_id}}</span> <span class="name">{{name}}</span>
+	<li {{#if activated}}class="activated"{{/if}} data-sensor-id="{{device_id}}">
+		<div class="heading">
+			<span class="device_id">{{device_id}}</span>
+			<span style="padding:20px;">{{type}}</span>
+			<span class="name">{{name}}</span>
+			<span class="delete glyphicon glyphicon-remove"></span>
+		</div>
 	</li>
 </script>
 {% endraw %}
+
 
 
 <!-- Javascript inclusions -->

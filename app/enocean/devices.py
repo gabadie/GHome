@@ -237,11 +237,9 @@ class LightMovementSensor(Sensor):
 
 # Actuators
 class Lamp(Actuator):
-    turned_on = mongoengine.BooleanField(default=False)
-
-    def turn_on(self, turned_on):
-        self.turned_on = turned_on
-        logger.info("Lamp #{} state changed. turned_on = {}".format(self.device_id, self.turned_on))
+    def turn_on(self, activated):
+        self.activated = activated
+        logger.info("Lamp #{} state changed. activated = {}".format(self.device_id, self.activated))
 
         self.save()
 
@@ -252,11 +250,9 @@ class Lamp(Actuator):
         return self.turn_on(False)
 
     def callback_toggle(self, server):
-        return self.turn_on(not self.turned_on)
+        return self.turn_on(not self.activated)
 
 class Socket(Actuator):
-    activated = mongoengine.BooleanField(default=False)
-
     def activate(self, activated):
         self.activated = activated
         logger.info("Socket #{} state changed. activated = {}".format(self.device_id, self.activated))

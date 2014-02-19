@@ -21,7 +21,6 @@ from fashion import fetch_fashion
 class Generator:
     def __init__(self, config):
             self.config = config
-            print config.mongo_db
             self.db = mongoengine.connect(config.mongo_db)
             self.db.drop_database(config.mongo_db)
             self.id = 1337

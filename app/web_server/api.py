@@ -41,6 +41,7 @@ rpc = xmlrpclib.Server('http://{}:{}/'.format(GlobalConfig().main_server.ip, Glo
 def dump_actuator(actuator):
     a_json = json.loads(actuator.to_json())
     a_json['callbacks'] = actuator.callbacks.keys()
+    a_json['type'] = actuator.__class__.__name__
     return a_json
 
 def dump_sensor(sensor):
@@ -127,7 +128,7 @@ def connections_graph():
     for actuator in actuators:
         i += 1
         actuator_repr = dict(id=str(actuator.device_id),
-                           label='{}'.format(actuator.name),
+                           label='{}'.format(actuator.name.encode('utf-8')),
                            x=math.cos(2 * i * math.pi / n),
                            y=math.sin(2 * i * math.pi / n),
                            color='#395FBD',
@@ -338,11 +339,31 @@ def sensor_ignored(device_id):
 
     return json.dumps(resp)
 
-@rest_api.route('/lamp/', methods=['GET'])
-def lamps():
+@rest_api.route('/actuator/', methods=['GET', 'POST'])
+def actuators():
+    actuators = [dump_actuator(actuator) for actuator in Actuator.objects]
+    resp = dict(ok=True, result=actuators)
+
+    return json.dumps(resp)
+
+@rest_api.route('/actuator/<device_id>', methods=['GET', 'DELETE'])
+def actuator(device_id):
+    device_id = int(device_id)
     if request.method == 'GET':
-        lamps = json.loads(Lamp.objects().to_json())
-        resp = dict(ok=True, result=lamps)
+        a = Actuator.objects.get(device_id=device_id)
+        if a is None:
+            resp = dict(ok=True, result="Couldn't find actuator")
+        else:
+            actuator = json.loads(a.to_json())
+            resp = dict(ok=True, result=actuator)
+    elif request.method == 'DELETE':
+        device = Actuator.objects(device_id=device_id).first()
+        if device:
+            device.delete()
+            connections = Connection.objects(receiving_object=device)
+            for c in connections:
+                c.delete()
+        resp = dict(ok=True, device_id=device_id)
 
     return json.dumps(resp)
 

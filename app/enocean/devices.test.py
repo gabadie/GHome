@@ -69,9 +69,9 @@ def test_thermometer():
 
 def test_lamp():
     lamp = Lamp(device_id=404)
-    assert not lamp.turned_on
+    assert not lamp.activated
     lamp.callback_turn_on(None)
-    assert lamp.turned_on
+    assert lamp.activated
     lamp.save()
 
     assert 'callback_turn_on' in lamp.callbacks

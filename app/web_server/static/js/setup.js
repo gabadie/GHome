@@ -1,6 +1,6 @@
 $(document).ready(function() {
     sensor_template = loadTemplate('#sensor-template');
-    lamp_template = loadTemplate('#lamp-template');
+    actuator_template = loadTemplate('#lamp-template');
     connection_template = loadTemplate('#connection-template');
     threshold_template = loadTemplate('#threshold-template');
 
@@ -9,8 +9,8 @@ $(document).ready(function() {
 
     updateSensors();
     bindSensors();
-    updateLamps();
-    setInterval(updateLamps, 500);
+    updateActuators();
+    //setInterval(updateActuators, 500);
 
     $('#add-sensor').ajaxForm({
         dataType:  'json',
@@ -22,7 +22,8 @@ $(document).ready(function() {
                 if(data.sensor) {
                     updateSensors();
                 } else {
-                    //updateActuators();
+                    updateSensors();
+                    updateActuators();
                 }
                 drawGraph();
             }
@@ -42,16 +43,9 @@ $(document).ready(function() {
         });
     });
 
-/*
-    <select class="form-control" data-width="auto" data-title="Sensor type" name="type"
-            placeholder="Sensor type">
-        {% for sensor_type in sensor_types %}
-        <option value="{{sensor_type.__name__}}">{{sensor_type.__name__}}</option>
-        {% endfor %}
-    </select>
-*/
     // Drawing the devices' graph
     drawGraph();
+    $('#device-type').val('Sensor');
 })
 
 var drawGraph = function() {
@@ -121,11 +115,11 @@ var updateSensors = function() {
     });
 }
 
-var updateLamps = function() {
-    $.getJSON('/lamp', function(data) {
-        $('.lamps').html('');
+var updateActuators = function() {
+    $.getJSON('/actuator', function(data) {
+        $('.actuators').html('');
         $.each(data.result, function(i, l) {
-            $('.lamps').append(lamp_template(l));
+            $('.actuators').append(actuator_template(l));
         });
     });
 
@@ -198,6 +192,24 @@ var bindSensors = function() {
         });
     });
 
+    // Deleting an actuator
+    $('.actuators').on('click', '.heading .delete', function(e) {
+        $this = $(this).closest('li');
+        var sensor_id = $this.attr('data-sensor-id');
+
+        apiCall('/actuator/' + sensor_id, 'DELETE', {}, function(data) {
+            $this.hide(200, function() {
+                $this.remove();
+                drawGraph();
+            });
+        });
+
+        updateSensors();
+
+        // Avoid triggering an event on the parent li
+        e.stopPropagation();
+    });
+
     // Triggering an event
     $('.sensors').on('click', '.event-connection .btn', function(e) {
         var connection_li = $(this).closest('.event-connection');
@@ -208,6 +220,8 @@ var bindSensors = function() {
                 notification.error("Could not trigger event '" + event);
             }
         });
+
+        updateActuators();
     });
 
     // Adding an event binding
@@ -295,5 +309,4 @@ var bindSensors = function() {
             }
         });
     });
-
 }
