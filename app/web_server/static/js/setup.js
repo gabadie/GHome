@@ -214,22 +214,34 @@ var bindSensors = function() {
     // s = $('select[name="callback"][data-actuator-id="889977"]')
 
 
+    $('.sensors').on('slide', '.trigger-slider', function(ev){
+        var $this = $(this);
+        var min = $this.data('slider').value[0];
+        var max = $this.data('slider').value[1];
+        $(this).parent().parent().find('.trigger-threshold-min').text(min);
+        $(this).parent().parent().find('.trigger-threshold-max').text(max);
+    });
+
+
     $('.sensors').on('slideStop', '.trigger-slider.modify', function(ev){
         var $this = $(this);
         var min = $this.data('slider').value[0];
         var max = $this.data('slider').value[1];
-        console.log('min = ' + min + '; max = ' + max);
-        $(this).parent().parent().find('.trigger-threshold-min').val($(this).val());
+        var thermometer_id = $this.closest('.sensor').data('sensor-id')
+        $(this).parent().parent().find('.trigger-threshold-min').text(min);
+        $(this).parent().parent().find('.trigger-threshold-max').text(max);
+
+        //apiCall(...)
     });
 
-
-    $('.sensors').on('slideStop', '.trigger-slider.new', function(ev){
+    $('.sensors').on('click', '.trigger-slider.new.add', function(ev){
         var $this = $(this);
-        var min = $this.data('slider').value[0];
-        var max = $this.data('slider').value[1];
-        console.log('min = ' + min + '; max = ' + max);
-        $(this).parent().parent().find('.trigger-threshold-min').val($(this).val());
+        var min = $(this).parent().parent().find('.trigger-slider').data('slider').value[0]
+        var max = $(this).parent().parent().find('.trigger-slider').data('slider').value[1]
+        var thermometer_id = $this.closest('.sensor').data('sensor-id')
+        console.log("min = " + min + "; max = " + max + "; thermometer_id = " + thermometer_id);
+        $(this).parent().parent().find('.trigger-threshold-min').text(min);
+        $(this).parent().parent().find('.trigger-threshold-max').text(max);
     });
-
 
 }
