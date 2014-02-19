@@ -97,6 +97,14 @@
 	</tr>
 </script>
 
+<script id="threshold-template" type="text/x-handlebars-template">
+    <tr class='threshold-trigger'>
+        <td>{{name}}</td>
+        <td><span class="badge threshold-trigger-min">{{min}}</span><input type="text" class="trigger-slider modify" data-slider-min="-10" data-slider-max="50" data-slider-step="1" data-slider-value="[{{min}}, {{max}}]" data-threshold-id="{{_id.$oid}}"/><span class="badge threshold-trigger-max">{{max}}</span></td>
+        <td><span class="delete glyphicon glyphicon-remove"></span></td>
+    </tr>
+</script>
+
 <script id="sensor-template" type="text/x-handlebars-template">
 	<li class="sensor{{#if ignored}} ignored{{/if}}" data-sensor-id="{{device_id}}">
 		<div class="heading">
@@ -213,16 +221,12 @@
                          </thead>
 					     <tbody>
                             <tr class='threshold-trigger'>
-                                <td><input type="text" class="form-control" /></td>
-                                <td>-10<input type="text" class="trigger-slider new" data-slider-min="-10" data-slider-max="50" data-slider-step="1" data-slider-value="[-10, 50]" data-threshold-id="{{_id.$oid}}"/>50</td>
+                                <td><input type="text" class="form-control name" /></td>
+                                <td><input type="text" class="trigger-slider new" data-slider-min="-10" data-slider-max="50" data-slider-step="1" data-slider-value="[-10, 50]" data-threshold-id="{{_id.$oid}}"/></td>
                                 <td><span class="add glyphicon glyphicon-plus"></span>
                             </tr>
                          {{#each temperature_triggers}}
-                            <tr class='threshold-trigger'>
-                                <td>{{name}}</td>
-                                <td><span class="badge trigger-threshold-min">{{min}}</span><input type="text" class="trigger-slider modify" data-slider-min="-10" data-slider-max="50" data-slider-step="1" data-slider-value="[{{min}}, {{max}}]" data-threshold-id="{{_id.$oid}}"/><span class="badge trigger-threshold-max">{{max}}</span></td>
-                                <td><span class="remove glyphicon glyphicon-remove"></span>
-                            </tr>
+					        {{> threshold-template}}
                         {{/each}}
 					     </tbody>
 					   </table>

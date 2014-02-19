@@ -58,7 +58,7 @@
         <a href="#" class="next-page">Next Page</a>
     </div>
 
-    <p><a class="btn btn-primary btn-lg" role="button" href="#">Select outfit</a></p>
+    <p><a class="btn btn-primary btn-lg" id="select-outfit" role="button" href="#">Select outfit</a></p>
 
 
 </div>
@@ -69,7 +69,7 @@
 
     {% raw %}
     <script id="product-template" type="text/x-handlebars-template">
-        <li>
+        <li data-product-id="{{_id}}">
             <div class="img-wrapper img-thumbnail">
                 <img src="{{main_image}}" class="img-responsive" />
             </div>
@@ -81,4 +81,19 @@
 
     <script src="/static/js/lemmon-slider.js"></script>
     <script src="/static/js/fashion.js"></script>
+    <script type="text/javascript">
+        document.getElementById('select-outfit').onclick = function()
+        {
+            var infos = {};
+
+            infos['top'] = $('.fashion-products.top .active').attr('data-product-id');
+            infos['bottom'] = $('.fashion-products.bottom .active').attr('data-product-id');
+            infos['feet'] = $('.fashion-products.feet .active').attr('data-product-id');
+
+            apiCall('/outfit', 'POST', infos, function(data) {
+            })
+
+            return false;
+        }
+    </script>
 {% endblock %}
