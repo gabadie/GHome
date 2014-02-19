@@ -20,7 +20,7 @@ from enocean.devices import Sensor, Actuator, Lamp, Thermometer
 from model.trigger import ThresholdTrigger
 from model.event import Connection
 from model.devices import NumericReading
-from model.fashion import Product
+from model.fashion import Product, OutfitChoice
 from model.house import Room
 from model.meteo import Location
 from model.meteo import Weather
@@ -538,4 +538,15 @@ def threshold(threshold_id):
 
     return json.dumps(resp)
 
+# Threslhold
+@rest_api.route('/outfit', methods=['POST'])
+def new_outfit():
+    outfit = OutfitChoice()
+
+    outfit.top = Product.objects(id=request.json['top']).first()
+    outfit.bottom = Product.objects(id=request.json['bottom']).first()
+    outfit.feet = Product.objects(id=request.json['feet']).first()
+    outfit.save()
+
+    return json.dumps(dict(ok=True))
 
