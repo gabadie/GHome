@@ -731,6 +731,7 @@ function HouseView(output, canvas_id, house)
         }
 
         this.update();
+        this.onsave_device(this.selected_device);
     }
 
     this.canvas.onkeydown = function(e)
@@ -744,6 +745,11 @@ function HouseView(output, canvas_id, house)
         this.view_mode = view_mode;
 
         this.update();
+    }
+
+    this.onsave_device = function(device)
+    {
+
     }
 
     this.load();
