@@ -20,7 +20,7 @@ class Sensor(model.devices.Sensor):
 
     @property
     def last_readings(self):
-        readings = model.devices.Reading.objects()
+        readings = model.devices.Reading.objects(device=self)
         readings_dict = dict()
 
         for r in readings:

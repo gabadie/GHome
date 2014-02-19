@@ -277,9 +277,9 @@ def all_sensors():
 @rest_api.route('/sensor/position', methods=['POST'])
 def set_sensor_position():
     sensor_id = request.json['sensor_id']
-    x, y = request.json['x'], request.json['y']
+    x, y, z = request.json['x'], request.json['y'], request.json['z']
     sensor = Sensor.objects.get(device_id=sensor_id)
-    sensor.x, sensor.y = x, y
+    sensor.x, sensor.y, sensor.z = x, y, z
     sensor.save()
 
     return json.dumps(dict(ok=True, sensor=dump_sensor(sensor)))
@@ -506,12 +506,13 @@ def get_rooms():
 @rest_api.route('/threshold', methods=['POST'])
 def new_threshold():
     thermometer_id = request.json['thermometer_id']
-    m, M = request.json['min'], request.json['max']
+    minimum, maximum = request.json['min'], request.json['max']
     threshold_name = request['threshold_name']
     thermometer = Thermometer.objects.get(device_id=thermometer_id)
-    t = ThresholdTrigger(name=threshold_name, min=m, max=M);
+    t = ThresholdTrigger(name=threshold_name, min=minimum, max=maximum);
+    thermometer.add_temperature_trigger(t)
 
-    return json.dumps(dict(ok=True, sensor=dump_sensor(sensor)))
+    return json.dumps(dict(ok=True, result=json.loads(t.to_json())))
 
 @rest_api.route('/threshold/<threshold_id>', methods=['GET'])
 def threshold(threshold_id):
