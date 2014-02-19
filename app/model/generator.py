@@ -181,8 +181,8 @@ if __name__ == '__main__':
     configuration = GlobalConfig()
 
     if len(sys.argv) > 1:
-        configuration = GlobalConfig.from_json(sys.argv[1
-            
+        configuration = GlobalConfig.from_json(sys.argv[1])
+
     g = Generator(configuration)
     g.generate_sample()
 
