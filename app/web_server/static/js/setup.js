@@ -8,7 +8,7 @@ $(document).ready(function() {
     updateSensors();
     bindSensors();
     updateLamps();
-    //setInterval(updateLamps, 500);
+    setInterval(updateLamps, 500);
 
     $('#add-sensor').ajaxForm({
         dataType:  'json',
