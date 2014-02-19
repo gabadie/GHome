@@ -81,5 +81,6 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         config = GlobalConfig.from_json(sys.argv[1])
     db = mongoengine.connect(config.mongo_db)
+    print config.mongo_db
 
     app.run(host="0.0.0.0", port=config.web_server.port, debug=True)

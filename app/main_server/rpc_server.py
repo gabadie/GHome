@@ -19,6 +19,7 @@ config = GlobalConfig()
 from py8tracks import API8tracks
 import logger
 from model import devices
+from model.event import Connection
 
 
 class RaspiUnit(object):
@@ -85,7 +86,6 @@ class Raspi(xmlrpc.XMLRPC):
         if id<len(self.rpi):
             if self.rpi[id].macAddress=="":
                 return "Failed, no raspi registered at this ID"
-
             server = xmlrpclib.Server("http://{}:{}".format(self.rpi[id].ip,self.rpi[id].port))
             previous_music = server.previous_music()
         else :
@@ -117,6 +117,22 @@ class RpcServer(xmlrpc.XMLRPC):
     def xmlrpc_ping(self, msg):
         logger.info("RpcServer.xmlrpc_ping(\"" + str(msg) + "\")")
         return msg
+    
+    def xmlrpc_trigger_connection(self, connection_id):
+        print connection_id
+        connection = Connection.objects.get(id=connection_id)
+
+        if connection is None:
+            logger.error("Unknown binding received")
+            return False
+
+        try:
+            connection.trigger(self.main_server)
+            return True
+        except Exception as e:
+            logger.exception(e)
+
+        return False
 
     @staticmethod
     def xmlrpc_bind_devices(sensor_id, sensor_event, actuator_id, actuator_callback):
@@ -131,20 +147,23 @@ class RpcServer(xmlrpc.XMLRPC):
 
         return connection.id
 
-
-    def xmlrcp_trigger_event(self, sensor_id, sensor_event):
+    """
+    def xmlrpc_trigger_event(self, sensor_id, sensor_event):
         sensor = devices.Sensor.objects(device_id=sensor_id).first()
 
         if not sensor:
             logger.error("Unknown device when triggering {}.{}".format(sensor_id, sensor_event))
-            return
+            return False
 
         try:
             getattr(sensor, sensor_event)(self.main_server)
+            return True
         except AttributeError as ae:
             logger.error("An error occurred when triggering event {}.{} ".format(sensor.__class__.__name__, sensor_event))
             logger.exception(ae)
-
+            
+        return False
+    """
 
 def search_music_generator(mixset):
     urls=[]
