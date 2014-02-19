@@ -356,6 +356,13 @@ input.sensor-toggle {
     color: #e74c3c;
 }
 
+.threshold-trigger .delete {
+    color: #c0392b;
+}
+
+.threshold-trigger .delete:hover {
+    color: #e74c3c;
+}
 
 .sensors li .glyphicon:hover {
 	opacity: 1;
