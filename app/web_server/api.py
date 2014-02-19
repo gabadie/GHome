@@ -16,10 +16,11 @@ from metwit import Metwit
 from flask import request, jsonify, Blueprint, current_app
 import mongoengine
 
-from enocean.devices import Sensor, Actuator, Lamp
+from enocean.devices import Sensor, Actuator, Lamp, Thermometer
+from model.trigger import ThresholdTrigger
 from model.event import Connection
 from model.devices import NumericReading
-from model.fashion import Product
+from model.fashion import Product, OutfitChoice
 from model.house import Room
 from model.meteo import Location
 from model.meteo import Weather
@@ -30,9 +31,10 @@ config = GlobalConfig()
 # \ ! / Monkey patching mongoengine to make json dumping easier
 mongoengine.Document.to_dict = lambda s : json.loads(s.to_json())
 
-rpc = xmlrpclib.Server('http://{}:{}/'.format(config.main_server.ip, config.main_server.rpc_port))
+from config import GlobalConfig
 
 rest_api = Blueprint('rest_api', __name__)
+rpc = xmlrpclib.Server('http://{}:{}/'.format(GlobalConfig().main_server.ip, GlobalConfig().main_server.rpc_port))
 
 ## Utility functions
 def dump_actuator(actuator):
@@ -178,23 +180,19 @@ def event_connection(connection_id):
 
     return json.dumps(resp)
 
-@rest_api.route('/connection/<connection_id>', methods=['GET', 'TRIGGER'])
-def trigger_event(connection_id):
+@rest_api.route('/trigger/<connection_id>', methods=['GET', 'POST'])
+def trigger_connection(connection_id):
     resp = dict(ok=False)
-    connection = Connection.objects.get(id=connection_id)
 
-    if connection is None:
-        return json.dumps(resp)
-    elif request.method == 'GET':
+    print request.method
+
+    if request.method == 'GET':
+        connection = Connection.objects.get(id=connection_id)
         c_json = dump_connection(connection)
         resp = dict(ok=True, result=c_json)
-    elif request.method == 'TRIGGER':
-        try:
-            #TODO : server parameter required
-            connection.trigger()
+    elif request.method == 'POST':
+        if rpc.trigger_connection(connection_id):
             resp = dict(ok=True)
-        except Exception as e:
-            current_app.logger.exception(e)
 
     return json.dumps(resp)
 
@@ -280,9 +278,9 @@ def all_sensors():
 @rest_api.route('/sensor/position', methods=['POST'])
 def set_sensor_position():
     sensor_id = request.json['sensor_id']
-    x, y = request.json['x'], request.json['y']
+    x, y, z = request.json['x'], request.json['y'], request.json['z']
     sensor = Sensor.objects.get(device_id=sensor_id)
-    sensor.x, sensor.y = x, y
+    sensor.x, sensor.y, sensor.z = x, y, z
     sensor.save()
 
     return json.dumps(dict(ok=True, sensor=dump_sensor(sensor)))
@@ -509,12 +507,17 @@ def get_rooms():
 @rest_api.route('/threshold', methods=['POST'])
 def new_threshold():
     thermometer_id = request.json['thermometer_id']
-    m, M = request.json['min'], request.json['max']
-    threshold_name = request['threshold_name']
-    thermometer = Thermometer.objects.get(device_id=thermometer_id)
-    t = ThresholdTrigger(name=threshold_name, min=m, max=M);
+    threshold_name = request.json['threshold_name']
+    minimum, maximum = request.json['min'], request.json['max']
 
-    return json.dumps(dict(ok=True, sensor=dump_sensor(sensor)))
+    print request.json
+
+    thermometer = Thermometer.objects.get(device_id=thermometer_id)
+    t = ThresholdTrigger(name=threshold_name, min=minimum, max=maximum);
+    thermometer.add_temperature_trigger(t)
+    thermometer.save()
+
+    return json.dumps(dict(ok=True, result=json.loads(t.to_json())))
 
 @rest_api.route('/threshold/<threshold_id>', methods=['GET'])
 def threshold(threshold_id):
@@ -535,4 +538,15 @@ def threshold(threshold_id):
 
     return json.dumps(resp)
 
+# Threslhold
+@rest_api.route('/outfit', methods=['POST'])
+def new_outfit():
+    outfit = OutfitChoice()
+
+    outfit.top = Product.objects(id=request.json['top']).first()
+    outfit.bottom = Product.objects(id=request.json['bottom']).first()
+    outfit.feet = Product.objects(id=request.json['feet']).first()
+    outfit.save()
+
+    return json.dumps(dict(ok=True))
 

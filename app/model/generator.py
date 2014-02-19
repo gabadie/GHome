@@ -21,6 +21,7 @@ from fashion import fetch_fashion
 class Generator:
     def __init__(self, config):
             self.config = config
+            print config.mongo_db
             self.db = mongoengine.connect(config.mongo_db)
             self.db.drop_database(config.mongo_db)
             self.id = 1337
@@ -177,7 +178,12 @@ class Generator:
         return self.id
 
 if __name__ == '__main__':
-    g = Generator(GlobalConfig())
+    configuration = GlobalConfig()
+
+    if len(sys.argv) > 1:
+        configuration = GlobalConfig.from_json(sys.argv[1])
+
+    g = Generator(configuration)
     g.generate_sample()
 
     if 'fashion' in sys.argv:

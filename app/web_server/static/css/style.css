@@ -319,6 +319,16 @@ input.sensor-toggle {
     color: #2ecc71;
 }
 
+.threshold-trigger .add {
+    margin-top: 8px;
+    color: #27ae60;
+}
+
+.threshold-trigger .add:hover {
+    color: #2ecc71;
+}
+
+
 .sensors .name {
 	font-size: 15px;
 	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
@@ -346,6 +356,13 @@ input.sensor-toggle {
     color: #e74c3c;
 }
 
+.threshold-trigger .delete {
+    color: #c0392b;
+}
+
+.threshold-trigger .delete:hover {
+    color: #e74c3c;
+}
 
 .sensors li .glyphicon:hover {
 	opacity: 1;

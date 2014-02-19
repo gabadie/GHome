@@ -3,3 +3,4 @@ metwit-weather
 flask
 Twisted
 geopy
+feedparser

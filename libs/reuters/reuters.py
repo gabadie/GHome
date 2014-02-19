@@ -12,8 +12,6 @@ from goose import Goose
 from config import GlobalConfig
 import mongoengine
 
-config = GlobalConfig()
-mongoengine.connect(config.mongo_db)
 
 
 class APIReuters(object):
@@ -79,6 +77,8 @@ class Article(mongoengine.Document):
 			
 
 if __name__ == '__main__':
+    config = GlobalConfig()
+    mongoengine.connect(config.mongo_db)
 
 	# Initializing the API
     api = APIReuters()

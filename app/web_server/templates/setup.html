@@ -92,6 +92,14 @@
 	</tr>
 </script>
 
+<script id="threshold-template" type="text/x-handlebars-template">
+    <tr class='threshold-trigger'>
+        <td>{{name}}</td>
+        <td><span class="badge threshold-trigger-min">{{min}}</span><input type="text" class="trigger-slider modify" data-slider-min="-10" data-slider-max="50" data-slider-step="1" data-slider-value="[{{min}}, {{max}}]" data-threshold-id="{{_id.$oid}}"/><span class="badge threshold-trigger-max">{{max}}</span></td>
+        <td><span class="delete glyphicon glyphicon-remove"></span></td>
+    </tr>
+</script>
+
 <script id="sensor-template" type="text/x-handlebars-template">
 	<li class="sensor{{#if ignored}} ignored{{/if}}" data-sensor-id="{{device_id}}">
 		<div class="heading">
@@ -203,23 +211,20 @@
                             <tr>
                               <th>Name</th>
                               <th>Threshold</th>
+                              <th></th>
                             </tr>
                          </thead>
 					     <tbody>
-                         {{#each temperature_triggers}}
-                            <tr>
-                                <td>{{name}}</td>
-                                <td><input type="text" class="trigger-slider modify" data-slider-min="{{min}}" data-slider-max="{{max}}" data-slider-step="1" data-slider-value="{{min}}" data-threshold-id="{{_id.$oid}}"/></td>
+                            <tr class='threshold-trigger'>
+                                <td><input type="text" class="form-control name" /></td>
+                                <td><input type="text" class="trigger-slider new" data-slider-min="-10" data-slider-max="50" data-slider-step="1" data-slider-value="[-10, 50]" data-threshold-id="{{_id.$oid}}"/></td>
+                                <td><span class="add glyphicon glyphicon-plus"></span>
                             </tr>
+                         {{#each temperature_triggers}}
+					        {{> threshold-template}}
                         {{/each}}
 					     </tbody>
 					   </table>
-
-   						<h4>Add a new threshold</h4>
-
-
-                        <input type="text" class="trigger-slider new" data-slider-min="-10" data-slider-max="50" data-slider-step="1" data-slider-value="20"/>
-                        <input type="text" class="trigger-threshold-min">
                     </li>
                 {{/if}}
 
