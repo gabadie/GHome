@@ -13,6 +13,7 @@ class Device(event.Eventable):
 
     x = mongoengine.FloatField(default=0.0)
     y = mongoengine.FloatField(default=0.0)
+    z = mongoengine.FloatField(default=0.0)
 
     meta = {'allow_inheritance': True}
 

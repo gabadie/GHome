@@ -103,7 +103,7 @@
                     console.info(reading_name + " = " + values[reading_name]);
                 }
 
-                house.addDevice(sensor.device_id, sensor.x, sensor.y, 4, values);
+                house.addDevice(sensor.device_id, sensor.x, sensor.y, sensor.z, values);
             });
             house_view.update_model();
         });
@@ -136,6 +136,7 @@
             infos['sensor_id'] = device.id;
             infos['x'] = device.x;
             infos['y'] = device.y;
+            infos['z'] = device.z;
 
             apiCall('/sensor/position', 'POST', infos, function(data) {
             })

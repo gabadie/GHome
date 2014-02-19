@@ -280,9 +280,9 @@ def all_sensors():
 @rest_api.route('/sensor/position', methods=['POST'])
 def set_sensor_position():
     sensor_id = request.json['sensor_id']
-    x, y = request.json['x'], request.json['y']
+    x, y, z = request.json['x'], request.json['y'], request.json['z']
     sensor = Sensor.objects.get(device_id=sensor_id)
-    sensor.x, sensor.y = x, y
+    sensor.x, sensor.y, sensor.z = x, y, z
     sensor.save()
 
     return json.dumps(dict(ok=True, sensor=dump_sensor(sensor)))
