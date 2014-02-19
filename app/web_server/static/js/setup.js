@@ -171,7 +171,7 @@ var bindSensors = function() {
         var connection_li = $(this).closest('.event-connection');
         var connection_id = connection_li.attr('data-connection-id');
 
-        apiCall('/connection/' + connection_id, 'TRIGGER', {}, function(data) {
+        apiCall('/trigger/' + connection_id, 'POST', {}, function(data) {
             if(!data.ok) {
                 notification.error("Could not trigger event '" + event);
             }
