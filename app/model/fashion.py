@@ -13,7 +13,7 @@ config = GlobalConfig()
 
 shopstyle = ShopStyle(config.api_shopsense)
 
-top_categories = ['shirt', 'dress', 'jacket', 't-shirt', 'pull']
+top_categories = ['shirt', 'dress', 'jacket', 't-shirt', 'pullover']
 bottom_categories = ['jeans', 'pants', 'trouser', 'skirt', 'shorts']
 feet_categories = ['shoe', 'shoes', 'heels', 'sandal', 'mocassin']
 
