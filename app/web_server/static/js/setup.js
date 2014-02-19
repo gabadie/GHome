@@ -2,7 +2,7 @@ $(document).ready(function() {
     sensor_template = loadTemplate('#sensor-template');
     lamp_template = loadTemplate('#lamp-template');
     connection_template = loadTemplate('#connection-template');
-    threshold_template = loadTemplate('#connection-template');
+    threshold_template = loadTemplate('#threshold-template');
 
     Handlebars.registerPartial("connection-template", $("#connection-template").html());
     Handlebars.registerPartial("threshold-template", $("#threshold-template").html());
@@ -248,6 +248,10 @@ var bindSensors = function() {
 
         $(this).closest('tr').find('.threshold-trigger-min').text(min);
         $(this).closest('tr').find('.threshold-trigger-max').text(max);
+
+        $(this).closest('li').find('.threshold-trigger .name').val("");
+        //$(this).closest('li').find('.trigger-slider').data('slider').value[0] = -1
+        //$(this).closest('li').find('.trigger-slider').data('slider').value[1] = 50
 
         var params = {thermometer_id: thermometer_id, threshold_name: threshold_name, min: min, max: max}
 
