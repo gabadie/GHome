@@ -13,11 +13,41 @@ $(document).ready(function() {
     $('#add-sensor').ajaxForm({
         dataType:  'json',
         success: function(data) {
-            updateSensors();
-            drawGraph();
+            if(!data.ok) {
+                notification.error("Could not add the specified device. Please check the ID is not already used.");
+            }
+            else {
+                if(data.sensor) {
+                    updateSensors();
+                } else {
+                    //updateActuators();
+                }
+                drawGraph();
+            }
         }
     });
 
+    //Change the device class list when updating the device type list
+    $('#device-type').on('change', function() {
+
+        apiCall('/device/' + this.value, 'GET', {}, function(data) {
+            $('#device-class').html("");
+
+            for(var i = 0; i < data.types.length; i++)
+            {
+                $('#device-class').append("<option value=" + data.types[i] + ">" + data.types[i] + "</option>");
+            }
+        });
+    });
+
+/*
+    <select class="form-control" data-width="auto" data-title="Sensor type" name="type"
+            placeholder="Sensor type">
+        {% for sensor_type in sensor_types %}
+        <option value="{{sensor_type.__name__}}">{{sensor_type.__name__}}</option>
+        {% endfor %}
+    </select>
+*/
     // Drawing the devices' graph
     drawGraph();
 })

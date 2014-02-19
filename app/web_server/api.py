@@ -23,6 +23,7 @@ from model.fashion import Product
 from model.house import Room
 from model.meteo import Location
 from model.meteo import Weather
+from model.devices import Device
 
 from config import GlobalConfig
 config = GlobalConfig()
@@ -251,24 +252,40 @@ def all_sensors():
         result = [dump_sensor(sensor) for sensor in Sensor.objects]
         resp = dict(ok=True, result=result)
     elif request.method == 'POST':
+        #Adding a device (sensor or actuator)
         form = request.form
-        s_id, s_name, s_type = [form.get(val) for val in ['id', 'name', 'type']]
+        d_id, d_name, d_type, d_class = [form.get(val) for val in ['id', 'name', 'device-type', 'device-class']]
 
-        current_app.logger.info((s_id, s_name, s_type))
+        current_app.logger.info((d_id, d_name, d_class))
 
         # Converting from hexadecimal representation
-        s_id = int(s_id, 16)
+        d_id = int(d_id, 16)
+
+        if Device.objects(device_id=d_id):
+            print "already exist"
+            resp = dict(ok=False)
+            return json.dumps(resp)
 
         # Finding the sensor class
-        SensorClass = [s_cls for s_cls in Sensor.__subclasses__() if s_cls.__name__ == s_type][0]
+        subclasses = []
+        for sub in Sensor.__subclasses__():
+            subclasses.append(sub)
+
+        for sub in Actuator.__subclasses__():
+            subclasses.append(sub)
+
+        DeviceClass = [d_cls for d_cls in subclasses if d_cls.__name__ == d_class][0]
 
         # Creating the new device
-        s = SensorClass(device_id=s_id, name=s_name, ignored=False)
-        s.save()
+        d = DeviceClass(device_id=d_id, name=d_name, ignored=False)
+        d.save()
 
-        sensors = json.loads(Sensor.objects(device_id=s_id).to_json())
-        if sensors:
-            resp = dict(ok=True, result=sensors[0])
+        devices = json.loads(Device.objects(device_id=d_id).to_json())
+        if devices:
+            if d_type == "Sensor":
+                resp = dict(ok=True, sensor=True, result=devices[0])
+            else:
+                resp = dict(ok=True, sensor=False, result=devices[0])
         else:
             resp = dict(ok=False)
 
@@ -533,4 +550,13 @@ def threshold(threshold_id):
 
     return json.dumps(resp)
 
+@rest_api.route('/device/<device_type>', methods=['GET', 'POST'])
+def device_types(device_type):
+    device_types = []
 
+    for cls in eval(device_type).__subclasses__():
+        device_types.append(cls.__name__)
+
+    resp = dict(ok=True, types=device_types)
+
+    return json.dumps(resp)

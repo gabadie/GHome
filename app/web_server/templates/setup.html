@@ -26,11 +26,16 @@
 
 
 			<form id="add-sensor" class="form-inline" action="/sensor" method="POST">
-				<h4>Add a sensor</h4>
+				<h4>Add a device</h4>
 
-				<input type="text" class="form-control" name="id" placeholder="Sensor ID (hexa)">
-				<input type="text" class="form-control" name="name" placeholder="Sensor name">
-	            <select class="form-control" data-width="auto" data-title="Sensor type" name="type"
+				<input type="text" class="form-control" name="id" placeholder="Device ID (hexa)">
+				<input type="text" class="form-control" name="name" placeholder="Device name">
+				<select class="form-control" id="device-type" data-width="auto" data-title="Device type" name="device-type"
+	                    placeholder="Sensor type">
+	            	<option value="Sensor">Sensor</option>
+	            	<option value="Actuator">Actuator</option>
+	            </select>
+	            <select class="form-control" id="device-class" data-width="auto" data-title="Device class" name="device-class"
 	                    placeholder="Sensor type">
 	            	{% for sensor_type in sensor_types %}
 	            	<option value="{{sensor_type.__name__}}">{{sensor_type.__name__}}</option>
