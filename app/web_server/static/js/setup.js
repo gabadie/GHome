@@ -2,8 +2,10 @@ $(document).ready(function() {
     sensor_template = loadTemplate('#sensor-template');
     lamp_template = loadTemplate('#lamp-template');
     connection_template = loadTemplate('#connection-template');
+    threshold_template = loadTemplate('#threshold-template');
 
     Handlebars.registerPartial("connection-template", $("#connection-template").html());
+    Handlebars.registerPartial("threshold-template", $("#threshold-template").html());
 
     updateSensors();
     bindSensors();
@@ -218,30 +220,50 @@ var bindSensors = function() {
         var $this = $(this);
         var min = $this.data('slider').value[0];
         var max = $this.data('slider').value[1];
-        $(this).parent().parent().find('.trigger-threshold-min').text(min);
-        $(this).parent().parent().find('.trigger-threshold-max').text(max);
+        $(this).parent().parent().find('.threshold-trigger-min').text(min);
+        $(this).parent().parent().find('.threshold-trigger-max').text(max);
     });
 
 
-    $('.sensors').on('slideStop', '.trigger-slider.modify', function(ev){
+    $('.sensors').on('slideStop', '.trigger-slider .modify', function(ev){
         var $this = $(this);
         var min = $this.data('slider').value[0];
         var max = $this.data('slider').value[1];
         var thermometer_id = $this.closest('.sensor').data('sensor-id')
-        $(this).parent().parent().find('.trigger-threshold-min').text(min);
-        $(this).parent().parent().find('.trigger-threshold-max').text(max);
+        $(this).parent().parent().find('.threshold-trigger-min').text(min);
+        $(this).parent().parent().find('.threshold-trigger-max').text(max);
 
         //apiCall(...)
+        //
     });
 
-    $('.sensors').on('click', '.trigger-slider.new.add', function(ev){
+    $('.sensors').on('click', '.threshold-trigger .add', function(ev){
         var $this = $(this);
-        var min = $(this).parent().parent().find('.trigger-slider').data('slider').value[0]
-        var max = $(this).parent().parent().find('.trigger-slider').data('slider').value[1]
         var thermometer_id = $this.closest('.sensor').data('sensor-id')
-        console.log("min = " + min + "; max = " + max + "; thermometer_id = " + thermometer_id);
-        $(this).parent().parent().find('.trigger-threshold-min').text(min);
-        $(this).parent().parent().find('.trigger-threshold-max').text(max);
+        var threshold_name = $(this).closest('li').find('.threshold-trigger .name').val();
+        var min = $(this).closest('li').find('.trigger-slider').data('slider').value[0]
+        var max = $(this).closest('li').find('.trigger-slider').data('slider').value[1]
+
+        console.log("min = " + min + "; max = " + max + "; thermometer_id = " + thermometer_id + "; threshold_name = " + threshold_name);
+
+        $(this).closest('tr').find('.threshold-trigger-min').text(min);
+        $(this).closest('tr').find('.threshold-trigger-max').text(max);
+
+        $(this).closest('li').find('.threshold-trigger .name').val("");
+        //$(this).closest('li').find('.trigger-slider').data('slider').value[0] = -1
+        //$(this).closest('li').find('.trigger-slider').data('slider').value[1] = 50
+
+        var params = {thermometer_id: thermometer_id, threshold_name: threshold_name, min: min, max: max}
+
+        apiCall('/threshold', 'POST', params, function(data) {
+
+            if (data.ok) {
+                $this.closest('table').find('tr:last').before(threshold_template(data.result));
+            }
+            else {
+                notification.error("Failed to add threshold : " + data.result);
+            }
+        });
     });
 
 }

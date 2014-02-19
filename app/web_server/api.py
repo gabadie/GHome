@@ -16,7 +16,8 @@ from metwit import Metwit
 from flask import request, jsonify, Blueprint, current_app
 import mongoengine
 
-from enocean.devices import Sensor, Actuator, Lamp
+from enocean.devices import Sensor, Actuator, Lamp, Thermometer
+from model.trigger import ThresholdTrigger
 from model.event import Connection
 from model.devices import NumericReading
 from model.fashion import Product
@@ -506,11 +507,15 @@ def get_rooms():
 @rest_api.route('/threshold', methods=['POST'])
 def new_threshold():
     thermometer_id = request.json['thermometer_id']
+    threshold_name = request.json['threshold_name']
     minimum, maximum = request.json['min'], request.json['max']
-    threshold_name = request['threshold_name']
+
+    print request.json
+
     thermometer = Thermometer.objects.get(device_id=thermometer_id)
     t = ThresholdTrigger(name=threshold_name, min=minimum, max=maximum);
     thermometer.add_temperature_trigger(t)
+    thermometer.save()
 
     return json.dumps(dict(ok=True, result=json.loads(t.to_json())))
 
