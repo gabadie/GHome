@@ -341,7 +341,7 @@ function HouseView(output, canvas_id, house)
 
         a = Math.max(Math.min(a, 1.0), 0.0);
 
-        return this.color_mix(0.9, 0.9, 1.0, 0.6, 0.8, 1.0, a);
+        return this.color_mix(1.0, 1.0, 0.95, 0.8, 0.97, 1.0, a);
     }
 
     this.color_temperature = function(temperature)
@@ -350,7 +350,7 @@ function HouseView(output, canvas_id, house)
 
         a = Math.max(Math.min(a, 1.0), 0.0);
 
-        return this.color_mix(1.0, 0.5, 0.5, 0.5, 0.5, 1.0, a);
+        return this.color_mix(0.45, 0.55, 1.0, 1.0, 0.0, 0.45, a);
     }
 
     this.filter_device = function(device)
@@ -391,7 +391,7 @@ function HouseView(output, canvas_id, house)
         var gl = this.gl;
 
         gl.uniformMatrix4fv(this.uniform.model_screen_matrix, false, new Float32Array(space_screen_matrix));
-        gl.uniform4f(this.uniform.albedo, 0.85, 0.9, 1.0, 1.0);
+        gl.uniform4f(this.uniform.albedo, 0.85 * 1.2, 0.9 * 1.2, 0.95 * 1.2, 1.0);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
         gl.vertexAttribPointer(this.attribute.vertex, 3, gl.FLOAT, false, 4 * 6, 4 * 0);
