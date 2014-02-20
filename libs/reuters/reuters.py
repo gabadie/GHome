@@ -56,8 +56,11 @@ class APIReuters(object):
 				category = " ".join(category_list_print)
 			
 			article_goose = g.extract(url = link)
-			image = article_goose.top_image.src
-			summary = article_goose.cleaned_text[:700]
+			if hasattr(article_goose.top_image, 'src'):
+				image = article_goose.top_image.src
+			else:
+				image = None
+			summary = article_goose.cleaned_text[:900]
 			article = Article(title = title, link = link, description = description, category = category, summary = summary, image = image)
 			article_list.append(article)
 
@@ -72,7 +75,7 @@ class Article(mongoengine.Document):
 	description = mongoengine.fields.StringField(required=False)
 	category = mongoengine.fields.StringField(required=True)
 	summary = mongoengine.fields.StringField(required=True)
-	image = mongoengine.fields.StringField(required=True)
+	image = mongoengine.fields.StringField(required=False)
 
 			
 
@@ -88,7 +91,7 @@ if __name__ == '__main__':
     categories = ["reuters/topNews", "news/artsculture", "reuters/businessNews", "ReutersBusinessTravel", "reuters/companyNews", "reuters/entertainment", "reuters/environment", "reuters/healthNews", "reuters/lifestyle", "news/reutersmedia", "news/wealth", "reuters/MostRead", "reuters/oddlyEnoughNews", "reuters/peopleNews", "Reuters/PoliticsNews", "reuters/scienceNews", "reuters/sportsNews", "reuters/technologyNews", "Reuters/domesticNews", "Reuters/worldNews"]
 
     for category in categories:
-
+    	print category
         for article in api.articles(category, g): 
-       # 	article.save()
+        	article.save()
         	print '       Article : "{}" added to the database'.format(article.title.encode('utf-8'))

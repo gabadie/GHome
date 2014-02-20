@@ -7,26 +7,46 @@
 <div class="container">
 	{% include "header.html" %}
 
-    <h1> News </h1>
+    <nav>
+        <ul class="fancyNav">
+            {% for category in categories %}
+            <li id="{{category}}Menu"><a href="#{{category}}" class="{{category}}Icon">{{category}}</a></li>
+            {% endfor %}
+        </ul>
+    </nav>
+
+    <br/>
+    <br/>
+    <br/>
 	<ul class="articles">
 		{% for category in categories %}
-            <h2 class="category"> {{category}} </h2>
-                {% for article in articles[category] %}
-                    <h3 class="title"> <a href="{{article.link}}" > {{article.title}} </a> </h3>
+            <h2 class="category" id ="{{category}}"> {{category}} </h2>
+            <br/>
+            <br/>
 
-                    {% if article.image %}
-                        <img class="img-thumbnail" src="{{article.image}}"> 
-                    {% endif %}
-                    <p class = "description">
-                        {{article.description|safe}}
-                    </p>
+            {% for article in articles[category] %}
+            <div class="article">
+                <h3 class="titleContainer"> <a class="title" href="{{article.link}}" > {{article.title}} </a> </h3>
 
-                    <p class="summary">
-                        {{article.summary|safe}}
-                        <a class="more" href="{{article.link}}"> ...More </a> </p> 
-                    </p>
+                {% if article.image %}
+                    <img class="img-thumbnail" src="{{article.image}}"> 
+                {% endif %}
+                </br>
+                <p class = "description">
+                    {{article.description|safe}}
+                </p>
 
-                {% endfor %}
+                <p class="summary">
+                    {{article.summary|safe}}
+                    <a class="more" href="{{article.link}}"> ...More </a> </p> 
+                </p>
+            </div>
+            <br/>      
+
+            {% endfor %}
+            <input type="button" name="addCategory" value="See more of {{category}} articles" onclick="self.location.href='lien.html'" > 
+            <br/>
+            <br/>
             <br/>
 		{% endfor %}
 	</ul>
