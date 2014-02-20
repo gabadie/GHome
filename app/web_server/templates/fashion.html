@@ -4,11 +4,14 @@
 {% endblock %}
 
 {% block body %}
+
+{% include "header.html" %}
+
+
 <div class="container fashion">
-    {% include "header.html" %}
 
 
-    <input id="fashion-query" type="text" name="query" class="form-control" />
+    <input id="fashion-query" type="text" name="query" class="form-control" placeholder="Search a product..." />
 
 
     <div class="page-header">

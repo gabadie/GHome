@@ -415,13 +415,16 @@ input.sensor-toggle {
 
 
 /* Fashion */
+.fashion {
+    padding: 30px;
+}
+
 /* Necessary CSS */
 .fashion .slider    { overflow:hidden; position:relative; }
 .fashion .slider ul { margin:0; padding:0; }
 .fashion .slider li { float:left; margin:0 5px 0 0; list-style:none; }
 /* IE6 issues */
 .fashion .slider ul { width:100%; }
-
 
 
 .fashion-products {
@@ -440,7 +443,6 @@ input.sensor-toggle {
     font-weight: bold;
 }
 
-
 .fashion-products .img-wrapper {
     max-height: 350px;
     max-width:300px;
@@ -448,11 +450,9 @@ input.sensor-toggle {
     overflow: hidden;
 }
 
-
 .fashion-products .img-wrapper:wrapper {
     max-height: inherit;
 }
-
 
 .fashion-products li img{
     height: 100%;
@@ -466,6 +466,12 @@ input.sensor-toggle {
 .fashion-products .price {
     font-style: italic;
 }
+
+#select-outfit {
+    margin-top: 30px;
+}
+
+/* vue maison */
 
 #renderingZone {
     outline: 0;

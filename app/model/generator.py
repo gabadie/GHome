@@ -179,11 +179,12 @@ class Generator:
 if __name__ == '__main__':
     configuration = GlobalConfig()
 
-    if len(sys.argv) > 1:
+
+    if len(sys.argv) > 1 and sys.argv[1] != 'fashion':
         configuration = GlobalConfig.from_json(sys.argv[1])
-        
     g = Generator(configuration)
     g.generate_sample()
+
 
     if 'fashion' in sys.argv:
         fetch_fashion()
