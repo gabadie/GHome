@@ -537,13 +537,13 @@ background: linear-gradient(#282828, #494949); /* Standard syntax (must be last)
 .fancyNav li{
 
 
-    display: inline;  
-    list-style: none;  
+    display: inline;
+    list-style: none;
     margin: 0px -1.5px;
 }
 
-.fancyNav a {  
-    display: inline-block;  
+.fancyNav a {
+    display: inline-block;
     line-height: 1.5em;
 
     background: #BBD2E1;
@@ -561,7 +561,7 @@ background: linear-gradient(#282828, #494949); /* Standard syntax (must be last)
     border-radius: 3px;
     padding: 4px 20px ;
     border: 2px solid #2B3C67;
-}  
+}
 
 .fancyNav a:hover, .fancyNav a:focus, .fancyNav a:active {
     background: #2B3C67;
@@ -576,6 +576,19 @@ background: linear-gradient(#282828, #494949); /* Standard syntax (must be last)
 
 
 /* Articles */
+
+nav.categories {
+    margin-top: 12px;
+}
+
+nav.categories .btn-group{
+    text-align: center;
+}
+
+nav.categories button {
+    font-size: 17px;
+    margin: 2px 2px;
+}
 
 .articles .category {
     background: #2B3C67;
@@ -617,7 +630,7 @@ background: linear-gradient(#282828, #494949); /* Standard syntax (must be last)
     margin: 0 auto;
     display: block;
     border: 1px solid grey;
-    box-shadow: 8px 8px 12px #aaa;
+    box-shadow: 3px 3px 15px rgba(0, 0, 0, 0.1);
 }
 
 .articles .description {
