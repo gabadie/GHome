@@ -10,7 +10,7 @@ $(document).ready(function() {
     updateSensors();
     bindSensors();
     updateActuators();
-    //setInterval(updateActuators, 500);
+    setInterval(updateActuators, 500);
 
     $('#add-sensor').ajaxForm({
         dataType:  'json',
