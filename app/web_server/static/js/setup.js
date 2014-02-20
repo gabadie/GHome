@@ -1,6 +1,6 @@
 $(document).ready(function() {
     sensor_template = loadTemplate('#sensor-template');
-    actuator_template = loadTemplate('#lamp-template');
+    actuator_template = loadTemplate('#actuator-template');
     connection_template = loadTemplate('#connection-template');
     threshold_template = loadTemplate('#threshold-template');
 

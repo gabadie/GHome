@@ -47,11 +47,11 @@
 				<div style="padding:5px;">
 					<input type="text" class="form-control" name="id" placeholder="Device ID (hexa)">
 				</div>
-				
+
 				<div style="padding:5px;">
 					<input type="text" class="form-control" name="name" placeholder="Device name">
 				</div>
-				
+
 				<div style="padding:5px;">
 					<select class="form-control" id="device-type" data-width="auto" data-title="Device type" name="device-type"
 	                    placeholder="Sensor type">
@@ -253,11 +253,11 @@
 	</li>
 </script>
 
-<script id="lamp-template" type="text/x-handlebars-template">
+<script id="actuator-template" type="text/x-handlebars-template">
 	<li {{#if activated}}class="activated"{{/if}} data-sensor-id="{{device_id}}">
 		<div class="heading">
 			<span class="device_id">{{device_id}}</span>
-			<span style="padding:20px;">{{type}}</span>
+			<span class="actuator-type">{{type}}</span>
 			<span class="name">{{name}}</span>
 			<span class="delete glyphicon glyphicon-remove"></span>
 		</div>

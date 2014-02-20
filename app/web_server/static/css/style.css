@@ -340,7 +340,7 @@ input.sensor-toggle {
 	margin-right: 10px;
 }
 
-.sensors li .heading .glyphicon {
+.sensors li .heading .glyphicon, .actuators li .glyphicon{
 	float: right;
 	text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
 	opacity: 0.5;
@@ -364,7 +364,7 @@ input.sensor-toggle {
     color: #e74c3c;
 }
 
-.sensors li .glyphicon:hover {
+.sensors li .glyphicon:hover, .actuators li .glyphicon:hover {
 	opacity: 1;
 }
 
@@ -531,4 +531,10 @@ background: linear-gradient(#282828, #494949); /* Standard syntax (must be last)
     font-weight: bold;
     font-size: 51px;
     letter-spacing: -3px;
+}
+
+
+.actuator-type {
+    padding: 0 20px;
+    font-weight: bold;
 }
