@@ -541,6 +541,10 @@ background: linear-gradient(#282828, #494949); /* Standard syntax (must be last)
     vertical-align: top;
 }
 
+.articles input {
+    margin: 5px 0 20px;
+}
+
 /* Nav */
 .fancyNav{
     text-align: center;
