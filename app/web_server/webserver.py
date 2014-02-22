@@ -48,7 +48,7 @@ def monitoring():
 def news():
     articles = {}
     for category in reuters.category_list:
-        articles[category] = reuters.Article.objects(category=category)[:3]
+        articles[category] = reuters.Article.objects(category=category)[:15]
     return render_template('news.html', categories = reuters.category_list, articles = articles)
 
 

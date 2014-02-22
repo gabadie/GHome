@@ -22,34 +22,50 @@
     <br/>
 	<ul class="articles">
 		{% for category in categories %}
-            <h2 class="category" id ="{{category}}"> {{category}} </h2>
-            <br/>
-            <br/>
+            {% set i = 0 %}
 
-            {% for article in articles[category] %}
-            <div class="article">
-                <h3 class="titleContainer"> <a class="title" href="{{article.link}}" > {{article.title}} </a> </h3>
+            <div id="{{category}}">
+                
+                <h2 class="categoryTitle" > {{category}} </h2>
+                <br/>
+                <br/>
 
-                {% if article.image %}
-                    <img class="img-thumbnail" src="{{article.image}}">
-                {% endif %}
-                </br>
-                <p class = "description">
-                    {{article.description|safe}}
-                </p>
+                {% for article in articles[category] %}
+                    {% if i < 3 %}
+                        <div class="article">
 
-                <p class="summary">
-                    {{article.summary|safe}}
-                    <a class="more" href="{{article.link}}"> ...More </a> </p>
-                </p>
+                    {% else %}
+                        <div class="hiddenArticle">
+                    {% endif %}
+                    {% set i=i+1 %}
+
+                            <h3 class="titleContainer"> <a class="title" href="{{article.link}}" > {{article.title}} </a> </h3>
+
+                            {% if article.image %}
+                                <img class="img-thumbnail" src="{{article.image}}">
+                            {% endif %}
+                            </br>
+                            <p class = "description">
+                                {{article.description|safe}}
+                            </p>
+
+                            <p class="summary">
+                                {{article.summary|safe}}
+                                <a class="more" href="{{article.link}}"> ...More </a> </p>
+                            </p>
+                        </div>
+
+                    <br/>
+                {% endfor %}
+
+                <input type="button" class="addCategory" value="See more of {{category}} articles" onclick="showHiddenArticles('{{category}}')" >
+
+                <input type="button" class="hideCategory" value="See less of {{category}} articles" onclick="hideHiddenArticles('{{category}}')" >
+                <br/>
+                <br/>
+                <br/>
             </div>
-            <br/>
 
-            {% endfor %}
-            <input type="button" name="addCategory" value="See more of {{category}} articles" onclick="self.location.href='lien.html'" >
-            <br/>
-            <br/>
-            <br/>
 		{% endfor %}
 	</ul>
 
@@ -57,6 +73,11 @@
 </div>
 {% endblock body %}
 
+
 {% block javascript %}
 
-{% endblock %}
+<script type="text/javascript" src="static/js/news.js"></script>
+{% endblock javascript %}
+
+
+

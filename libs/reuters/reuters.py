@@ -86,7 +86,7 @@ if __name__ == '__main__':
 	# Initializing the API
     api = APIReuters()
     g = Goose()
-  #  Article.drop_collection()
+    Article.drop_collection()
 
     categories = ["reuters/topNews", "news/artsculture", "reuters/businessNews", "ReutersBusinessTravel", "reuters/companyNews", "reuters/entertainment", "reuters/environment", "reuters/healthNews", "reuters/lifestyle", "news/reutersmedia", "news/wealth", "reuters/MostRead", "reuters/oddlyEnoughNews", "reuters/peopleNews", "Reuters/PoliticsNews", "reuters/scienceNews", "reuters/sportsNews", "reuters/technologyNews", "Reuters/domesticNews", "Reuters/worldNews"]
 
