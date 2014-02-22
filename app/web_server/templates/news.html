@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block style %}
+<link href="/static/css/news.css" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
@@ -18,53 +19,50 @@
     </nav>
 
     <br/>
-    <br/>
-    <br/>
+
 	<ul class="articles">
 		{% for category in categories %}
             {% set i = 0 %}
+            <li>
+                <ul id="{{category}}" class="category-wrapper">
 
-            <div id="{{category}}">
-                
-                <h2 class="categoryTitle" > {{category}} </h2>
-                <br/>
-                <br/>
-
-                {% for article in articles[category] %}
-                    {% if i < 3 %}
-                        <div class="article">
-
-                    {% else %}
-                        <div class="hiddenArticle">
-                    {% endif %}
-                    {% set i=i+1 %}
-
-                            <h3 class="titleContainer"> <a class="title" href="{{article.link}}" > {{article.title}} </a> </h3>
-
-                            {% if article.image %}
-                                <img class="img-thumbnail" src="{{article.image}}">
-                            {% endif %}
-                            </br>
-                            <p class = "description">
-                                {{article.description|safe}}
-                            </p>
-
-                            <p class="summary">
-                                {{article.summary|safe}}
-                                <a class="more" href="{{article.link}}"> ...More </a> </p>
-                            </p>
-                        </div>
-
+                    <h2 class="categoryTitle" > {{category}} </h2>
                     <br/>
-                {% endfor %}
+                    <br/>
 
-                <input type="button" class="addCategory" value="See more of {{category}} articles" onclick="showHiddenArticles('{{category}}')" >
+                    {% for article in articles[category] %}
 
-                <input type="button" class="hideCategory" value="See less of {{category}} articles" onclick="hideHiddenArticles('{{category}}')" >
-                <br/>
-                <br/>
-                <br/>
-            </div>
+                            <li {% if i < 4 %}class="article shown"{% else %}class="article more"{% endif %}>
+
+                                {% set i=i+1 %}
+
+                                <h3 class="titleContainer">
+                                    <a class="title" href="{{article.link}}">
+                                        {{article.title}}
+                                    </a>
+                                </h3>
+
+                                {% if article.image %}
+                                    <img class="img-thumbnail" src="{{article.image}}">
+                                {% endif %}
+                                </br>
+                                <p class="description">
+                                    {{article.description|safe}}
+                                </p>
+
+                                <p class="summary">
+                                    {{article.summary|safe}}
+                                    <a class="more" href="{{article.link}}"> ...More </a> </p>
+                                </p>
+                            </li>
+
+                    {% endfor %}
+
+                    <input type="button" class="addCategory" value="See more of {{category}} articles" data-category="{{category}}" />
+                    <input type="button" class="hideCategory" value="See less of {{category}} articles" data-category="{{category}}" />
+
+                </ul>
+            </li>
 
 		{% endfor %}
 	</ul>

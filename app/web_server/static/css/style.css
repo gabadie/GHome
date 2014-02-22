@@ -525,6 +525,22 @@ background: linear-gradient(#282828, #494949); /* Standard syntax (must be last)
 
 /* News */
 
+.articles, .articles ul {
+    padding: 0;
+    list-style: none;
+}
+
+.article.more {
+    display: none;
+}
+
+.article {
+    display: inline-block;
+    width: 47%;
+    margin: 1%;
+    vertical-align: top;
+}
+
 /* Nav */
 .fancyNav{
     text-align: center;

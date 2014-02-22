@@ -1,31 +1,22 @@
-function showHiddenArticles(category) {
-        var categ = document.getElementById(category);
-        var hiddenArticles = categ.getElementsByClassName("hiddenArticle");
+$(document).ready(function() {
+    $('.addCategory').click(showHiddenArticles);
+    $('.hideCategory').click(hideHiddenArticles);
+});
 
-        for(var i=0; i<hiddenArticles.length; i++)
-        {
-            hiddenArticles[i].style.display = "block";
-        }
+function showHiddenArticles() {
+    var category = $(this).data('category');
+    var $categ = $(this).closest(".category-wrapper");
+    $categ.find(".article.more").css('display', 'inline-block');
 
-        var buttonAdd = categ.getElementsByClassName("addCategory")[0];
-        buttonAdd.style.display = "none";
-
-        var buttonHide = categ.getElementsByClassName("hideCategory")[0];
-        buttonHide.style.display = "block";
+    $categ.find(".addCategory").hide();
+    $categ.find(".hideCategory").show();
 }
 
-function hideHiddenArticles(category) {
-        var categ = document.getElementById(category);
-        var hiddenArticles = categ.getElementsByClassName("hiddenArticle");
+function hideHiddenArticles() {
+    var category = $(this).data('category');
+    var $categ = $(this).closest(".category-wrapper");
+    $categ.find(".article.more").hide();
 
-        for(var i=0; i<hiddenArticles.length; i++)
-        {
-            hiddenArticles[i].style.display = "none";
-        }
-
-        var buttonAdd = categ.getElementsByClassName("addCategory")[0];
-        buttonAdd.style.display = "block";
-
-        var buttonHide= categ.getElementsByClassName("hideCategory")[0];
-        buttonHide.style.display = "none";
+    $categ.find(".addCategory").show();
+    $categ.find(".hideCategory").hide();
 }
