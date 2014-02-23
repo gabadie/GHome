@@ -107,7 +107,7 @@ class Generator:
         for idx, t in enumerate(thermometers):
             for i in xrange(5):
                 trigger = ThresholdTrigger(name="Threshold{}{}".format(idx, i),
-                    min=idx*10+i, max=2*idx*10+i+1)
+                                           min=(idx * 10 + i), max=(2 * idx * 10 + i + 1))
                 t.add_temperature_trigger(trigger)
                 t.save()
 

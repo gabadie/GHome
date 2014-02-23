@@ -302,7 +302,9 @@ var bindSensors = function() {
         apiCall('/threshold', 'POST', params, function(data) {
 
             if (data.ok) {
-                $this.closest('table').find('tr:last').before(threshold_template(data.result));
+                $this.closest('table').find('tr:last').after(threshold_template(data.result));
+
+                $this.closest('table').find('tr:last').find('.trigger-slider').slider();
             }
             else {
                 notification.error("Failed to add threshold : " + data.result);
