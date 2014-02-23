@@ -40,6 +40,35 @@ class Product(mongoengine.Document):
     def clean(self):
         self.name = self.name.encode('utf-8')
 
+    def to_dict(self):
+        d = mongoengine.Document.to_dict(self)
+
+        current_weather = get_current_weather()
+
+        def compue_rank(outfits):
+            rank = 0
+
+            for p in outfits:
+                rank += p.today_rank()
+
+            return rank
+
+
+        rank = 0
+
+        if self.top:
+            rank += compue_rank(OutfitChoice.objects(top=self))
+
+        if self.bottom:
+            rank += compue_rank(OutfitChoice.objects(bottom=self))
+
+        if self.feet:
+            rank += compue_rank(OutfitChoice.objects(feet=self))
+
+        d['rank'] = rank
+
+        return d
+
     @staticmethod
     def from_data(data):
         data['url'] = data['pageUrl']
@@ -74,9 +103,26 @@ class OutfitChoice(mongoengine.Document):
     date = mongoengine.DateTimeField(required=True, default=datetime.now)
     weekday = mongoengine.IntField(required=True)
 
+    def today_rank(self):
+        rank = 1
+
+        current_weather = get_current_weather()
+
+        rank -= 0.8 * self.weather.get_distance_to(current_weather)
+
+        return rank
+
     def clean(self):
         self.weekday = self.date.weekday()
 
+def fashion_product_rank(product):
+    rank = 0
+
+    rank += len(OutfitChoice.objects(top=product))
+    rank += len(OutfitChoice.objects(bottom=product))
+    rank += len(OutfitChoice.objects(feet=product))
+
+    return rank
 
 def fetch_fashion():
     Product.drop_collection()
