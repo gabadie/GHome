@@ -68,10 +68,6 @@ def music():
 def meteo_page():
     return render_template('meteo.html')
 
-@app.route('/calendar')
-def calendar_page():
-    return render_template('calendar.html')
-
 @app.route('/fashion')
 def fashion_page():
     return render_template('fashion.html')
@@ -84,10 +80,16 @@ def products():
 
 @app.route('/calendar')
 def calendar():
+    day_dico={0:"Monday",1:"Tuesday",2:"Wednesday",3:"Thursday",4:"Friday",5:"Saturday",6:"Sunday"}
     #  if len(sys.argv) > 1:
     #     config = GlobalConfig.from_json(sys.argv[1])
     # database = mongoengine.connect(config.mongo_db)
-    return render_template('clock.html', alarms = model.clock.Event.objects())
+
+    actuators = Actuator.objects()
+    sensor_types = Sensor.__subclasses__()
+    alarms=[{'name':ev.name,'minutes':ev.minutes, 'days':[day_dico[i] for i,day in enumerate([(ev.week_days_mask & (1 << i))!=0 for i in range(7)]) if day==True]} for ev in model.clock.Event.objects()]
+
+    return render_template('clock.html', alarms = alarms , sensor_types=sensor_types, actuators=actuators)
 
 if __name__ == "__main__":
     if len(sys.argv) > 1: 

@@ -23,6 +23,8 @@ from model.fashion import Product
 from model.house import Room
 from model.meteo import Location
 from model.meteo import Weather
+import model.clock
+import main_server.rpc_server
 
 from config import GlobalConfig
 config = GlobalConfig()
@@ -511,5 +513,114 @@ def threshold(threshold_id):
         if threshold:
             threshold.delete()
         resp = dict(ok=True, threshold_id=threshold_id)
+
+    return json.dumps(resp)
+
+
+@rest_api.route('/calendar/create', methods=['POST'])
+def create_alarm():
+    if request.method == 'POST':
+        form = request.form
+        day_dico={0:"Monday",1:"Tuesday",2:"Wednesday",3:"Thursday",4:"Friday",5:"Saturday",6:"Sunday"}
+        s_name, i_hours, i_minutes, m,tu,w,th,f,sa,su = [form.get(val) for val in ['alarm_name', 'hours', 'minutes', 'Monday','Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']]
+        print str(s_name), m,tu,w,th,f,sa,su, i_hours, i_minutes,  int(i_hours)*int(60)+int(i_minutes)
+        s_days=[m,tu,w,th,f,sa,su];
+        minutes=int(i_hours)*int(60)+int(i_minutes)
+        event = model.clock.Event(name=str(s_name), minutes=minutes)
+        for day in s_days :
+            try :
+                event.set_week_day_mask(int(day),True)
+            except TypeError :
+                print "type error"
+        event.save()
+        alarms=[{'name':ev.name,'minutes':ev.minutes, 'days':[i for i,day in enumerate([(ev.week_days_mask & (1 << i))!=0 for i in range(7)]) if day==True]} for ev in model.clock.Event.objects()]
+        print alarms[0]['days']
+    return json.dumps(alarms)
+
+
+@rest_api.route('/clockConnection', methods=['GET', 'POST'])
+def event_clock_binding():
+
+    if request.method == 'GET':
+        connections = [dump_connection(c) for c in Connection.objects]
+        resp = dict(ok=True, result=connections)
+        return json.dumps(resp)
+
+    elif request.method == 'POST':
+        s_event =  request.json['event']
+        actuator_id, callback = request.json['actuator'], request.json['callback']
+
+        clock = model.clock.Event.objects(name = s_event)
+        print s_event
+        actuator = Actuator.objects(device_id=actuator_id)
+        if len(actuator) == 0 :
+            actuator = main_server.rpc_server.RaspiUnit.objects(device_id = actuator_id)
+        if len(actuator) > 0 :
+            current_app.logger.info(actuator[0].callbacks[callback])
+        current_app.logger.info(clock[0].name)
+
+        try:
+            connection = clock[0].event.connect(actuator[0].callbacks[callback])
+        except ValueError as e:
+            resp = dict(ok=False, result=str(e))
+            return json.dumps(resp)
+
+        connection_json = dump_connection(connection)
+        connection_json['triggering_event'] = s_event
+
+        resp = dict(ok=True, result=connection_json)
+        return json.dumps(resp)
+
+
+
+
+@rest_api.route('/calendar/bind', methods = ['GET'])
+def bind_music():
+    alarm_name = request.args.get("alarm_name")
+    print alarm_name
+    clock = model.clock.Event.objects(name = alarm_name)
+    rpi = main_server.rpc_server.RaspiUnit.objects(name="rpi0")
+    print rpi[0].name
+    if len(clock) != 0:
+        try:
+            clock[0].event.connect(rpi[0].callback_rpi_music)
+        except ValueError as e:
+            resp = dict(ok=False, result=str(e))
+            return json.dumps(resp)
+    return ""
+
+
+def dump_alarm(alarm):
+    s_json = json.loads(alarm.to_json())
+    s_json['days']= [i for i,day in enumerate([(alarm.week_days_mask & (1 << i))!=0 for i in range(7)]) if day==True]
+    s_json['events'] = alarm.events.keys()
+    s_json['type'] = alarm.__class__.__name__
+
+    # TODO : find a way to render the alarm without putting this into each alarm's data
+    listObjects = list(Actuator.objects)
+    [listObjects.append(c) for c in main_server.rpc_server.RaspiUnit.objects]
+    s_json['actuators'] = [dump_actuator(actuator) for actuator in listObjects]
+    print s_json['actuators']
+    # TODO : Dirty hack to get events' name
+    connections = list()
+    for e_name, e in alarm.events.iteritems():
+        e_connections = [dump_connection(c) for c in Connection.objects(triggering_event=e)]
+
+        for c in e_connections:
+            c['triggering_event'] = e_name
+
+        connections.extend(e_connections)
+
+    s_json['connections'] = connections
+
+
+    return s_json
+
+
+@rest_api.route('/alarms', methods=['POST', 'GET'])
+def all_alarms():
+    if request.method == 'GET':
+        result = [dump_alarm(alarm) for alarm in model.clock.Event.objects]
+        resp = dict(ok=True, result=result)
 
     return json.dumps(resp)

@@ -7,6 +7,7 @@ from twisted.web import xmlrpc
 import xmlrpclib
 import requests
 import json
+import mongoengine
 #from SimpleXMLRPCServer import SimpleXMLRPCServer
 #from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
 
@@ -18,29 +19,59 @@ config = GlobalConfig()
 
 from py8tracks import API8tracks
 import logger
+import model.event
 from model import devices
 
 
-class RaspiUnit(object):
-    def __init__(self):
-        self.ip="127.0.0.1"
-        self.macAddress=""
-        self.port = 7080
+class RaspiUnit(model.devices.Actuator):
+    name = mongoengine.StringField(default = "rpi")
+    ip=mongoengine.StringField(default = "127.0.0.1")
+    macAddress= mongoengine.StringField(default = "")
+    port = mongoengine.IntField(default = 7080)  
+
+
+    def callback_rpi_music(self,server):
+        id=0;
+        tags=["happy"]
+        api=API8tracks(config.api_8tracks)
+        tags_low=[tag.lower() for tag in tags]
+        print tags_low
+        mixset = api.mixset(tags=tags_low, sort='popular')
+        urls=search_music_generator(mixset)
+        if len(urls) >0 :
+            print "http://{}:{}".format(self.ip,self.port)
+            server = xmlrpclib.Server("http://{}:{}".format(self.ip,self.port))
+            server.init_play_music(json.dumps(urls),tags)
+            print urls
+            return urls[0]['name'], urls[0]['img_url']
+        else :
+            print "no url found", "Err"
+            return "no url found", "Err"
+
 
 class Raspi(xmlrpc.XMLRPC):
     def __init__(self):
         self.rpi= list()
 
-
     ##############Functions added to communicate with the raspi
     #TODO to be completed/modified
     def xmlrpc_add_raspi(self,ip,port,macAddress):
         print "Adding raspi ip: " + str(ip) + "port: "+ str(port) + "Mac Address: " + macAddress
-        self.rpi.append(RaspiUnit())
-        id=len(self.rpi)-1
+        id=len(self.rpi)
+        self.rpi.append(RaspiUnit(name="rpi"+str(len(self.rpi))))
+        self.device_id = 1000 + id
         self.rpi[id].ip=ip
         self.rpi[id].port=int(port)
         self.rpi[id].macAddress=macAddress
+        if len(RaspiUnit.objects(name=str(self.rpi[id].name))) == 0 :
+            RaspiUnit.objects.create(name=str(self.rpi[id].name), ip=ip, port=port, macAddress=macAddress, device_id = 1000 + id)
+        else : 
+            raspiU = RaspiUnit.objects(name=str(self.rpi[id].name))[0]
+            raspiU.device_id = 1000 + id
+            raspiU.ip=ip
+            raspiU.port=port
+            raspiU.macAddress=macAddress
+            raspiU.save()
         return id
 
 

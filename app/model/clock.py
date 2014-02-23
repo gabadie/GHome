@@ -16,7 +16,7 @@ import event
 #
 
 class Event(event.Eventable):
-    name = mongoengine.StringField(required=True)
+    name = mongoengine.StringField(required=True, unique=True)
     event = event.slot()
     minutes = mongoengine.IntField(default=0, required=True)
     week_days_mask = mongoengine.IntField(default=0, required=True)

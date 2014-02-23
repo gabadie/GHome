@@ -498,7 +498,6 @@ background: linear-gradient(#282828, #494949); /* Standard syntax (must be last)
 }
 
     
-}
 
 .input_time
 {
@@ -509,10 +508,7 @@ background: linear-gradient(#282828, #494949); /* Standard syntax (must be last)
     color: #FFFFFF;
     font-size : 700%;
     font-weight: bold;
-    background: -webkit-radial-gradient(ellipse, #07AAFC , #3632FF ); /* Safari */
-    background: -o-radial-gradient(ellipse, #07AAFC , #3632FF ); /* For Opera 11.1 to 12.0 */
-    background: -moz-radial-gradient(ellipse, #07AAFC , #3632FF ); /* For Firefox 3.6 to 15 */
-    background: radial-gradient(ellipse, #07AAFC , #3632FF ); /* Standard syntax (must be last) */
+    background-color: #425EB3
 }
 
 input : invalid
@@ -535,12 +531,44 @@ background: radial-gradient(ellipse, #07AAFC , #3632FF ); /* Standard syntax (mu
 }
 
 
-.alarm_header
+
+.hours_minutes_sep{
+    font-size: 800%;
+    color: white;
+}
+
+
+.select_alarm_area
 {
-    background-color: blue;
+    background: white;
+    height: 80%;
+    width: 80%;
+    margin: 0 0 0 15%;
+    border-radius: 15px;
+    border-color: #FFFFFF;
+    border-style:solid;
+    border-width: 1px;
+    overflow: auto;
+
+}
+
+.alarm_validator_div
+{
+    margin: 10 0 0 0;
+    /*display: none;*/
+}
+
+.arrow_button
+{
+    background: transparent;
+    border:none;
+}
+
+.alarm .heading
+{
+    background-color: #425EB3;
     box-shadow: 0 0 80px rgba(0, 0, 0, 0.2);
     padding: 10px;
-    border-radius: 5px;
     color: #FFF;
     border-bottom: none;
 
@@ -551,9 +579,51 @@ background: radial-gradient(ellipse, #07AAFC , #3632FF ); /* Standard syntax (mu
             transition: all 0.5s ease-out;
 }
 
-.hours_minutes_sep{
-    font-size: 800%;
-    color: white;
-}
-=======
+.alarm_header .panel {
+        margin:5px 0;
+        background : transparent;
+        display:none;
+    }   
 
+.alarm_set
+{
+    list-style: none;
+    width: 100%;
+    margin: 10 0 10 0;
+    overflow: auto;
+    padding-left : 0;
+
+}
+
+.alarm
+{
+    list-style: none;
+    margin: 5 0 5 0;
+    padding-left : 0;
+    to
+}
+
+
+.li :before
+{
+
+}
+
+.checkbox_block
+{
+    display: inline;
+}
+
+.Alarm_Interface
+{
+    background-color: #FFFFFF
+}
+
+.iconic
+{
+    width: 10%;
+}
+
+.alarm .details {
+    display: none;
+}
