@@ -40,6 +40,24 @@ class Product(mongoengine.Document):
     def clean(self):
         self.name = self.name.encode('utf-8')
 
+    def to_dict(self):
+        d = mongoengine.Document.to_dict(self)
+
+        rank = 0
+
+        if self.top:
+            rank += len(OutfitChoice.objects(top=self))
+
+        if self.bottom:
+            rank += len(OutfitChoice.objects(bottom=self))
+
+        if self.feet:
+            rank += len(OutfitChoice.objects(feet=self))
+
+        d['rank'] = rank
+
+        return d
+
     @staticmethod
     def from_data(data):
         data['url'] = data['pageUrl']
@@ -77,6 +95,14 @@ class OutfitChoice(mongoengine.Document):
     def clean(self):
         self.weekday = self.date.weekday()
 
+def fashion_product_rank(product):
+    rank = 0
+
+    rank += len(OutfitChoice.objects(top=product))
+    rank += len(OutfitChoice.objects(bottom=product))
+    rank += len(OutfitChoice.objects(feet=product))
+
+    return rank
 
 def fetch_fashion():
     Product.drop_collection()

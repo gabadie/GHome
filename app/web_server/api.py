@@ -20,7 +20,7 @@ from enocean.devices import Sensor, Actuator, Lamp, Thermometer
 from model.trigger import ThresholdTrigger
 from model.event import Connection
 from model.devices import NumericReading
-from model.fashion import Product, OutfitChoice
+from model.fashion import Product, OutfitChoice, fashion_product_rank
 from model.house import Room
 from model.meteo import Location
 from model.meteo import Weather
@@ -410,12 +410,32 @@ def previousMusic():
 
 @rest_api.route('/product/')
 def products_search():
-    top = [p.to_dict() for p in Product.objects(top=True)]
-    bottom = [p.to_dict() for p in Product.objects(bottom=True)]
-    feet = [p.to_dict() for p in Product.objects(feet=True)]
+    fashion_product_rank
+
+    def fashion_sort_by_rank(objects):
+        l = [p.to_dict() for p in objects]
+        l = sorted(l, key=lambda p: p['rank'], reverse=True)
+
+        return l
+
+    top = fashion_sort_by_rank(Product.objects(top=True))
+    bottom = fashion_sort_by_rank(Product.objects(bottom=True))
+    feet = fashion_sort_by_rank(Product.objects(feet=True))
 
     result = dict(ok=True, result=dict(top=top, bottom=bottom, feet=feet))
     return json.dumps(result)
+
+# Threslhold
+@rest_api.route('/outfit', methods=['POST'])
+def new_outfit():
+    outfit = OutfitChoice()
+
+    outfit.top = Product.objects(id=request.json['top']).first()
+    outfit.bottom = Product.objects(id=request.json['bottom']).first()
+    outfit.feet = Product.objects(id=request.json['feet']).first()
+    outfit.save()
+
+    return json.dumps(dict(ok=True))
 
 @rest_api.route('/meteo/getloc', methods=['POST','GET'])
 def get_location():
@@ -587,18 +607,6 @@ def device_types(device_type):
     resp = dict(ok=True, types=device_types)
 
     return json.dumps(resp)
-
-# Threslhold
-@rest_api.route('/outfit', methods=['POST'])
-def new_outfit():
-    outfit = OutfitChoice()
-
-    outfit.top = Product.objects(id=request.json['top']).first()
-    outfit.bottom = Product.objects(id=request.json['bottom']).first()
-    outfit.feet = Product.objects(id=request.json['feet']).first()
-    outfit.save()
-
-    return json.dumps(dict(ok=True))
 
 @rest_api.route('/calendar/create', methods=['POST'])
 def create_alarm():
