@@ -35,7 +35,7 @@ def index():
 
 @app.route('/setup')
 def setup():
-    actuators = Actuator.objects()
+    actuators = Actuator.objects() 
     sensor_types = Sensor.__subclasses__()
 
     return render_template('setup.html', sensor_types=sensor_types, actuators=actuators)
@@ -47,8 +47,10 @@ def monitoring():
 
 @app.route('/news')
 def news():
-    articles = Article_base.objects()
-    return render_template('news.html', articles = articles)
+    articles = {}
+    for category in reuters.category_list:
+        articles[category] = reuters.Article.objects(category=category)[:15]
+    return render_template('news.html', categories = reuters.category_list, articles = articles)
 
 
 @app.route('/house')

@@ -1,10 +1,10 @@
 $(document).ready(function() {
 
     var displayCurWeather = function() {
-		$('#curweather').html("<h4>");
-		$('#icweather').html("");
-
 		$.getJSON('/meteo/getloc', function(data) {
+			$('#curweather').html("<h4>");
+			$('#icweather').html("");
+
     		$('#curweather').append(data.time + "</br>");
 
 			if (data.loc) {
@@ -19,9 +19,10 @@ $(document).ready(function() {
 		    		}
 			    });
 			}
+			
+	    	$('#curweather').append("</h4>");
 		});
 
-	    $('#curweather').append("</h4>");
     }
 
     var displayBusy = function(element, enable) {

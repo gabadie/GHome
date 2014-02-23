@@ -107,7 +107,7 @@ class Generator:
         for idx, t in enumerate(thermometers):
             for i in xrange(5):
                 trigger = ThresholdTrigger(name="Threshold{}{}".format(idx, i),
-                    min=idx*10+i, max=2*idx*10+i+1)
+                                           min=(idx * 10 + i), max=(2 * idx * 10 + i + 1))
                 t.add_temperature_trigger(trigger)
                 t.save()
 
@@ -177,8 +177,14 @@ class Generator:
         return self.id
 
 if __name__ == '__main__':
-    g = Generator(GlobalConfig())
+    configuration = GlobalConfig()
+
+
+    if len(sys.argv) > 1 and sys.argv[1] != 'fashion':
+        configuration = GlobalConfig.from_json(sys.argv[1])
+    g = Generator(configuration)
     g.generate_sample()
+
 
     if 'fashion' in sys.argv:
         fetch_fashion()

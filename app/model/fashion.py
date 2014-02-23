@@ -7,13 +7,13 @@ from datetime import datetime
 import mongoengine
 
 from shopsense.shopstyle import ShopStyle
-from config import GlobalConfig
 from meteo import Weather, get_current_weather
-config = GlobalConfig()
 
-shopstyle = ShopStyle(config.api_shopsense)
+from config import GlobalConfig
 
-top_categories = ['shirt', 'dress', 'jacket', 't-shirt', 'pull']
+shopstyle = ShopStyle(GlobalConfig().api_shopsense)
+
+top_categories = ['shirt', 'jacket', 't-shirt', 'pullover']
 bottom_categories = ['jeans', 'pants', 'trouser', 'skirt', 'shorts']
 feet_categories = ['shoe', 'shoes', 'heels', 'sandal', 'mocassin']
 
@@ -83,24 +83,22 @@ def fetch_fashion():
 
     # Adding products
     for query in top_categories:
+        query = 'men ' + query
         for p in Product.search(query):
             p.top = True
             p = p.save()
             print 'Added "{}"'.format(p.name)
 
     for query in bottom_categories:
+        query = 'men ' + query
         for p in Product.search(query):
             p.bottom = True
             p = p.save()
             print 'Added "{}"'.format(p.name)
 
     for query in feet_categories:
+        query = 'men ' + query
         for p in Product.search(query):
             p.feet = True
             p = p.save()
             print 'Added "{}"'.format(p.name)
-
-
-if __name__ == '__main__':
-    mongoengine.connect(config.mongo_db)
-    fetch_fashion()

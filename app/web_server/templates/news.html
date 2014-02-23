@@ -1,14 +1,69 @@
 {% extends "base.html" %}
 
+{% block style %}
+<link href="/static/css/news.css" rel="stylesheet">
+{% endblock %}
+
 {% block body %}
 <div class="container">
 	{% include "header.html" %}
 
-	<ul class="list">
-		{% for article in articles %}
-            <h2> {{article.title}} </h2>
-			{{article.description}}
-			
+    <nav class="categories">
+
+        <div class="btn-group">
+        {% for category in categories %}
+          <a href="#{{category}}" class="{{category}}Icon"><button type="button" class="btn btn-default">{{category}}</button></a>
+        {% endfor %}
+        </div>
+
+    </nav>
+
+    <br/>
+
+	<ul class="articles">
+		{% for category in categories %}
+            {% set i = 0 %}
+            <li>
+                <ul id="{{category}}" class="category-wrapper">
+
+                    <h2 class="categoryTitle" > {{category}} </h2>
+                    <br/>
+                    <br/>
+
+                    {% for article in articles[category] %}
+
+                            <li {% if i < 4 %}class="article shown"{% else %}class="article more"{% endif %}>
+
+                                {% set i=i+1 %}
+
+                                <h3 class="titleContainer">
+                                    <a class="title" href="{{article.link}}">
+                                        {{article.title}}
+                                    </a>
+                                </h3>
+
+                                {% if article.image %}
+                                    <img class="img-thumbnail" src="{{article.image}}">
+                                {% endif %}
+                                </br>
+                                <p class="description">
+                                    {{article.description|safe}}
+                                </p>
+
+                                <p class="summary">
+                                    {{article.summary|safe}}
+                                    <a class="more" href="{{article.link}}"> ...More </a> </p>
+                                </p>
+                            </li>
+
+                    {% endfor %}
+
+                    <input type="button" class="addCategory form-control" value="See more of {{category}} articles" data-category="{{category}}" />
+                    <input type="button" class="hideCategory form-control" value="See less of {{category}} articles" data-category="{{category}}" />
+
+                </ul>
+            </li>
+
 		{% endfor %}
 	</ul>
 
@@ -16,6 +71,11 @@
 </div>
 {% endblock body %}
 
+
 {% block javascript %}
 
-{% endblock %}
+<script type="text/javascript" src="static/js/news.js"></script>
+{% endblock javascript %}
+
+
+
