@@ -54,6 +54,9 @@ table {
     background-color: #c0392b;
 }
 
+.home-title {
+    margin: 0;
+}
 
 .container {
 	width: 100%;
@@ -445,7 +448,6 @@ input.sensor-toggle {
 
 .fashion-products .img-wrapper {
     max-height: 350px;
-    max-width:300px;
     display: block;
     overflow: hidden;
 }
@@ -458,8 +460,9 @@ input.sensor-toggle {
     height: 100%;
 }
 
-.fashion-products .name {
-    font-size: 25px;
+.fashion-products .name {
+    font-size: 20px;
+    letter-spacing: -1px;
     font-weight: bold;
 }
 

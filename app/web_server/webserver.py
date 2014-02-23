@@ -22,6 +22,7 @@ news_api = reuters.APIReuters()
 ## Initializing the app
 app = Flask(__name__)
 app.debug = True
+user = "Adrien"
 
 # Binding the API calls
 from api import rest_api
@@ -30,11 +31,11 @@ app.register_blueprint(rest_api)
 ## Main pages
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', user=user)
 
 @app.route('/setup')
 def setup():
-    actuators = Actuator.objects() 
+    actuators = Actuator.objects()
     sensor_types = Sensor.__subclasses__()
 
     return render_template('setup.html', sensor_types=sensor_types, actuators=actuators)
@@ -48,7 +49,7 @@ def monitoring():
 def news():
     articles = {}
     for category in reuters.category_list:
-        articles[category] = reuters.Article.objects(category=category)[:15]
+        articles[category] = reuters.Article.objects(category=category)[:10]
     return render_template('news.html', categories = reuters.category_list, articles = articles)
 
 
@@ -58,7 +59,6 @@ def house():
 
 @app.route('/music')
 def music():
-    user="Adrien"
     combo_options = ["jazz", "rock", "rap", "happy", "sad", "tired"] #TODO this in the config file ?
     size_tags = int(round(len(combo_options)/2))
     left_tags = [i for i in combo_options[:size_tags]]
