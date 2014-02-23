@@ -8,11 +8,16 @@
 <div class='container with-3d-shadow with-transitions'>
     {% include "header.html" %}
 
+
+    <h2>Monitoring</h2>
+
     <select class="form-control" id="reading-type">
         {% for reading_cls in reading_classes %}
         <option value="{{reading_cls.__name__}}"> {{reading_cls.__name__}} </option>
         {% endfor %}
     </select>
+
+    <br/>
     <svg id="values-chart"></svg>
 
 </div>
