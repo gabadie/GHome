@@ -534,33 +534,32 @@ background: linear-gradient(#282828, #494949); /* Standard syntax (must be last)
     color: white;
 }
 
-.slider
-{
+.slider {
   width: 100% !important;
 }
 
 
-.input_time
-{
-    height: 25%;
+.input_time {
     width: 70%;
-    border-radius: 25px;
+    border-radius: 10px;
     text-align: center;
     color: #FFFFFF;
-    font-size : 700%;
+    font-size: 740%;
+    text-shadow: 0px 4px 0 rgba(0, 0, 0, 0.38);
     font-weight: bold;
-    background-color: #425EB3
+    font-family: "Ubuntu Mono", monospace;
+    background-color: #2E51BC;
+    border: 0;
+    outline: 0;
 }
 
-input : invalid
-{
-
+input : invalid {
     color: #EEEEEE;
     background: #24F278;
 }
 
 
-/* Calendar */ 
+/* Calendar */
 .gradCalendar
 {
 height:100%;
@@ -575,7 +574,12 @@ background: radial-gradient(ellipse, #07AAFC , #3632FF ); /* Standard syntax (mu
 
 .hours_minutes_sep{
     font-size: 800%;
-    color: blue;
+    font-family: "Ubuntu Mono", monospace;
+    color: #2E51BC;
+    line-height: 334%;
+    text-align: center;
+    width: 3%;
+    padding: 0;
 }
 
 
@@ -624,7 +628,7 @@ background: radial-gradient(ellipse, #07AAFC , #3632FF ); /* Standard syntax (mu
         margin:5px 0;
         background : transparent;
         display:none;
-    }   
+    }
 
 .alarm_set
 {
@@ -657,7 +661,7 @@ background: radial-gradient(ellipse, #07AAFC , #3632FF ); /* Standard syntax (mu
 
 .Alarm_Interface
 {
-    background-color: #FFFFFF
+    background-color: #FFFFFF;
 }
 
 .iconic
