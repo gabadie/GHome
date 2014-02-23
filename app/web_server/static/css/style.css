@@ -583,22 +583,16 @@ background: radial-gradient(ellipse, #07AAFC , #3632FF ); /* Standard syntax (mu
 }
 
 
-.select_alarm_area
-{
-    background: white;
+.select_alarm_area {
     height: 80%;
     width: 80%;
     margin: 0 0 0 15%;
-    border-radius: 15px;
-    border-color: #FFFFFF;
-    border-style:solid;
-    border-width: 1px;
     overflow: auto;
-
 }
 
 .alarm_validator_div
 {
+    width: 150%;
     margin: 10 0 0 0;
     /*display: none;*/
 }
@@ -659,9 +653,9 @@ background: radial-gradient(ellipse, #07AAFC , #3632FF ); /* Standard syntax (mu
     display: inline;
 }
 
-.Alarm_Interface
-{
-    background-color: #FFFFFF;
+.Alarm_Interface {
+    height: 100%;
+    background: url('../img/blurred.jpg');
     overflow: hidden;
 }
 
