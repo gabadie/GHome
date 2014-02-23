@@ -699,6 +699,19 @@ def dump_alarm(alarm):
 
     return s_json
 
+@rest_api.route('/alarm/<device_name>', methods=['DELETE'])
+def alarm(device_name):
+    device_name = str(device_name)
+    if request.method == 'DELETE':
+        print "<<<<>>>>> " + device_name
+        clockEvent = model.clock.Event.objects(name=device_name).first()
+        print clockEvent
+        if clockEvent:
+            clockEvent.delete()
+        resp = dict(ok=True, device_name=device_name)
+
+    return json.dumps(resp)
+
 
 @rest_api.route('/alarms', methods=['POST', 'GET'])
 def all_alarms():

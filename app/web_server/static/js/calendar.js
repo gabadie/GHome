@@ -61,107 +61,24 @@ $(document).ready(function() {
 
   })
 
-  // $('#day_up').on('click', function(data){
-  //   switch ( $('#day').val()) {
-  //      case 'm':
-  //       $('#day').attr2('value','tu');
-  //      break;
-  //      case 'tu':
-  //       $('#day').attr2('value','w');
-  //      break;
-  //      case 'w':
-  //       $('#day').attr2('value','th');
-  //      break;
-  //      case 'th':
-  //       $('#day').attr2('value','f');
-  //      break;
-  //      case 'f':
-  //       $('#day').attr2('value','sa');
-  //      break;
-  //      case 'sa':
-  //       $('#day').attr2('value','su');
-  //      break;
-  //      case 'su':
-  //       $('#day').attr2('value','m');
-  //      break;
-  //      default: 
-  //       $('#day').attr2('value','m');
-  //      break;
-  // }
-  // });
-
-  // $('#day_down').on('click', function(data){
-  //   switch ( $('#day').val()) {
-  //      case 'm':
-  //       $('#day').attr2('value','su');
-  //      break;
-  //      case 'su':
-  //       $('#day').attr2('value','sa');
-  //      break;
-  //      case 'sa':
-  //       $('#day').attr2('value','f');
-  //      break;
-  //      case 'f':
-  //       $('#day').attr2('value','th');
-  //      break;
-  //      case 'th':
-  //       $('#day').attr2('value','w');
-  //      break;
-  //      case 'w':
-  //       $('#day').attr2('value','tu');
-  //      break;
-  //      case 'tu':
-  //       $('#day').attr2('value','m');
-  //      break;
-  //      default: 
-  //       $('#day').attr2('value','m');
-  //      break;
-  // }
-  // });
-
-
     $('#clock_form').ajaxForm({
         url: '/calendar/create', type: 'post',dataType:  'json',
         success : function(data){
-          // var new_html="";
-          // var alarms =JSON.stringify(data);
-          // alert(dico_days[data[0]['days'][0]])
-          // for (var i = data.length - 1; i >= 0; i--) {
-          //   new_html += "<li class=\"alarm\"  > <div class=\"alarm_header\" alarm_name=\""+data[i]['name']+"\""+
-          //   " alarm_minutes="+data[i]['minutes']+"\" > "+data[i]['name']+" : "+Math.floor(data[i]['minutes']/60)+":"+data[i]['minutes']%60
-          //   +"<div class=\"panel\"> <ul > <li>";
-          //   for (var j = 0; j<data[i]['days'].length; j++){
-          //     new_html+= dico_days[data[i]['days'][j]] +"  "
-          //   }
-
-          //   new_html+= "</li></ul></div></div\></li>";
-          // };
-          // document.getElementById("ul_alarms").innerHTML=new_html;
           updateAlarms();
           }
         } );
 
-//   $('#ul_alarms').on('click','li',function () {
-
-//     var text = $(this).children('div.heading').children('div.details');
-//     $('.details').attr('style','display:none');
-//     if (text.is(':hidden')) {
-//       text.slideDown('200');  
-//     } else {
-//       text.slideUp('200'); 
-//     }
-// });
 
 })
 
 var dico_days = new Array();
-  dico_days[0] = "Monday";
-  dico_days[1] = "tuesday"; 
-  dico_days[2] = "wednesday";
-  dico_days[3] = "thursday"; 
-  dico_days[4] = "friday";
-  dico_days[5] = "saturday"; 
-  dico_days[6] = "sunday"; 
+  dico_days[0] = "Mon";
+  dico_days[1] = "tue"; 
+  dico_days[2] = "wed";
+  dico_days[3] = "thu"; 
+  dico_days[4] = "fri";
+  dico_days[5] = "sat"; 
+  dico_days[6] = "sun"; 
 
 
 var updateAlarms = function() {
@@ -186,7 +103,20 @@ var bindAlarms = function() {
       $('#minutes').attr2('value',$(this).attr("alarm_minutes")%60);
     }); 
 
+    // Deleting a sensor
+    $('.select_alarm_area').on('click', '.heading .delete', function(e) {
+        $this = $(this).closest('li');
+        var alarm_name = $this.attr('alarm_name');
 
+        apiCall('/alarm/' + alarm_name, 'DELETE', {}, function(data) {
+            $this.hide(200, function() {
+                $this.remove();
+            });
+        });
+
+        // Avoid triggering an event on the parent li
+        e.stopPropagation();
+    });
 
     // Deleting an event binding
     $('.select_alarm_area').on('click', '.event-connection .delete', function(e) {

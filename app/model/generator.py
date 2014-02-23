@@ -14,6 +14,7 @@ import model.devices
 from model.trigger import ThresholdTrigger
 from model.house import Room
 from model.meteo import Location
+from model.clock import Event
 from config import GlobalConfig
 from main_server.rpc_server import RpcServer
 from fashion import fetch_fashion
@@ -94,6 +95,13 @@ class Generator:
             value = value + round(random.random()*max_step_evolution, 2)
             time += td
 
+    def generate_alarm(self,name,hours,minutes,days): #days : [1,2,5] for days 1, 2 and 5
+        Event.objects.create(name=name, minutes=hours*60+minutes)
+        obj = Event.objects(name=name)[0]
+        for day in days :
+            obj.set_week_day_mask(day,True)
+        obj.save()
+
     def generate_sample(self):
         #Thermometer
         thermometers = self.generate_devices(enocean.devices.Thermometer, 3)
@@ -164,7 +172,10 @@ class Generator:
         #Setting current location
         self.generate_location(name="Villeurbanne, France", lat=45.771944, lon=4.8901709)
 
-
+        #generate alarms
+        self.generate_alarm("Work", 6,42,[0,1,2,3,4])
+        self.generate_alarm("Music lesson", 17,29,[4])
+        self.generate_alarm("GHome presentation", 8,10,[2])
 
     def generate_rooms(self):
         Room(x=-2.5, y=-2.5, width=5, height=5).save()

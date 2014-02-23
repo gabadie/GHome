@@ -824,3 +824,8 @@ nav.categories button {
 .articles .description br, .articles .description img, .articles .feedflare {
     display: none;
 }
+
+.weekdays li
+{
+    list-style: none;
+}
