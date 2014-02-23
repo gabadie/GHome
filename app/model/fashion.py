@@ -49,8 +49,7 @@ class Product(mongoengine.Document):
             rank = 0
 
             for p in outfits:
-                rank += 1
-                rank -= 0.8 * p.weather.get_distance_to(current_weather)
+                rank += p.today_rank()
 
             return rank
 
@@ -103,6 +102,15 @@ class OutfitChoice(mongoengine.Document):
     weather = mongoengine.ReferenceField(Weather, default=get_current_weather)
     date = mongoengine.DateTimeField(required=True, default=datetime.now)
     weekday = mongoengine.IntField(required=True)
+
+    def today_rank(self):
+        rank = 1
+
+        current_weather = get_current_weather()
+
+        rank -= 0.8 * self.weather.get_distance_to(current_weather)
+
+        return rank
 
     def clean(self):
         self.weekday = self.date.weekday()
