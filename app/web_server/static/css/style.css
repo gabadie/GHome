@@ -662,11 +662,35 @@ background: radial-gradient(ellipse, #07AAFC , #3632FF ); /* Standard syntax (mu
 .Alarm_Interface
 {
     background-color: #FFFFFF;
+    overflow: hidden;
+}
+
+.day-choice {
+    font-size: 25px;
+    text-align: left;
+    margin: 90px 40px;
+    letter-spacing: -1;
+}
+
+#alarm_creator {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 10px;
 }
 
 .iconic
 {
     width: 10%;
+}
+.alarm .name {
+    font-weight: bold;
+}
+.alarm .time {
+    font-style: italic;
+}
+
+.alarm .glyphicon {
+    float: right;
 }
 
 .alarm .details {
@@ -832,7 +856,10 @@ nav.categories button {
     display: none;
 }
 
-.weekdays li
-{
-    list-style: none;
+.weekdays {
+    opacity: 0.6;
+}
+
+.weekdays .value{
+    font-weight: bold;
 }

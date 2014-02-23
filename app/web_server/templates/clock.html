@@ -69,33 +69,24 @@
 		 		</div>
 
 		 		<div id = "days_setter" class="col-md-2"style="text-align:center;">
-		 			<div class="row">
-				 		 <!--<button  type="button" class="arrow_button" id="day_up" ><img src="../static/img/clock_up_arrow.png" / ></button>-->
-				 	</div>
-				 	<div class="row" style="margin:70% 0 0 0">
-				 	</div>
-				 	<div class="row" >
+				 	<div class="row day-choice">
+				 		<p id="alarm_creator">Create an alarm </p>
+
+
 				 		<!--<input id="day" name="day" type="text" class="input_time" value="L">-->
-			 		 		<p style="text-align:left;margin:0 0 0 50;">
-			 		 			<input type="checkbox" name="Monday" value="0"> Monday<br>
-			 		 			<input type="checkbox" name="Tuesday" value="1"> Tuesday<br>
-							 	<input type="checkbox" name="Wednesday" value="2"> Wednesday<br>
-							 	<input type="checkbox" name="Thursday" value="3"> Thursday<br>
-							 	<input type="checkbox" name="Friday" value="4"> Friday<br>
-							 	<input type="checkbox" name="Saturday" value="5"> Saturday<br>
-							 	<input type="checkbox" name="Sunday" value="6"> Sunday<br>
-							</p>
-				 	</div>
-				 	<div class="row">
-				 		<!-- <button  type="button" id="day_down" class="arrow_button"><img src="../static/img/clock_down_arrow.png"/ ></button>-->
-				 	</div>
-				 	<div class="row" style="text-align:center;margin:20% 0 0 0">
-				 		<div>
-				 			<text id="alarm_creator"> Create the alarm </text>
-			 		 	</div>
+			 		 	<input type="checkbox" name="Monday" value="0"> Monday<br>
+			 		 	<input type="checkbox" name="Tuesday" value="1"> Tuesday<br>
+						<input type="checkbox" name="Wednesday" value="2"> Wednesday<br>
+						<input type="checkbox" name="Thursday" value="3"> Thursday<br>
+						<input type="checkbox" name="Friday" value="4"> Friday<br>
+						<input type="checkbox" name="Saturday" value="5"> Saturday<br>
+						<input type="checkbox" name="Sunday" value="6"> Sunday<br>
+
 			 		 	<div class="alarm_validator_div" id="id_alarm_validator_div">
-				 			<input id="alarm_name" name="alarm_name" type="text" ></text> <button id="button_alarm_validator" type="submit" class="alarm_validator"> OK </button>
+				 			<input class="form-control" id="alarm_name" name="alarm_name" type="text" placeholder="Alarm's name" ></text>
+				 			<button id="button_alarm_validator" type="submit" class="alarm_validator form-control"> OK </button>
 			 		 	</div>
+
 				 	</div>
 		 		</div>
 	 		</form>
@@ -137,7 +128,7 @@
 
 	<li class="alarm" data-alarm-id="{{device_id}}" alarm_name="{{name}}" alarm_minutes="{{minutes}}" alarm_day="{{week_days_mask}}">
 		<div class="heading" alarm_name="{{name}}" alarm_minutes="{{minutes}}" alarm_day="{{week_days_mask}}">
-			<span class="device_id">{{device_id}}</span> <span class="name">{{name}}</span>: <span > {{hours_real minutes}} </span>
+			<span class="device_id">{{device_id}}</span> <span class="name">{{name}}</span> - <span class="time"> {{hours_real minutes}} </span>
 
 			<span class="delete glyphicon glyphicon-remove"></span>
 		</div>
@@ -145,16 +136,14 @@
 
 		<div class="details">
 			<ul class="list-group infos">
+
+			<li class="list-group-item">
 			{{#if days}}
-				<ul class="weekdays">
- 					<li>
- 						Effective days : {{day_str days}}
-					</li>
-				</ul>
+				<p class="weekdays">
+ 						Effective days : <span class="value">{{day_str days}}</span>
+				</p>
 			{{/if}}
                 {{#if events}}
-
-					<li class="list-group-item">
 						{{! List of existing event bindings}}
 						<h4>Events' bindings</h4>
 
@@ -206,10 +195,11 @@
 					      </tbody>
 					    </table>
 
-					</li>
-
 				{{/if}}
 				{{!--End of events handling--}}
+
+				</li>
+
 
 
 			</ul>
