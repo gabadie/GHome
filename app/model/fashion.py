@@ -43,16 +43,28 @@ class Product(mongoengine.Document):
     def to_dict(self):
         d = mongoengine.Document.to_dict(self)
 
+        current_weather = get_current_weather()
+
+        def compue_rank(outfits):
+            rank = 0
+
+            for p in outfits:
+                rank += 1
+                rank -= 0.8 * p.weather.get_distance_to(current_weather)
+
+            return rank
+
+
         rank = 0
 
         if self.top:
-            rank += len(OutfitChoice.objects(top=self))
+            rank += compue_rank(OutfitChoice.objects(top=self))
 
         if self.bottom:
-            rank += len(OutfitChoice.objects(bottom=self))
+            rank += compue_rank(OutfitChoice.objects(bottom=self))
 
         if self.feet:
-            rank += len(OutfitChoice.objects(feet=self))
+            rank += compue_rank(OutfitChoice.objects(feet=self))
 
         d['rank'] = rank
 
