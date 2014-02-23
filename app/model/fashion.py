@@ -13,7 +13,7 @@ from config import GlobalConfig
 
 shopstyle = ShopStyle(GlobalConfig().api_shopsense)
 
-top_categories = ['shirt', 'dress', 'jacket', 't-shirt', 'pullover']
+top_categories = ['shirt', 'jacket', 't-shirt', 'pullover']
 bottom_categories = ['jeans', 'pants', 'trouser', 'skirt', 'shorts']
 feet_categories = ['shoe', 'shoes', 'heels', 'sandal', 'mocassin']
 
@@ -83,18 +83,21 @@ def fetch_fashion():
 
     # Adding products
     for query in top_categories:
+        query = 'men ' + query
         for p in Product.search(query):
             p.top = True
             p = p.save()
             print 'Added "{}"'.format(p.name)
 
     for query in bottom_categories:
+        query = 'men ' + query
         for p in Product.search(query):
             p.bottom = True
             p = p.save()
             print 'Added "{}"'.format(p.name)
 
     for query in feet_categories:
+        query = 'men ' + query
         for p in Product.search(query):
             p.feet = True
             p = p.save()
