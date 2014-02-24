@@ -40,9 +40,8 @@ class Product(mongoengine.Document):
     def clean(self):
         self.name = self.name.encode('utf-8')
 
-    def to_dict(self):
-        d = mongoengine.Document.to_dict(self)
-
+    @property
+    def rank(self):
         current_weather = get_last_weather()
 
         def compue_rank(outfits):
@@ -52,7 +51,6 @@ class Product(mongoengine.Document):
                 rank += p.today_rank()
 
             return rank
-
 
         rank = 0
 
@@ -65,7 +63,11 @@ class Product(mongoengine.Document):
         if self.feet:
             rank += compue_rank(OutfitChoice.objects(feet=self))
 
-        d['rank'] = rank
+        return rank
+
+    def to_dict(self):
+        d = mongoengine.Document.to_dict(self)
+        d['rank'] = self.rank
 
         return d
 
