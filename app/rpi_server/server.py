@@ -54,6 +54,13 @@ class RpiServer(xmlrpc.XMLRPC):
         self.macAddress=str(get_mac())
         self.music_player=MusicPlayer()
 
+    def xmlrpc_music_playing(self) : 
+        if len(self.music_player.musics)>0:
+            return json.dumps({  'ok' : True, 'result' :  self.music_player.musics[self.music_player.current_music] })
+        else :
+            return json.dumps({  'ok' : False, 'result' : ""})
+
+            
     def xmlrpc_init_play_music(self,urls,tags):
         urls_splitted=json.loads(urls)
         print "ok, music is playing"  #+ str(urls_splitted[0])

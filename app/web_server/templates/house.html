@@ -33,7 +33,6 @@
 <script type="text/javascript" src="static/webgl/console.js"></script>
 <script type="text/javascript" src="static/webgl/camera.js"></script>
 <script type="text/javascript" src="static/webgl/house_view.js"></script>
-<script src="//js.leapmotion.com/0.4.0/leap.js"></script>
 
 <script type="text/javascript">
 
@@ -59,25 +58,30 @@
          //initite variables
           var firstValidFrame = null
           var rotateY = 90, rotateX = 0, curY = 0
-
+         var changed = false;
          Leap.loop(function(frame) {
                 if (frame.valid) {
                     if (!firstValidFrame) firstValidFrame = frame
                     var t = firstValidFrame.translation(frame)
-
-                      //assign rotation coordinates
+                   //assign rotation coordinates
                       rotateX = t[0]
                       rotateY = t[1]
-                      print "cccccccccccccccccccc"
+                    if frame.hands[0].fingers. == 5 :
+                        if (rotateX > 200 && changed == false){
+                                      changed = true;
+                                        window.location.replace("../");
+                                      return;
+                        }
+
 
                       //adjust 3D spherical coordinates of the camera
-                      var positionx =  5*Math.cos(rotateX * Math.PI/180) //+5*Math.sin(rotateY * Math.PI/180)
-                      var positiony = 5*Math.sin(rotateX * Math.PI/180)
-                      var positionz= house_view.camera.from[2]
+                      var positionx =  5*Math.cos(rotateX * Math.PI/180) 
+                      var positiony = 5*Math.sin(rotateX * Math.PI/180) 
+                      var positionz=  5*Math.cos(rotateY * Math.PI/180) + 5*Math.sin(rotateY * Math.PI/180) 
 
                     house_view.camera.from = [positionx, positiony, positionz];
                     //alert(positionx);
-                    house_view.update();
+                    house_view.update_leap();
 
                     }
                 });

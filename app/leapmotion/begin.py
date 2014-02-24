@@ -12,11 +12,21 @@ from Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
 
 
 
-def timer_Disable(controller):
+def timer_disable_circle(controller):
 	controller.enable_gesture(Leap.Gesture.TYPE_CIRCLE)
+
+def timer_disable_screen(controller):
+	controller.enable_gesture(Leap.Gesture.TYPE_SCREEN_TAP)
+
+def timer_disable_swipe(controller):
+	controller.enable_gesture(Leap.Gesture.TYPE_SWIPE)
 
 
 class SampleListener(Leap.Listener):
+
+	m=PyMouse()
+	x_dim, y_dim = m.screen_size()
+
 	def on_init(self,controller):
 		print"initialized"
 
@@ -38,44 +48,55 @@ class SampleListener(Leap.Listener):
 		controller.enable_gesture(Leap.Gesture.TYPE_SCREEN_TAP)
 		#downward ""
 		controller.enable_gesture(Leap.Gesture.TYPE_SWIPE)
+		controller.config.set("Gesture.ScreenTap.MinForwardVelocity", 10.0)
+		controller.config.set("Gesture.ScreenTap.HistorySeconds", 1.0)	
+		controller.config.set("Gesture.ScreenTap.MinDistance", 10.0)
+		controller.config.save()
+
 
 	def on_frame(self,controller):
-		m=PyMouse()
-		x_dim, y_dim = m.screen_size()
 		frame = controller.frame()
 		#print"Frame id: {}, timestamp: {}, hand: {}, fingers{}, tools: {}".format(frame.id, frame.timestamp,len(frame.hands),len(frame.fingers),len(frame.tools))
 
 		if not frame.hands.is_empty:
 			hand=frame.hands[0]
 			fingers=hand.fingers
-			if not fingers.is_empty:
+			if not fingers.is_empty and len(fingers)<2:
 				#print fingers[0].tip_position.x
 				#print fingers[0].tip_position.y
-				m.move(((fingers[0].tip_position.x)+160)*x_dim/320,y_dim-((fingers[0].tip_position.y)-200)*y_dim/200)
-				#alculate avg position
-				avg_pos = Leap.Vector()
-				for finger in fingers:
-					avg_pos+=finger.tip_position
-				avg_pos /= len(fingers)
-				#print "Hand has ablablabl"
-
+				self.m.move(((fingers[0].tip_position.x)+160)*self.x_dim/320,self.y_dim-((fingers[0].tip_position.y)-200)*self.y_dim/200)
 				# can get radius and palm position print "Hand sphere radius: %f mm, palm position: %s" % (hand.sphere_radius, hand.palm_position)
 
 				#can also get angles...
 
+			for gesture in frame.gestures():
+				if controller.is_gesture_enabled(Leap.Gesture.TYPE_CIRCLE):
+					if gesture.type == Leap.Gesture.TYPE_CIRCLE:
+						circle = CircleGesture(gesture)
+						self.m.click((circle.center.x+160)*self.x_dim/320,self.y_dim-(circle.center.y-200)*self.y_dim/200);
+						controller.enable_gesture(Leap.Gesture.TYPE_CIRCLE,False)
+						t=threading.Timer(2.0,timer_disable_circle,[controller])
+						t.start()
 
-		for gesture in frame.gestures():
-			if controller.is_gesture_enabled(Leap.Gesture.TYPE_CIRCLE):
-				if gesture.type == Leap.Gesture.TYPE_CIRCLE:
-					circle = CircleGesture(gesture)
-					m.click((circle.center.x+160)*x_dim/320,y_dim-(circle.center.y-200)*y_dim/200);
-					if circle.center.x <0: #&& circle.center.y>230:
-						print"upper left"
-					else:
-						print"right" 
-					controller.enable_gesture(Leap.Gesture.TYPE_CIRCLE,False)
-					t=threading.Timer(2.0,timer_Disable,[controller])
-					t.start()
+				if controller.is_gesture_enabled(Leap.Gesture.TYPE_SCREEN_TAP):
+					if len(fingers) == 2 :
+						if gesture.type == Leap.Gesture.TYPE_SCREEN_TAP:
+							tap =  ScreenTapGesture(gesture)
+							self.m.click(self.m.position()[0],self.m.position()[1])
+							controller.enable_gesture(Leap.Gesture.TYPE_SCREEN_TAP,False)
+							t=threading.Timer(1.0,timer_disable_screen,[controller])
+							t.start()
+
+				if controller.is_gesture_enabled(Leap.Gesture.TYPE_SWIPE):
+					if len(fingers) == 3 :
+						if gesture.type == Leap.Gesture.TYPE_SWIPE:
+							sw_gest = SwipeGesture(gesture)
+							self.m.scroll(sw_gest.direction.y*10)
+							controller.enable_gesture(Leap.Gesture.TYPE_SWIPE,False)
+							t=threading.Timer(1.0,timer_disable_swipe,[controller])
+							t.start()
+
+
 
 
 def main():

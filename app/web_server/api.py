@@ -12,7 +12,7 @@ import xmlrpclib
 import math
 
 from geopy import geocoders
-from metwit import Metwit
+from metwit import metwit
 from flask import request, jsonify, Blueprint, current_app
 import mongoengine
 
@@ -378,6 +378,10 @@ def playMusic():
         print tags
         urls_name, urls_img = rpc.raspi.find_music_url(0,tags)
     return jsonify(name=urls_name,  tags=tags, img=urls_img)
+
+def music_playing():
+    music_playing = rpc.raspi.music_playing(0)
+    return music_playing
 
 @rest_api.route('/player/tags', methods=['POST','GET'])
 def playMusicViaTag():

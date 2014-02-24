@@ -135,7 +135,16 @@ class Raspi(xmlrpc.XMLRPC):
             return "Failed, no raspi get this ID"
         return result
 
-
+    def xmlrpc_music_playing(self, id):
+        if id<len(self.rpi):
+            if self.rpi[id].macAddress=="":
+                return json.dumps({  'ok' : False, 'result' : "Failed, no raspi get this ID"})
+            server = xmlrpclib.Server("http://{}:{}".format(self.rpi[id].ip,self.rpi[id].port))
+            result = json.loads(server.music_playing())
+        else :
+            return json.dumps({  'ok' : False, 'result' : "Failed, no raspi get this ID"})
+        return json.dumps({  'ok' : result['ok'], 'result' : result['result']})
+        
 class RpcServer(xmlrpc.XMLRPC):
 
     def __init__(self, main_server):
