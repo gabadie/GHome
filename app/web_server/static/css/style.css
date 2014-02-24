@@ -192,8 +192,8 @@ table {
 }
 .big-menu .music::before{
 	content: url('../img/music.png');
-    bottom: -30px;
-    right: -15px;
+    bottom: -41px;
+    right: -34px;
 }
 
 .big-menu .meteo {
