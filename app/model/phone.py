@@ -1,5 +1,7 @@
 from twilio.rest import TwilioRestClient
-from devices import Actuator
+import sys
+sys.path.append('..')
+from enocean.devices import Actuator
 
 class Phone(Actuator):
     account_sid = "AC5835465fb0e2e2e1dd00aadd5243a21a"
@@ -11,6 +13,13 @@ class Phone(Actuator):
                                        from_="+33975184908",
                                        url="http://kachkach.com/twiml")
         print call.sid
+
+    # def callback_sms(self, server):
+    #     message = self.client.messages.create(to="+33626274011",
+    #                                      from_="+33975184908",
+    #                                  body="An alert was triggered by one of your devices. Please log-in to GHome for more information.")
+
+    #     print message
 
 if __name__ == '__main__':
     phone = Phone(device_id=112233)
