@@ -30,6 +30,9 @@ def get_current_weather():
     elif update_current_weather():
         return Weather.objects.first()
 
+def get_last_weather():
+    return Weather.objects.first()
+
 def update_current_weather():
     pass
     # TODO : Needs to be implemented to update the weather

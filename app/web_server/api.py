@@ -16,10 +16,12 @@ from metwit import metwit
 from flask import request, jsonify, Blueprint, current_app
 import mongoengine
 
-from enocean.devices import Sensor, Actuator, Lamp, Thermometer
+from model.devices import Sensor, Actuator
+from enocean.devices import Thermometer
 from model.trigger import ThresholdTrigger
 from model.event import Connection
 from model.devices import NumericReading
+from model.phone import Phone
 from model.fashion import Product, OutfitChoice, fashion_product_rank
 from model.house import Room
 from model.meteo import Location
@@ -347,6 +349,13 @@ def actuators():
     resp = dict(ok=True, result=actuators)
 
     return json.dumps(resp)
+
+@rest_api.route('/phone/')
+def phone():
+    resp = dict(ok=True, result=json.loads(Phone.objects.to_json()))
+
+    return json.dumps(resp)
+
 
 @rest_api.route('/actuator/<device_id>', methods=['GET', 'DELETE'])
 def actuator(device_id):

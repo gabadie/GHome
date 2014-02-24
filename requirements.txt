@@ -4,3 +4,4 @@ flask
 Twisted
 geopy
 feedparser
+twilio

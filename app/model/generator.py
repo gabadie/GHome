@@ -15,6 +15,7 @@ from model.trigger import ThresholdTrigger
 from model.house import Room
 from model.meteo import Location
 from model.clock import Event
+from model.phone import Phone
 from config import GlobalConfig
 from main_server.rpc_server import RpcServer
 from fashion import fetch_fashion
@@ -196,6 +197,9 @@ if __name__ == '__main__':
     g = Generator(configuration)
     g.generate_sample()
 
+    # generating a phone
+    phone = Phone(device_id=112233445566, name="Twilio Phone")
+    phone.save()
 
     if 'fashion' in sys.argv:
         fetch_fashion()
