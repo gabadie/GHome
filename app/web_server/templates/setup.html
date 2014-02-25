@@ -107,9 +107,10 @@
 </script>
 
 <script id="threshold-template" type="text/x-handlebars-template">
-    <tr class='threshold-trigger'>
+<tr class='threshold-trigger' data-threshold-id="{{_id.$oid}}">
         <td>{{name}}</td>
-        <td><span class="badge threshold-trigger-min">{{min}}</span><input type="text" class="trigger-slider modify" data-slider-min="-10" data-slider-max="50" data-slider-step="1" data-slider-value="[{{min}}, {{max}}]" data-threshold-id="{{_id.$oid}}"/><span class="badge threshold-trigger-max">{{max}}</span></td>
+        <td><span class="badge threshold-trigger-min">{{min}}</span>
+        <input type="text" class="trigger-slider modify" data-slider-min="-10" data-slider-max="50" data-slider-step="1" data-slider-value="[{{min}}, {{max}}]" data-threshold-id="{{_id.$oid}}"/><span class="badge threshold-trigger-max">{{max}}</span></td>
         <td><span class="delete glyphicon glyphicon-remove"></span></td>
     </tr>
 </script>
@@ -230,14 +231,14 @@
                             </tr>
                          </thead>
 					     <tbody>
+                             {{#each temperature_triggers}}
+                                {{> threshold-template}}
+                            {{/each}}
                             <tr class='threshold-trigger'>
                                 <td><input type="text" class="form-control name" placeholder="Threshold name" /></td>
                                 <td><input type="text" class="trigger-slider new" data-slider-min="-10" data-slider-max="50" data-slider-step="1" data-slider-value="[-10, 50]" data-threshold-id="{{_id.$oid}}"/></td>
                                 <td><span class="add glyphicon glyphicon-plus"></span>
                             </tr>
-                         {{#each temperature_triggers}}
-					        {{> threshold-template}}
-                        {{/each}}
 					     </tbody>
 					   </table>
                     </li>
