@@ -12,7 +12,7 @@ import xmlrpclib
 import math
 
 from geopy import geocoders
-from metwit import metwit
+from metwit import Metwit
 from flask import request, jsonify, Blueprint, current_app
 import mongoengine
 
