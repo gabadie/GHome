@@ -293,6 +293,24 @@ function HouseView(output, canvas_id, house)
 
         this.draw()
     }
+        this.update_leap = function()
+    {
+        this.viewport.width = this.canvas.width;
+        this.viewport.height = this.canvas.height;
+        this.viewport.update();
+
+        var bounding_box = this.house.getBoundingBox();
+        this.camera.at[0] = bounding_box.x + bounding_box.w / 2;
+        this.camera.at[1] = bounding_box.y + bounding_box.h / 2;
+
+        this.camera.from[0] += this.camera.at[0];
+        this.camera.from[1] += this.camera.at[1];
+        this.camera.from[2] += this.camera.at[2];
+
+        this.camera.update();
+
+        this.draw()
+    }
 
     this.update_model = function()
     {

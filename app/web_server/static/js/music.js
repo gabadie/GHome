@@ -1,22 +1,39 @@
 $(document).ready(function() {
 
 
+    var firstValidFrame = null
+    changed=false;
+    Leap.loop(function(frame) { 
+
+       if (frame.valid) {
+          if (!firstValidFrame) firstValidFrame = frame
+          var t = firstValidFrame.translation(frame)
+
+            //assign rotation coordinates
+            transX = t[0]
+            transY = t[1]
+            if (transX > 200 && changed == false){
+              console.log("haha")
+              changed = true;
+              window.location.replace("../");
+              return;
+            }
+        }
+
+  });
 
     $('#play-music').ajaxForm({
         url: '/player', type: 'post',dataType:  'json',
         success : function(data){
-          alert(data.img)
-           if (data.img == "Err"){
+           if (data.ok == "false") {
             $('#pausing').attr('src',"../static/img/player_play.png");
-            $('#song_text').text("----- " + data.name + " -----");
-            $('#tag_text').text("Categorie unfound");
-            $('#song_picture').attr('src',data.img);
+            $('#song_text').text("");
+            notification.error(data.name);
            }
           else {
             $('#pausing').attr('src',"../static/img/player_pause.png");
             $('#song_text').text("----- " + data.name + " -----");
             $('#tag_text').text("Catégorie "+ data.tags);
-            $('#song_picture').attr('src',data.img);
           }
           }
         } );
@@ -31,7 +48,12 @@ $(document).ready(function() {
       data: JSON.stringify("data"),
       contentType: 'application/json;charset=UTF-8',
       success : function(data){
+          if (data.ok == "true") {
             $('#pausing').attr('src',data.src);
+          }
+          else {
+            notification.error(data.src);
+          }
         }
     });
     });
@@ -45,7 +67,12 @@ $(document).ready(function() {
       data: JSON.stringify("data"),
       contentType: 'application/json;charset=UTF-8',
       success : function(data){
-            $('#song_text').text(data.name);
+          if (data.ok == true){
+            $('#song_text').text(data.name);    
+          }
+          else {
+            notification.error(data.name)
+          }
         }
     });
     });
@@ -59,7 +86,12 @@ $(document).ready(function() {
       data: JSON.stringify("data"),
       contentType: 'application/json;charset=UTF-8',
       success : function(data){
-            $('#song_text').text(data.name);
+          if (data.ok == true){
+            $('#song_text').text(data.name);    
+          }
+          else {
+            notification.error(data.name)
+          }
         }
     });
     });
@@ -77,17 +109,15 @@ $(document).ready(function() {
       data: JSON.stringify(this_button),
       contentType: 'application/json;charset=UTF-8',
       success : function(data){
-        if (data.img != "Err"){
+        if (data.ok == true){
             $('#pausing').attr('src',"../static/img/player_pause.png");
             $('#song_text').text("----- " + data.name + " -----");
             $('#tag_text').text("Catégorie "+ data.tags);
-            $('#song_picture').attr('src',data.img);
           }
           else {
             $('#pausing').attr('src',"../static/img/player_play.png");
-            $('#song_text').text("----- " + data.name + " -----");
-            $('#tag_text').text("Catégorie "+ data.tags);
-            $('#song_picture').attr('src',data.img);
+            $('#song_text').text("");
+            notification.error(data.name);
            }
         }
     });

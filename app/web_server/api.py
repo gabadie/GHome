@@ -16,10 +16,12 @@ from metwit import Metwit
 from flask import request, jsonify, Blueprint, current_app
 import mongoengine
 
-from enocean.devices import Sensor, Actuator, Lamp, Thermometer
+from model.devices import Sensor, Actuator
+from enocean.devices import Thermometer
 from model.trigger import ThresholdTrigger
 from model.event import Connection
 from model.devices import NumericReading
+from model.phone import Phone
 from model.fashion import Product, OutfitChoice, fashion_product_rank
 from model.house import Room
 from model.meteo import Location
@@ -348,6 +350,13 @@ def actuators():
 
     return json.dumps(resp)
 
+@rest_api.route('/phone/')
+def phone():
+    resp = dict(ok=True, result=json.loads(Phone.objects.to_json()))
+
+    return json.dumps(resp)
+
+
 @rest_api.route('/actuator/<device_id>', methods=['GET', 'DELETE'])
 def actuator(device_id):
     device_id = int(device_id)
@@ -376,36 +385,43 @@ def playMusic():
         form = request.form
         tags =  [form.get(val) for val in ['tag']]
         print tags
-        urls_name, urls_img = rpc.raspi.find_music_url(0,tags)
-    return jsonify(name=urls_name,  tags=tags, img=urls_img)
+        result = json.loads(rpc.raspi.find_music_url(0,tags))
+    return jsonify(name=result['result'], tags=tags, img="", ok=json.dumps(result['ok']))
+
+def music_playing():
+    music_playing = json.loads(rpc.raspi.music_playing(0))
+    return music_playing
 
 @rest_api.route('/player/tags', methods=['POST','GET'])
 def playMusicViaTag():
     if request.method == 'POST':
         tags = [json.loads(request.data)]
-        urls_name, urls_img = rpc.raspi.find_music_url(0,tags)
-    return jsonify(name=urls_name,  tags=tags, img=urls_img)
+        result = json.loads(rpc.raspi.find_music_url(0,tags))
+    return jsonify(name=result['result'], tags=tags, img="", ok=result['ok'])
 
 
 @rest_api.route('/player/pause', methods=['POST','GET'])
 def pauseMusic():
     if request.method == 'POST':
-        b_result = rpc.raspi.pause_music(0)
-        if b_result == True :
-            return jsonify( src="../static/img/player_play.png")
-        return jsonify( src="../static/img/player_pause.png")
+        result = json.loads(rpc.raspi.pause_music(0))
+        print "<<<<<<<<<<<é" + str(result)
+        if result['ok'] == True :
+            if result['result'] == True :
+                return jsonify( src="../static/img/player_play.png", ok = "true")
+            return jsonify( src="../static/img/player_pause.png", ok="true")
+        return  jsonify( src=result['result'], ok = "false")
 
 @rest_api.route('/player/next', methods=['POST','GET'])
 def nextMusic():
     if request.method == 'POST':
-        result = rpc.raspi.next_music(0)
-        return jsonify( name = result )
+        result = json.loads(rpc.raspi.next_music(0))
+        return jsonify( name = result['result'], ok=result['ok'] )
 
 @rest_api.route('/player/previous', methods=['POST','GET'])
 def previousMusic():
     if request.method == 'POST':
-        result = rpc.raspi.previous_music(0)
-        return jsonify( name = result )
+        result = json.loads(rpc.raspi.previous_music(0))
+        return jsonify( name = result['result'], ok=result['ok'] )
 
 
 @rest_api.route('/product/')
@@ -566,7 +582,7 @@ def get_rooms():
 @rest_api.route('/threshold', methods=['POST'])
 def new_threshold():
     thermometer_id = request.json['thermometer_id']
-    threshold_name = request.json['threshold_name']
+    threshold_name = request.json['threshold_name'].encode('utf-8')
     minimum, maximum = request.json['min'], request.json['max']
 
     print request.json

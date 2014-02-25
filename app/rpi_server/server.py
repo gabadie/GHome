@@ -54,6 +54,13 @@ class RpiServer(xmlrpc.XMLRPC):
         self.macAddress=str(get_mac())
         self.music_player=MusicPlayer()
 
+    def xmlrpc_music_playing(self) :
+        if len(self.music_player.musics)>0:
+            return json.dumps({  'ok' : True, 'result' :  self.music_player.musics[self.music_player.current_music]['name'] })
+        else :
+            return json.dumps({  'ok' : False, 'result' : ""})
+
+
     def xmlrpc_init_play_music(self,urls,tags):
         urls_splitted=json.loads(urls)
         print "ok, music is playing"  #+ str(urls_splitted[0])
@@ -122,7 +129,7 @@ if __name__=='__main__':
 
     rpiServer=RpiServer()
     #launch client call to add this raspi to the main server
-    proxy = Proxy('http://'+rpiServer.config.mainServerRpi.ip + ':' + str(rpiServer.config.mainServerRpi.port))
+    proxy = Proxy('http://{}:{}'.format(rpiServer.config.mainServerRpi.ip, rpiServer.config.mainServerRpi.port))
     proxy.callRemote('raspi.add_raspi',rpiServer.ip,rpiServer.port,rpiServer.macAddress)
     #launch server
     reactor.listenTCP(rpiServer.config.rpiServer.port,server.Site(rpiServer))

@@ -5,7 +5,7 @@ class Trigger(Eventable):
     name = mongoengine.StringField(required=True)
 
     def __str__(self):
-        return self.name
+        return self.name.encode('utf-8')
 
     # Returns whether a event has been triggered
     def trigger(self, oldValue, newValue, server):

@@ -13,7 +13,7 @@ from model.devices import NumericReading
 import model.clock
 
 from reuters import reuters
-
+import json
 
 from config import GlobalConfig
 config = GlobalConfig()
@@ -23,9 +23,10 @@ news_api = reuters.APIReuters()
 ## Initializing the app
 app = Flask(__name__)
 app.debug = True
-user = "Adrien"
+user = "John"
 
 # Binding the API calls
+from api import music_playing
 from api import rest_api
 app.register_blueprint(rest_api)
 
@@ -64,7 +65,14 @@ def music():
     size_tags = int(round(len(combo_options)/2))
     left_tags = [i for i in combo_options[:size_tags]]
     right_tags = [i for i in combo_options[size_tags:int(2*size_tags)]]
-    return render_template("music.html", combo_options = combo_options, user = user, left_tags = left_tags, right_tags = right_tags)
+    str_music_playing = music_playing()
+    if str_music_playing['ok'] == False:
+        play_picture = "../static/img/player_play.png"
+        str_music_playing['result'] = ""
+    else :
+        play_picture = "../static/img/player_pause.png"
+
+    return render_template("music.html", song_title = str_music_playing['result'], combo_options = combo_options, user = user,left_tags = left_tags, right_tags = right_tags, play_picture = play_picture)
 
 @app.route('/meteo')
 def meteo_page():

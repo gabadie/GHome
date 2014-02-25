@@ -7,7 +7,7 @@ from datetime import datetime
 import mongoengine
 
 from shopsense.shopstyle import ShopStyle
-from meteo import Weather, get_current_weather
+from meteo import Weather, get_last_weather
 
 from config import GlobalConfig
 
@@ -40,10 +40,9 @@ class Product(mongoengine.Document):
     def clean(self):
         self.name = self.name.encode('utf-8')
 
-    def to_dict(self):
-        d = mongoengine.Document.to_dict(self)
-
-        current_weather = get_current_weather()
+    @property
+    def rank(self):
+        current_weather = get_last_weather()
 
         def compue_rank(outfits):
             rank = 0
@@ -52,7 +51,6 @@ class Product(mongoengine.Document):
                 rank += p.today_rank()
 
             return rank
-
 
         rank = 0
 
@@ -65,7 +63,11 @@ class Product(mongoengine.Document):
         if self.feet:
             rank += compue_rank(OutfitChoice.objects(feet=self))
 
-        d['rank'] = rank
+        return rank
+
+    def to_dict(self):
+        d = mongoengine.Document.to_dict(self)
+        d['rank'] = self.rank
 
         return d
 
@@ -99,14 +101,14 @@ class OutfitChoice(mongoengine.Document):
     bottom = mongoengine.ReferenceField(Product, required=True)
     feet = mongoengine.ReferenceField(Product, required=True)
 
-    weather = mongoengine.ReferenceField(Weather, default=get_current_weather)
+    weather = mongoengine.ReferenceField(Weather, default=get_last_weather)
     date = mongoengine.DateTimeField(required=True, default=datetime.now)
     weekday = mongoengine.IntField(required=True)
 
     def today_rank(self):
         rank = 1
 
-        current_weather = get_current_weather()
+        current_weather = get_last_weather()
 
         rank -= 0.8 * self.weather.get_distance_to(current_weather)
 

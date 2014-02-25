@@ -95,6 +95,9 @@
             infos['feet'] = $('.fashion-products.feet .active').attr('data-product-id');
 
             apiCall('/outfit', 'POST', infos, function(data) {
+                apiCall('/product', 'GET', {}, function(data) {
+                    renderProducts(data.result);
+                });
             })
 
             return false;
