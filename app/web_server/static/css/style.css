@@ -576,7 +576,7 @@ background: radial-gradient(ellipse, #07AAFC , #3632FF ); /* Standard syntax (mu
     font-size: 800%;
     font-family: "Ubuntu Mono", monospace;
     color: #2E51BC;
-    line-height: 334%;
+    line-height: 508%;
     text-align: center;
     width: 3%;
     padding: 0;
@@ -588,6 +588,8 @@ background: radial-gradient(ellipse, #07AAFC , #3632FF ); /* Standard syntax (mu
     width: 80%;
     margin: 0 0 0 15%;
     overflow: auto;
+    vertical-align: middle; 
+    min-height: 80%;
 }
 
 .alarm_validator_div
@@ -662,7 +664,7 @@ background: radial-gradient(ellipse, #07AAFC , #3632FF ); /* Standard syntax (mu
 .day-choice {
     font-size: 25px;
     text-align: left;
-    margin: 90px 40px;
+    margin: 120px 40px;
     letter-spacing: -1;
 }
 
@@ -690,6 +692,93 @@ background: radial-gradient(ellipse, #07AAFC , #3632FF ); /* Standard syntax (mu
 .alarm .details {
     display: none;
 }
+
+input[type=checkbox] {
+    display:none;
+
+  }
+
+  input[type=checkbox][name=Monday] + label
+   {
+        background: url('../img/days/monday.png') no-repeat 0 0;
+        background-size: 100%;
+        height: 10%;
+        width: 45%;
+        display:inline-block;
+        padding: 0 0 0 0px;
+        opacity: 0.6;
+   }
+  input[type=checkbox][name=Tuesday] + label
+   {
+        background: url('../img/days/tuesday.png') no-repeat 0 0;
+        background-size: 100%;
+        height: 10%;
+        width: 45%;
+        display:inline-block;
+        padding: 0 0 0 0px;
+        opacity: 0.6;
+   }
+  input[type=checkbox][name=Wednesday] + label
+   {
+        background: url('../img/days/wednesday.png') no-repeat 0 0;
+        background-size: 100%;
+        height: 10%;
+        width: 45%;
+        display:inline-block;
+        padding: 0 0 0 0px;
+        opacity: 0.6;
+   }
+  input[type=checkbox][name=Thursday] + label
+   {
+        background: url('../img/days/thursday.png') no-repeat 0 0;
+        background-size: 100%;
+        height: 10%;
+        width: 45%;
+        display:inline-block;
+        padding: 0 0 0 0px;
+        opacity: 0.6;
+   }
+  input[type=checkbox][name=Friday] + label
+   {
+        background: url('../img/days/friday.png') no-repeat 0 0;
+        background-size: 100%;
+        height: 10%;
+        width: 45%;
+        display:inline-block;
+        padding: 0 0 0 0px;
+        opacity: 0.6;
+   }
+  input[type=checkbox][name=Saturday] + label
+   {
+        background: url('../img/days/saturday.png') no-repeat 0 0;
+        background-size: 100%;
+        height: 10%;
+        width: 45%;
+        display:inline-block;
+        padding: 0 0 0 0px;
+        opacity: 0.6;
+   }
+  input[type=checkbox][name=Sunday] + label
+   {
+        background: url('../img/days/sunday.png') no-repeat 0 0;
+        background-size: 100%;
+        height: 10%;
+        width: 45%;
+        display:inline-block;
+        padding: 0 0 0 0px;
+        opacity: 0.6;
+   }
+
+   input[type=checkbox]:checked + label
+    {
+        opacity: 1;
+    }
+
+.alarm-head
+{
+    margin-top: 40% !important;
+}
+
 
 /* News */
 

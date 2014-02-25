@@ -23,7 +23,7 @@ news_api = reuters.APIReuters()
 ## Initializing the app
 app = Flask(__name__)
 app.debug = True
-user = "Adrien"
+user = "John"
 
 # Binding the API calls
 from api import music_playing
@@ -69,6 +69,7 @@ def music():
     print str_music_playing['result']
     if str_music_playing['ok'] == False:
         play_picture = "../static/img/player_play.png"
+        str_music_playing['result'] = ""
     else :
         play_picture = "../static/img/player_pause.png"
 

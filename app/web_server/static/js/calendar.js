@@ -161,7 +161,7 @@ var bindAlarms = function() {
         var event = cb_form.find('input[name="event"]').val();
         var actuator = cb_form.find('select[name="actuator"]').val();
         var callback = cb_form.find('select[name="callback"]:enabled').val();
-        alert(event);
+        //alert(event);
         var params = {event: event, actuator: actuator, callback: callback};
 
 

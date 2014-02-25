@@ -56,7 +56,7 @@ class RpiServer(xmlrpc.XMLRPC):
 
     def xmlrpc_music_playing(self) : 
         if len(self.music_player.musics)>0:
-            return json.dumps({  'ok' : True, 'result' :  self.music_player.musics[self.music_player.current_music] })
+            return json.dumps({  'ok' : True, 'result' :  self.music_player.musics[self.music_player.current_music]['name'] })
         else :
             return json.dumps({  'ok' : False, 'result' : ""})
 

@@ -82,7 +82,7 @@ class Raspi(xmlrpc.XMLRPC):
     def xmlrpc_find_music_url(self, id, tags ):
         if id<len(self.rpi):
             if self.rpi[id].macAddress=="":
-                return "Failed, no raspi registered at this ID"
+                return json.dumps(dict(ok = False, result="Failed, no raspi registered ID " + str(id))) 
 
             api=API8tracks(config.api_8tracks)
             tags_low=[tag.lower() for tag in tags]
@@ -94,11 +94,11 @@ class Raspi(xmlrpc.XMLRPC):
                 server = xmlrpclib.Server("http://{}:{}".format(self.rpi[id].ip,self.rpi[id].port))
                 server.init_play_music(json.dumps(urls),tags)
                 print urls
-                return urls[0]['name'], urls[0]['img_url']
+                return json.dumps(dict(ok = True, result=urls[0]['name']))
             else :
-                return "no url found", "Err"
+                return json.dumps(dict(ok = False, result="no url found"))
         else :
-            return "Failed, no raspi get this ID" , "Err"
+            return json.dumps(dict(ok = False, result="Failed, no raspi register ID " + str(id))) 
 
 
     def xmlrpc_next_music(self, id):

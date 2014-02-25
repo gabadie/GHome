@@ -385,8 +385,8 @@ def playMusic():
         form = request.form
         tags =  [form.get(val) for val in ['tag']]
         print tags
-        urls_name, urls_img = rpc.raspi.find_music_url(0,tags)
-    return jsonify(name=urls_name,  tags=tags, img=urls_img)
+        result = json.loads(rpc.raspi.find_music_url(0,tags))
+    return jsonify(name=result['result'], tags=tags, img="", ok=json.dumps(result['ok']))
 
 def music_playing():
     music_playing = rpc.raspi.music_playing(0)
@@ -396,8 +396,8 @@ def music_playing():
 def playMusicViaTag():
     if request.method == 'POST':
         tags = [json.loads(request.data)]
-        urls_name, urls_img = rpc.raspi.find_music_url(0,tags)
-    return jsonify(name=urls_name,  tags=tags, img=urls_img)
+        result = json.loads(rpc.raspi.find_music_url(0,tags))
+    return jsonify(name=result['result'], tags=tags, img="", ok=result['ok'])
 
 
 @rest_api.route('/player/pause', methods=['POST','GET'])

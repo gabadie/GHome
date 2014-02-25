@@ -66,8 +66,7 @@
                    //assign rotation coordinates
                       rotateX = t[0]
                       rotateY = t[1]
-                    if frame.hands[0].fingers. == 5 :
-                        if (rotateX > 200 && changed == false){
+                      if (rotateX > 400 && changed == false){
                                       changed = true;
                                         window.location.replace("../");
                                       return;
@@ -77,7 +76,7 @@
                       //adjust 3D spherical coordinates of the camera
                       var positionx =  5*Math.cos(rotateX * Math.PI/180) 
                       var positiony = 5*Math.sin(rotateX * Math.PI/180) 
-                      var positionz=  5*Math.cos(rotateY * Math.PI/180) + 5*Math.sin(rotateY * Math.PI/180) 
+                      var positionz=  10*Math.cos(rotateY * Math.PI/180) + 10*Math.sin(rotateY * Math.PI/180) 
 
                     house_view.camera.from = [positionx, positiony, positionz];
                     //alert(positionx);
