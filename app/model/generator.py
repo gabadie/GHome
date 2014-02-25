@@ -9,6 +9,7 @@ import datetime
 
 sys.path.append('..')
 
+import logger
 import enocean.devices
 import model.devices
 from model.trigger import ThresholdTrigger
@@ -21,10 +22,15 @@ from fashion import fetch_fashion
 
 class Generator:
     def __init__(self, config):
-            self.config = config
-            self.db = mongoengine.connect(config.mongo_db)
+        self.config = config
+        self.db = mongoengine.connect(config.mongo_db)
+        logger.info("Connected to localhost database : " + config.mongo_db)
+        self.id = 1337
+
+        if config.init_db:
+            logger.info("Initializing database")
             self.db.drop_database(config.mongo_db)
-            self.id = 1337
+            self.generate_sample()
 
     def generate_location(self, name, lat, lon):
         Location(name=name, latitude=lat, longitude=lon).save()

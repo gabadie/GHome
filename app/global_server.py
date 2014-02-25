@@ -100,7 +100,7 @@ if __name__ == "__main__":
         config = GlobalConfig()
 
     model_generator = generator.Generator(config)
-    model_generator.generate_sample()
+    
     main_server = MainServerProcess(config)
     web_server = WebServerProcess(config)
 
@@ -117,4 +117,3 @@ if __name__ == "__main__":
 
     main_server.terminate()
     web_server.terminate()
-

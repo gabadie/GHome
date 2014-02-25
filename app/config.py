@@ -23,6 +23,7 @@ class GlobalConfig:
         """ Construct with the development configuration """
 
         self.mongo_db = 'ghome_development'
+        self.init_db = 'True'
         self.api_8tracks =  'cd7a9189d060c79845828dc26471dbd6397cdb31'
         self.api_shopsense = 'uid3444-24262962-52'
 
@@ -34,6 +35,7 @@ class GlobalConfig:
         with open(path, 'w') as outfile:
             json_data = {
                 'mongo_db': self.mongo_db,
+                'init_db': self.init_db,
                 'enocean': {
                     'ip': self.enocean.ip,
                     'port': self.enocean.port
@@ -61,6 +63,7 @@ class GlobalConfig:
             json_content = json.load(file)
 
             config.mongo_db = json_content["mongo_db"]
+            config.init_db = json_content["init_db"]
 
             config.enocean.ip = json_content["enocean"]["ip"]
             config.enocean.port = int(json_content["enocean"]["port"])
