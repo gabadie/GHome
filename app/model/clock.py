@@ -41,7 +41,7 @@ class Server(object):
     # main_server: main_server.server.MainServer
     # looping_task: mongoengine.task.LoopingCall
     # previous_minutes: int
-    quantum = 30 # seconds
+    quantum = 2 # seconds
 
     def __init__(self, main_server):
         logger.info("Clock initializing (quantum = {} seconds)".format(Server.quantum))
@@ -53,7 +53,7 @@ class Server(object):
 
         self.looping_task = twisted.internet.task.LoopingCall(self.looping_callback)
         self.looping_task.start(Server.quantum)
-        
+
     def trigger_events(self, week_day, minutes, previous_minute):
         clock_events = Event.objects(minutes__gt=previous_minute, minutes__lte=minutes)
 

@@ -588,7 +588,7 @@ background: radial-gradient(ellipse, #07AAFC , #3632FF ); /* Standard syntax (mu
     width: 80%;
     margin: 0 0 0 15%;
     overflow: auto;
-    vertical-align: middle; 
+    vertical-align: middle;
     min-height: 80%;
 }
 
@@ -945,4 +945,9 @@ nav.categories button {
 
 .weekdays .value{
     font-weight: bold;
+}
+
+.homebg {
+    background: url('../img/sky_blurred.jpg');
+    height: 100%;
 }
