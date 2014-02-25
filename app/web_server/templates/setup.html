@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+
+{% block style %}
+<link href="static/css/xcharts.min.css" rel="stylesheet">
+<link href="static/css/iostoggle.css" rel="stylesheet">
+<link href="static/css/bootstrap-slider.css" rel="stylesheet">
+{% endblock %}
+
+
+{% block body %}
+<div class="container">
+	{% include "header.html" %}
+
+
+	<div>
+
+		<div class="col-md-9">
+
+			<h2>Sensors</h2>
+
+			<ul class="sensors">
+				<!-- Populated by JS Handlebars -->
+			</ul>
+
+
+			<h2>Actuators</h2>
+
+			<ul class="actuators">
+				<!-- Populated by JS Handlebars -->
+			</ul>
+
+		</div>
+
+
+
+		<div class="col-md-3">
+			<h2>Devices graph</h2>
+
+			<div id="devices-graph"></div>
+
+			<br/>
+
+			<form id="add-sensor" class="form-horizontal" action="/sensor" method="POST">
+				<h4 style="padding:5px;">Add a device</h4>
+				<div style="padding:5px;">
+					<input type="text" class="form-control" name="id" placeholder="Device ID (hexa)">
+				</div>
+
+				<div style="padding:5px;">
+					<input type="text" class="form-control" name="name" placeholder="Device name">
+				</div>
+
+				<div style="padding:5px;">
+					<select class="form-control" id="device-type" data-width="auto" data-title="Device type" name="device-type"
+	                    placeholder="Sensor type">
+		            	<option value="Sensor">Sensor</option>
+		            	<option value="Actuator">Actuator</option>
+	            	</select>
+
+		            <select class="form-control" id="device-class" data-width="auto" data-title="Device class" name="device-class"
+		                    placeholder="Sensor type">
+		            	{% for sensor_type in sensor_types %}
+		            	<option value="{{sensor_type.__name__}}">{{sensor_type.__name__}}</option>
+		            	{% endfor %}
+		            </select>
+				</div>
+
+				<div style="padding:5px;">
+					<button type="submit" class="btn btn-primary form-control">Add device</button>
+				</div>
+			</form>
+
+		</div>
+
+	</div>
+</div>
+{% endblock body %}
+
+{% block javascript %}
+
+<!-- Handlebars templates for sensors / actuators -->
+{% raw %}
+<script id="connection-template" type="text/x-handlebars-template">
+	<tr class="event-connection" data-connection-id="{{_id.$oid}}">
+
+		<td>
+			{{triggering_event}}
+		</td>
+
+		<td>
+			<span class="device_id">{{receiving_object.device_id}}</span>  {{receiving_object.name}}
+		</td>
+
+		<td>
+			{{method_name}}
+		</td>
+
+		<td>
+			<span class="delete glyphicon glyphicon-remove"></span>
+		</td>
+
+		<td style="width:100px;">
+			<button class="btn btn-primary btn-trigger">Trigger</button>
+		</td>
+
+	</tr>
+</script>
+
+<script id="threshold-template" type="text/x-handlebars-template">
+    <tr class='threshold-trigger'>
+        <td>{{name}}</td>
+        <td><span class="badge threshold-trigger-min">{{min}}</span><input type="text" class="trigger-slider modify" data-slider-min="-10" data-slider-max="50" data-slider-step="1" data-slider-value="[{{min}}, {{max}}]" data-threshold-id="{{_id.$oid}}"/><span class="badge threshold-trigger-max">{{max}}</span></td>
+        <td><span class="delete glyphicon glyphicon-remove"></span></td>
+    </tr>
+</script>
+
+<script id="sensor-template" type="text/x-handlebars-template">
+	<li class="sensor{{#if ignored}} ignored{{/if}}" data-sensor-id="{{device_id}}">
+		<div class="heading">
+			<span class="device_id">{{device_id}}</span>
+			<span style="padding:20px;">{{type}}</span>
+			<span class="name">{{name}}</span>
+			<span class="delete glyphicon glyphicon-remove"></span>
+		</div>
+
+		<div class="details">
+			<ul class="list-group infos">
+				{{! Sensor's status + a toggle to change it}}
+				<li class="list-group-item">
+					<span class="sensor-status"></span>
+					{{#if ignored}}
+						<input class="modern-toggle sensor-toggle" type="checkbox" />
+					{{else}}
+						<input class="modern-toggle sensor-toggle" type="checkbox" checked/>
+					{{/if}}
+				</li>
+
+
+				{{! Sensor's type (Thermometer, Switch, ...)}}
+				<li class="list-group-item">
+					<span class="title">Type:</span> {{type}}
+                </li>
+
+
+                {{! Chart showing the latest readings}}
+				<li class="list-group-item">
+					<h4>Readings</h4>
+					<div class="sensor-readings" id="readings-{{device_id}}"></div>
+				</li>
+
+                {{#if events}}
+
+					<li class="list-group-item">
+						{{! List of existing event bindings}}
+						<h4>Events' bindings</h4>
+
+						<table class="table table-striped binding-table">
+					      <thead>
+					        <tr>
+					          <th>Event</th>
+					          <th>Actuator</th>
+					          <th>Callback</th>
+					          <th style="width:100px;"> </th>
+					        </tr>
+					      </thead>
+					      <tbody>
+
+
+						{{#each connections}}
+					        {{> connection-template}}
+						{{/each}}   
+
+							{{!-- Binding events should be done inside the table, but it's buggy for some reason --}}
+							<tr class="callback-binding">
+									<input type="hidden" name="sensor" value="{{device_id}}" >
+									<td>
+										{{! Event select }}
+							            <select class="form-control" name="event" placeholder="Event">
+										{{#each events}}
+								            	<option value="{{this}}">{{this}}</option>
+						            	{{/each}}
+							            </select>
+						            </td>
+
+									<td>
+							            {{! Actuators select }}
+										<select class="form-control" name="actuator" placeholder="Actuator">
+										{{#each actuators}}
+								            	<option value="{{device_id}}">{{device_id}} - {{name}}</option>
+						            	{{/each}}
+							            </select>
+							        </td>
+
+									<td>
+							            {{! Each actuator's callbacks select }}
+							            {{#each actuators}}
+							            		<select class="form-control" name="callback" placeholder="Callback" data-actuator-id="{{device_id}}" {{#if @first}}{{else}}disabled{{/if}}>
+												{{#each callbacks}}
+										            	<option value="{{this}}">{{this}}</option>
+								            	{{/each}}
+									            </select>
+						            	{{/each}}
+					            	</td>
+
+					            	<td>
+					            		<span class="add glyphicon glyphicon-plus"></span>
+									</td>
+							</tr>
+
+
+
+					      </tbody>
+					    </table>
+
+					</li>
+
+				{{/if}}
+				{{!--End of events handling--}}
+
+                {{#if is_thermometer}}
+                    <li class="list-group-item">
+						<h4>Temperature thresholds</h4>
+
+						<table class="table table-striped binding-table">
+					      <thead>
+                            <tr>
+                              <th>Name</th>
+                              <th>Threshold</th>
+                              <th></th>
+                            </tr>
+                         </thead>
+					     <tbody>
+                            <tr class='threshold-trigger'>
+                                <td><input type="text" class="form-control name" placeholder="Threshold name" /></td>
+                                <td><input type="text" class="trigger-slider new" data-slider-min="-10" data-slider-max="50" data-slider-step="1" data-slider-value="[-10, 50]" data-threshold-id="{{_id.$oid}}"/></td>
+                                <td><span class="add glyphicon glyphicon-plus"></span>
+                            </tr>
+                         {{#each temperature_triggers}}
+					        {{> threshold-template}}
+                        {{/each}}
+					     </tbody>
+					   </table>
+                    </li>
+                {{/if}}
+
+
+			</ul>
+
+
+		</div>
+	</li>
+</script>
+
+<script id="actuator-template" type="text/x-handlebars-template">
+	<li {{#if activated}}class="activated"{{/if}} data-sensor-id="{{device_id}}">
+		<div class="heading">
+			<span class="device_id">{{device_id}}</span>
+			<span class="actuator-type">{{type}}</span>
+			<span class="name">{{name}}</span>
+			<span class="delete glyphicon glyphicon-remove"></span>
+		</div>
+	</li>
+</script>
+{% endraw %}
+
+
+
+<!-- Javascript inclusions -->
+<script src="/static/d3/lib/d3.v3.js"></script>
+<script src="/static/d3/nv.d3.js"></script>
+<script src="/static/d3/src/utils.js"></script>
+<script src="/static/d3/src/models/axis.js"></script>
+<script src="/static/d3/src/tooltip.js"></script>
+<script src="/static/d3/src/interactiveLayer.js"></script>
+<script src="/static/d3/src/models/legend.js"></script>
+<script src="/static/d3/src/models/axis.js"></script>
+
+<script src="/static/js/xcharts.min.js"></script>
+<script src="/static/js/sigma.min.js"></script>
+<script src="/static/js/plugins/sigma.parsers.json.min.js"></script>
+
+<script src="/static/js/setup.js"></script>
+<script src="/static/js/bootstrap-slider.js"></script>
+{% endblock %}

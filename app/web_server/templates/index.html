@@ -1,111 +1,162 @@
-<html>
+{% extends "base.html" %}
 
-<head>
-	<title>GHome web interface</title>
+{% block style %}
+<link rel="stylesheet" type="text/css" href="/static/shapehover/css/normalize.css" />
+<link rel="stylesheet" type="text/css" href="/static/shapehover/css/component.css" />
+{% endblock %}
+
+{% block body %}
+<div class="container demo-2">
+	{% include "header.html" %}
+
+	<div class="jumbotron">
+
+		<h1 class="home-title">Hello, John!</h1>
+		<p>Welcome to GHome</p>
+		<p><a class="btn btn-primary btn-lg" role="button" href="news">Start your day with some fresh news!</a></p>
+
+		<p>Or access the menu directly :</p>
+
+		<ul class="big-menu">
+
+			<a href="news">
+				<li class="news">News</li>
+			</a>
+
+			<a href="meteo">
+				<li class="meteo">Weather</li>
+			</a>
+
+			<a href="house">
+				<li class="house">House view</li>
+			</a>
 
 
-    <!-- Bootstrap related CSS -->
-    <link href="static/css/bootstrap.css" rel="stylesheet">
-    <link href="static/css/bootstrap-select.css" rel="stylesheet">
 
-    <!-- Custom styles for this template -->
-    <link href="static/css/style.css" rel="stylesheet">
+			<a href="fashion">
+				<li class="clothes">Wardrobe</li>
+			</a>
 
+			<a href="music">
+				<li class="music">Music</li>
+			</a>
 
-</head>
+			<a href="calendar">
+				<li class="calendar">Calendar</li>
+			</a>
 
-<body>
-	<div class="container">
-		<div class="row header">
-			<h1 class="logo"><span class="glyphicon glyphicon-cog"></span> GHome</h1>
-		</div>
+			<a href="monitoring">
+				<li class="monitoring">Monitoring</li>
+			</a>
 
+			<a href="setup">
+				<li class="setup">Setup</li>
+			</a>
 
-		<div class="row">
+		</ul>
 
+<!--
+		<section id="grid" class="grid clearfix">
+				<a href="#" data-path-hover="m 0,0 0,47.7775 c 24.580441,3.12569 55.897012,-8.199417 90,-8.199417 34.10299,0 65.41956,11.325107 90,8.199417 L 180,0 z">
+					<figure>
+						<img src="/static/img/news.png" />
+						<svg viewBox="0 0 180 320" preserveAspectRatio="none"><path d="m 0,0 0,171.14385 c 24.580441,15.47138 55.897012,24.75772 90,24.75772 34.10299,0 65.41956,-9.28634 90,-24.75772 L 180,0 0,0 z"/></svg>
+						<figcaption>
+							<h2>News</h2>
+							<p>Stay up-to-date with your favorite subjects.</p>
+							<button>View</button>
+						</figcaption>
+					</figure>
+				</a>
 
-			<div class="col-md-10">
-				<h2>EnOcean sensors</h2>
+				<a href="#" data-path-hover="m 0,0 0,47.7775 c 24.580441,3.12569 55.897012,-8.199417 90,-8.199417 34.10299,0 65.41956,11.325107 90,8.199417 L 180,0 z">
+					<figure>
+						<img src="/static/img/weather.png" />
+						<svg viewBox="0 0 180 320" preserveAspectRatio="none"><path d="m 0,0 0,171.14385 c 24.580441,15.47138 55.897012,24.75772 90,24.75772 34.10299,0 65.41956,-9.28634 90,-24.75772 L 180,0 0,0 z"/></svg>
+						<figcaption>
+							<h2>Weather</h2>
+							<p>Should you bring an umbrella today?</p>
+							<button>View</button>
+						</figcaption>
+					</figure>
+				</a>
+				<a href="#" data-path-hover="m 0,0 0,47.7775 c 24.580441,3.12569 55.897012,-8.199417 90,-8.199417 34.10299,0 65.41956,11.325107 90,8.199417 L 180,0 z">
+					<figure>
+						<img src="/static/img/meteo.png" />
+						<svg viewBox="0 0 180 320" preserveAspectRatio="none"><path d="m 0,0 0,171.14385 c 24.580441,15.47138 55.897012,24.75772 90,24.75772 34.10299,0 65.41956,-9.28634 90,-24.75772 L 180,0 0,0 z"/></svg>
+						<figcaption>
+							<h2>House view</h2>
+							<p>Explore your house in 3D and monitor each of its rooms.</p>
+							<button>View</button>
+						</figcaption>
+					</figure>
+				</a>
+				<a href="#" data-path-hover="m 0,0 0,47.7775 c 24.580441,3.12569 55.897012,-8.199417 90,-8.199417 34.10299,0 65.41956,11.325107 90,8.199417 L 180,0 z">
+					<figure>
+						<img src="/static/img/clothes.png" />
+						<svg viewBox="0 0 180 320" preserveAspectRatio="none"><path d="m 0,0 0,171.14385 c 24.580441,15.47138 55.897012,24.75772 90,24.75772 34.10299,0 65.41956,-9.28634 90,-24.75772 L 180,0 0,0 z"/></svg>
+						<figcaption>
+							<h2>Wardrobe</h2>
+							<p>Pick your outfit for the day!</p>
+							<button>View</button>
+						</figcaption>
+					</figure>
+				</a>
+				<a href="#" data-path-hover="m 0,0 0,47.7775 c 24.580441,3.12569 55.897012,-8.199417 90,-8.199417 34.10299,0 65.41956,11.325107 90,8.199417 L 180,0 z">
+					<figure>
+						<img src="/static/img/music.png" />
+						<svg viewBox="0 0 180 320" preserveAspectRatio="none"><path d="m 0,0 0,171.14385 c 24.580441,15.47138 55.897012,24.75772 90,24.75772 34.10299,0 65.41956,-9.28634 90,-24.75772 L 180,0 0,0 z"/></svg>
+						<figcaption>
+							<h2>Music</h2>
+							<p>Listen to your favorite music.</p>
+							<button>View</button>
+						</figcaption>
+					</figure>
+				</a>
+				<a href="#" data-path-hover="m 0,0 0,47.7775 c 24.580441,3.12569 55.897012,-8.199417 90,-8.199417 34.10299,0 65.41956,11.325107 90,8.199417 L 180,0 z">
+					<figure>
+						<img src="/static/img/calendar.png" />
+						<svg viewBox="0 0 180 320" preserveAspectRatio="none"><path d="m 0,0 0,171.14385 c 24.580441,15.47138 55.897012,24.75772 90,24.75772 34.10299,0 65.41956,-9.28634 90,-24.75772 L 180,0 0,0 z"/></svg>
+						<figcaption>
+							<h2>Calendar</h2>
+							<p>A grape silver beet watercress potato.</p>
+							<button>View</button>
+						</figcaption>
+					</figure>
+				</a>
+				<a href="#" data-path-hover="m 0,0 0,47.7775 c 24.580441,3.12569 55.897012,-8.199417 90,-8.199417 34.10299,0 65.41956,11.325107 90,8.199417 L 180,0 z">
+					<figure>
+						<img src="img/5.png" />
+						<svg viewBox="0 0 180 320" preserveAspectRatio="none"><path d="m 0,0 0,171.14385 c 24.580441,15.47138 55.897012,24.75772 90,24.75772 34.10299,0 65.41956,-9.28634 90,-24.75772 L 180,0 0,0 z"/></svg>
+						<figcaption>
+							<h2>Resonant</h2>
+							<p>Chickweed okra pea winter purslane.</p>
+							<button>View</button>
+						</figcaption>
+					</figure>
+				</a>
+				<a href="#" data-path-hover="m 0,0 0,47.7775 c 24.580441,3.12569 55.897012,-8.199417 90,-8.199417 34.10299,0 65.41956,11.325107 90,8.199417 L 180,0 z">
+					<figure>
+						<img src="img/7.png" />
+						<svg viewBox="0 0 180 320" preserveAspectRatio="none"><path d="m 0,0 0,171.14385 c 24.580441,15.47138 55.897012,24.75772 90,24.75772 34.10299,0 65.41956,-9.28634 90,-24.75772 L 180,0 0,0 z"/></svg>
+						<figcaption>
+							<h2>Zenith</h2>
+							<p>Salsify taro catsear garlic gram.</p>
+							<button>View</button>
+						</figcaption>
+					</figure>
+				</a>
+		</section>
 
-				<p>List of all devices in the database:</p>
-				<ul class="sensors">
-<!-- 
-				{% for sensor in sensors %}
-					<li {% if sensor.ignored %}class="ignored"{% endif %} data-sensor-id="{{sensor.device_id}}">
-						<span class="device_id">{{ sensor.device_id }}</span> - <span class="name">{{sensor.name}}</span>
-						<span class="delete glyphicon glyphicon-remove"></span>
-					</li>
-				{% endfor %}
  -->
-				</ul>
 
-
-				<form id="add-sensor" class="form-inline" action="/sensor" method="POST">
-					<h4>Add a sensor</h4>
-
-					<div class="form-group">
-						<input type="text" class="form-control" name="id" placeholder="Sensor ID">
-					</div>
-
-					<div class="form-group">
-						<input type="text" class="form-control" name="name" placeholder="Sensor name">
-					</div>
-
-					<div class="form-group">
-			            <select class="selectpicker" data-width="auto" data-title="Actuators" name="actuators"
-			                    placeholder="Linked actuators" multiple>
-			            	{% for actuator in actuators %}
-			            	<option value="{{actuator.device_id}}">{{actuator.name}}</option>
-			            	{% endfor %}
-			            </select>
-		            </div>
-
-
-					<div class="form-group">
-			            <select class="selectpicker" data-width="auto" data-title="Sensor type" name="type"
-			                    placeholder="Sensor type">
-			            	{% for sensor_type in sensor_types %}
-			            	<option value="{{sensor_type.__name__}}">{{sensor_type.__name__}}</option>
-			            	{% endfor %}
-			            </select>
-		            </div>
-
-					<button type="submit" class="btn btn-primary btn-sm">Add device</button>
-				</form>
-
-			</div>
-
-
-
-			<div class="col-md-2">
-				<h2>Lamps</h2>
-
-				<ul class="lamps">
-<!-- 				
-					{% for lamp in lamps %}
-					<li {% if lamp.turned_on %}class="turned_on"{% endif %} data-sensor-id="{{lamp.device_id}}">
-						<span class="device_id">{{ lamp.device_id }}</span><br />
-						<span class="name">{{lamp.name}}</span>
-					</li>
-					{% endfor %}
--->
-
-				</ul>
-
-			</div>
-
-		</div>
 	</div>
 
-	<!-- JS files, placed at the end for faster page loading -->
-    <script src="static/js/jquery-1.10.2.js"></script>
-    <script src="static/js/bootstrap.min.js"></script>
-    <script src="static/js/jquery.form.min.js"></script>
-    <script src="static/js/bootstrap-select.js"></script>
-
-    <script src="static/js/main.js"></script>
+</div>
+{% endblock body %}
 
 
-</body>
-
-</html>
+{% block javascript %}
+<script src="/static/js/menu.js"></script>
+<script src="/static/shapehover/js/snap.svg-min.js"></script>
+{% endblock %}

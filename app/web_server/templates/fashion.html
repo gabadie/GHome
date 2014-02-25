@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block style %}
+{% endblock %}
+
+{% block body %}
+
+{% include "header.html" %}
+
+
+<div class="container fashion">
+
+
+    <input id="fashion-query" type="text" name="query" class="form-control" placeholder="Search a product..." />
+
+
+    <div class="page-header">
+      <h1>Top <small>Shirts, Pullovers, t-shirts, dresses, ...</small></h1>
+    </div>
+
+    <div class="slider">
+        <ul class="fashion-products top">
+        </ul>
+    </div>
+    <div class="controls">
+        <a href="#" class="prev-page">Prev Page</a> |
+        <a href="#" class="prev-slide">Prev Product</a> |
+        <a href="#" class="next-slide">Next Product</a> |
+        <a href="#" class="next-page">Next Page</a>
+    </div>
+
+
+    <div class="page-header">
+      <h1>Bottom <small>Pants, jeans, skirts, shorts, ...</small></h1>
+    </div>
+
+    <div class="slider">
+        <ul class="fashion-products bottom">
+        </ul>
+    </div>
+    <div class="controls">
+        <a href="#" class="prev-page">Prev Page</a> |
+        <a href="#" class="prev-slide">Prev Product</a> |
+        <a href="#" class="next-slide">Next Product</a> |
+        <a href="#" class="next-page">Next Page</a>
+    </div>
+
+
+    <div class="page-header">
+      <h1>Feet <small>Shoes, sneakers, sandals, ...</small></h1>
+    </div>
+
+    <div class="slider">
+        <ul class="fashion-products feet">
+        </ul>
+    </div>
+    <div class="controls">
+        <a href="#" class="prev-page">Prev Page</a> |
+        <a href="#" class="prev-slide">Prev Product</a> |
+        <a href="#" class="next-slide">Next Product</a> |
+        <a href="#" class="next-page">Next Page</a>
+    </div>
+
+    <p><a class="btn btn-primary btn-lg" id="select-outfit" role="button" href="#">Select outfit</a></p>
+
+
+</div>
+{% endblock body %}
+
+
+{% block javascript %}
+
+    {% raw %}
+    <script id="product-template" type="text/x-handlebars-template">
+        <li data-product-id="{{_id}}">
+            <div class="img-wrapper img-thumbnail">
+                <img src="{{main_image}}" class="img-responsive" />
+            </div>
+            <br/>
+            <span class="name">{{name}}</span> <br/>
+            <span class="price">{{price_label}}</span>
+        </li>
+    </script>
+    {% endraw %}
+
+    <script src="/static/js/lemmon-slider.js"></script>
+    <script src="/static/js/fashion.js"></script>
+    <script type="text/javascript">
+        document.getElementById('select-outfit').onclick = function()
+        {
+            var infos = {};
+
+            infos['top'] = $('.fashion-products.top .active').attr('data-product-id');
+            infos['bottom'] = $('.fashion-products.bottom .active').attr('data-product-id');
+            infos['feet'] = $('.fashion-products.feet .active').attr('data-product-id');
+
+            apiCall('/outfit', 'POST', infos, function(data) {
+                apiCall('/product', 'GET', {}, function(data) {
+                    renderProducts(data.result);
+                });
+            })
+
+            return false;
+        }
+    </script>
+{% endblock %}

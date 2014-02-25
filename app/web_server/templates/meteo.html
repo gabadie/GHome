@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="container">
+	{% include "header.html" %}
+
+	<div style="margin: 20;">
+
+		<form id="update-location" class="form-group" action="/meteo/setloc" method="POST">
+            <h3>Place of residence</h3>
+            <input id="location" name="location" type="text" placeholder="Adresse">
+            <button id="update" type="submit" class="btn btn-primary btn-sm">Update</button>
+        </form>
+
+		<div id="weather">
+	        <div id="busy" style="height:7%">
+			</div>
+		</div>
+</div>
+{% endblock body %}
+
+{% block javascript %}
+    <script src="static/js/meteo.js"></script>
+{% endblock javascript %}

@@ -6,7 +6,7 @@ class RpiGlobalConfig:
     class RpiServer(object):
         def __init__(self):
             self.ip="127.0.0.1"
-            self.port=7080
+            self.port=5001
             
     class MainServer(object):
 

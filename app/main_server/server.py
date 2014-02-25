@@ -3,26 +3,27 @@
 
 import mongoengine
 import os
-import subprocess
 import sys
 from twisted.internet import reactor
 import twisted.web
-import tempfile
-import time
 
 sys.path.insert(0, '..')
 
 import enocean.client
+import model.clock
 from rpc_server import RpcServer, Raspi
-
+import logger
+from config import GlobalConfig
+import enocean.devices
 
 class MainServer(object):
 
     def __init__(self, config):
         self.config = config
         self.db = mongoengine.connect(config.mongo_db)
-        print config.mongo_db
         self.rpc_server = None
+        self.clock_server = None
+        self.enocean_protocol = None
 
         logger.info('main server initialized')
 
@@ -38,43 +39,14 @@ class MainServer(object):
         self.rpc_server.putSubHandler('raspi',raspi)
         reactor.listenTCP(self.config.main_server.rpc_port, twisted.web.server.Site(self.rpc_server))
 
+        """ Launchs Clock Server """
+        self.clock_server = model.clock.Server(self)
+
         """ Main loop """
         reactor.run()
 
 
-class MainServerProcess(object):
-
-    def __init__(self, config):
-        self.config = config
-
-        config_path = tempfile.mktemp(suffix=".json")
-        config.save_json(config_path)
-
-        self.process = subprocess.Popen(["python", __file__, config_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=os.path.dirname(__file__))
-
-        time.sleep(0.1)
-
-    def terminate(self):
-        self.process.terminate()
-        self.process.wait()
-        return self.process.returncode
-
-    @property
-    def return_code(self):
-        return self.process.returncode
-
-    @property
-    def stdout(self):
-        return self.process.stdout
-
-    @property
-    def stderr(self):
-        return self.process.stderr
-
-
 if __name__ == "__main__":
-    import logger
-    from config import GlobalConfig
 
     logger.add_file('log/main_server')
 

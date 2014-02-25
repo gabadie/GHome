@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block style %}
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    {% include "header.html" %}
+
+    <div style="margin: 0 auto; width: 800px;">
+        <canvas id="renderingZone" width="800px" height="600px">
+            WebGL 2 canvas
+        </canvas>
+
+        <div style="padding: 10px 0;">
+            <input id="deviceName" class="form-control" readonly="readonly" />
+            <select id="houseViewType" class="form-control">
+                 <option value="Default" selected="selected">Default View</option>
+                 <option value="Temperature">Temperature View</option>
+                 <option value="Humidity">Humidity View</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock body %}
+
+{% block javascript %}
+
+<script type="text/javascript" src="static/webgl/utils.js"></script>
+<script type="text/javascript" src="static/webgl/console.js"></script>
+<script type="text/javascript" src="static/webgl/camera.js"></script>
+<script type="text/javascript" src="static/webgl/house_view.js"></script>
+
+<script type="text/javascript">
+
+
+
+    function main()
+    {
+        var output = new EngineConsole();
+
+        var house = new House();
+
+
+        // house.addRoom(-2.5, -2.5, 5, 5);
+        house.addRoom(+2.5, -2.5, 5, 4);
+        // house.addDevice("id", 2.5, 2.5, 3, {});
+        // house.addDevice("id", -2.5, -2.5, 3, {});
+
+        var house_view = new HouseView(output, "renderingZone", house);
+        house_view.camera.from = [-2.0, -5.0, 5.0];
+        house_view.update();
+
+
+         //initite variables
+          var firstValidFrame = null
+          var rotateY = 90, rotateX = 0, curY = 0
+         var changed = false;
+         Leap.loop(function(frame) {
+                if (frame.valid) {
+                    if (!firstValidFrame) firstValidFrame = frame
+                    var t = firstValidFrame.translation(frame)
+                   //assign rotation coordinates
+                      rotateX = t[0]
+                      rotateY = t[1]
+                      if (rotateX > 400 && changed == false){
+                                      changed = true;
+                                        window.location.replace("../");
+                                      return;
+                        }
+
+
+                      //adjust 3D spherical coordinates of the camera
+                      var positionx =  5*Math.cos(rotateX * Math.PI/180) 
+                      var positiony = 5*Math.sin(rotateX * Math.PI/180) 
+                      var positionz=  10*Math.cos(rotateY * Math.PI/180) + 10*Math.sin(rotateY * Math.PI/180) 
+
+                    house_view.camera.from = [positionx, positiony, positionz];
+                    //alert(positionx);
+                    house_view.update_leap();
+
+                    }
+                });
+
+        apiCall('/room', 'GET', {}, function(data) {
+            $.each(data.result, function(i, room) {
+                house.addRoom(room.x, room.y, room.width, room.height);
+            });
+            house_view.update_model();
+        });
+
+        apiCall('/sensor', 'GET', {}, function(data) {
+            $.each(data.result, function(i, sensor) {
+                if (sensor.ignored)
+                {
+                    return;
+                }
+
+                var values = {};
+
+                for (var reading_name in sensor.last_readings)
+                {
+                    values[reading_name] = sensor.last_readings[reading_name].value;
+
+                    console.info(reading_name + " = " + values[reading_name]);
+                }
+
+                house.addDevice(sensor.device_id, sensor.x, sensor.y, sensor.z, values);
+            });
+            house_view.update_model();
+        });
+
+        document.getElementById("houseViewType").onchange = function()
+        {
+            e = document.getElementById("houseViewType");
+
+            house_view.set_view_mode(e.value);
+        }
+
+        house_view.callback_selected_device = function(device_id)
+        {
+            if (device_id === null)
+            {
+                document.getElementById("deviceName").value = "No selected device";
+            }
+            else
+            {
+                document.getElementById("deviceName").value = "Device " + device_id;
+            }
+        }
+
+        house_view.callback_selected_device(null);
+
+        house_view.onsave_device = function(device)
+        {
+            var infos = {};
+
+            infos['sensor_id'] = device.id;
+            infos['x'] = device.x;
+            infos['y'] = device.y;
+            infos['z'] = device.z;
+
+            apiCall('/sensor/position', 'POST', infos, function(data) {
+            })
+        }
+    }
+
+    document.body.onload = function()
+    {
+        main();
+
+    }
+
+</script>
+
+
+{% endblock %}

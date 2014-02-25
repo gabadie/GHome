@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block style %}
+<link href="../static/d3/src/nv.d3.css" rel="stylesheet" type="text/css">
+{% endblock  %}
+
+{% block body %}
+<div class='container with-3d-shadow with-transitions'>
+    {% include "header.html" %}
+
+
+    <h2>Monitoring</h2>
+
+    <select class="form-control" id="reading-type">
+        {% for reading_cls in reading_classes %}
+        <option value="{{reading_cls.__name__}}"> {{reading_cls.__name__}} </option>
+        {% endfor %}
+    </select>
+
+    <br/>
+    <svg id="values-chart"></svg>
+
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script src="/static/d3/lib/d3.v3.js"></script>
+<script src="/static/d3/nv.d3.js"></script>
+<script src="/static/d3/src/utils.js"></script>
+<script src="/static/d3/src/models/axis.js"></script>
+<script src="/static/d3/src/tooltip.js"></script>
+<script src="/static/d3/src/interactiveLayer.js"></script>
+<script src="/static/d3/src/models/legend.js"></script>
+<script src="/static/d3/src/models/axis.js"></script>
+
+<script src="/static/js/graph.js"></script>
+{% endblock %}

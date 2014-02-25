@@ -1,21 +1,84 @@
-<html>
-    <head>
-        <title> Music player </title>
-    </head>
-    <body>
-        <h1> Hello, {{ user}}, what do you want to listen to ? </h1>
-        <form id="play-music" class="form-music" action="/player" method="POST">
-            <h4>Choose a category</h4>
 
-            <div class="form-group">
-                <input type=text list=browsers name=tag>
-                <datalist id=browsers >
-                    {% for option in combo_options %}
-                    <option> {{option}}
-                    {% endfor %}
-                </datalist>
+{% extends "base.html" %}
+
+{% block body %}
+<div class="container">
+    {% include "header.html" %}
+        <div id=gradPlayer class="container">
+            <div class="row" style="text-align:center;">
+                <h1 class="white_text"> Hello, <strong>{{user}}</strong>, what do you want to listen to ? </h1>
             </div>
-            <button type="submit" class="btn btn-primary btn-sm">Search for music</button>
-        </form>
-    </body>
-</html>
+            <div class="row">
+                <div class="col-md-4" style="text-align:right;vertical-align:bottom; ">
+                <br />
+                    {% for option in left_tags %}
+                        <div class="row">
+                            <button class="btn btn-primary btn-sm player-btn form-control" name={{ option }} onclick='on_tag_click(this.name)' style="width:30%">{{ option }}</button>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-4" style="text-align:center;">
+                    <form id="play-music" class="form-music" >
+                        <h4 class="white_text">Choose a category</h4>
+
+                        <div class="form-group">
+                            <input id="tag" type="text" list="browsers" name="tag" class="form-control" />
+                            <datalist id="browsers" >
+                                {% for option in combo_options %}
+                                    <option> {{option}} </option>
+                                {% endfor %}
+                            </datalist>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lm player-btn form-control">Search for music</button>
+                    </form>
+                </div>
+                <div class="col-md-4" style="text-align:left;">
+                    <br />
+                    {% for option in right_tags %}
+                        <div class="row">
+                            <button class="btn btn-primary btn-sm player-btn form-control"  name={{ option }} onclick='on_tag_click(this.name)' style="width:30%">{{ option }}</button>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+
+            <div class="row" style="min-height:10%">
+                <div class="col-md-4" style="text-align:right;">
+                </div>
+                <div class="col-md-4" style="text-align:center;">
+                        <h3 id="tag_text"/>
+                </div>
+                <div class="col-md-4" style="text-align:right;">
+                </div>
+            </div>
+             <div class="row">
+                <div class="col-md-4" style="text-align:right;">
+                </div>
+                <div class="col-md-4" style="text-align:center;">
+                        <h3 id="song_text" >{{song_title}}</h3>
+                </div>
+                <div class="col-md-4" style="text-align:right;">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4" style="text-align:right;">
+                 <input type="image" src="../static/img/player_backward.png" class="player_button" id="previous"  />
+                </div>
+                <div class="col-md-4"  style="text-align:center;">
+                    <input type="image" src="{{play_picture}}" class="player_button" id="pausing"  />
+                </div>
+                <div class="col-md-4" style="text-align:left;">
+                 <input type="image" src="../static/img/player_forward.png" class="player_button" id="next"  />
+                </div>
+            </div>
+            <div class="row">
+                <img src=""  class="img-rounded">
+            </div>
+    </div>
+{% endblock body %}
+
+{% block javascript %}
+<script src="static/js/music.js"></script>
+{% endblock javascript %}

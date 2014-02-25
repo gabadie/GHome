@@ -7,9 +7,13 @@ import event
 
 # Generic classes
 
-class Device(event.Object):
-    device_id = mongoengine.IntField(required=True, unique=True)
+class Device(event.Eventable):
+    device_id = mongoengine.IntField(required=True)#, unique=True)
     name = mongoengine.StringField()
+
+    x = mongoengine.FloatField(default=0.0)
+    y = mongoengine.FloatField(default=0.0)
+    z = mongoengine.FloatField(default=0.0)
 
     meta = {'allow_inheritance': True}
 
@@ -20,30 +24,29 @@ class Reading(mongoengine.Document):
 
     meta = {'allow_inheritance': True}
 
+    def __repr__(self):
+        return '<{Reading} device={}>'.format(self.device)
+
 
 class NumericReading(Reading):
     value = mongoengine.FloatField(required=True)
 
+    def __repr__(self):
+        return '<NumericReading value={} device={}>'.format(self.value, self.device)
 
 class BooleanReading(Reading):
     value = mongoengine.BooleanField(required=True)
 
+    def __repr__(self):
+        return '<BooleanReading value={} device={}>'.format(self.value, self.device)
 
 class Actuator(Device):
-
-    def activate(self, sensor):
-        raise NotImplementedError
+    activated = mongoengine.BooleanField(default=False)
 
 class Sensor(Device):
-    ignored = mongoengine.BooleanField(required=True, default=False)
-    actuators = mongoengine.ListField(mongoengine.ReferenceField(Actuator), default=[])
-
-    def activated(self):
-        for actuator in self.actuators:
-            actuator.activate(self)
+    pass
 
 # Numeric reading
-
 class Temperature(NumericReading):
     pass
 

@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="container" >
+	<div class="Alarm_Interface">
+		{% include "header.html" %}
+
+	 	<div class="row">
+	 	</div>
+	 	<div class="row">
+
+	 		<div id ="existing_alarms" class="col-md-5" >
+			 	<div class="row">
+	 		<div style="height:4%;"> </div>
+
+			 	</div>
+			 	<div class="row">
+			 		<div class="select_alarm_area">
+				 		<ul id="ul_alarms" class="alarm_set">
+				 			<!-- {% for alarm in alarms %}
+				 			<li class="alarm"  >
+				 				<div class="alarm_header" alarm_name="{{alarm.name}}" alarm_minutes="{{alarm.minutes}}" alarm_day="{{alarm.week_days_mask}}">
+				 					{{alarm.name}} : {{alarm.minutes//60}}:{{alarm.minutes%60}}
+				 					<div class="panel">
+					 					<ul >
+					 					<li>
+					 						{% for day in alarm.days %}
+					 							{{day}}
+					 						{% endfor %}
+				 						</li>
+					 					</ul>
+				 					</div>
+				 				</div>
+			 				</li>
+				 			{% endfor %} -->
+				 		</ul>
+				 	</div>
+			 	</div>
+			 	<div class="row">
+			 	</div>
+	 		</div>
+	 		<form id="clock_form">
+		 		<div id = "hours_setter" class="col-md-2" style="text-align:center;">
+		 			<div class="row  alarm-head">
+				 		  <button  id="hours_up" type="button" class="arrow_button"><img src="../static/img/clock_up_arrow.png" / ></button>
+				 	</div>
+				 	<div class="row">
+				 		<input id="hours" name="hours" type="number" class="input_time" value="12">
+				 	</div>
+				 	<div class="row">
+				 	</div>
+				 	<div class="row">
+				 		 <button  id="hours_down" type="button" class="arrow_button" ><img src="../static/img/clock_down_arrow.png"/ ></button>
+				 	</div>
+		 		</div>
+
+		 		<div id = "H" class="col-md-1 hours_minutes_sep">:</div>
+
+		 		<div id = "minutes_setter" class="col-md-2"style="text-align:center; ">
+		 			<div class="row alarm-head">
+				 		 <button  id="minutes_up" type="button" class="arrow_button" ><img src="../static/img/clock_up_arrow.png"/ ></button>
+				 	</div>
+				 	<div class="row">
+				 		<input id="minutes" name="minutes" type="number" class="input_time" value="30" style="margin:0px 0px 0px 5px;">
+				 	</div>
+				 	<div class="row">
+				 		 <button  id="minutes_down"  type="button" class="arrow_button"><img src="../static/img/clock_down_arrow.png"/ ></button>
+				 	</div>
+		 		</div>
+
+		 		<div id = "days_setter" class="col-md-2"style="text-align:center;">
+				 	<div class="row day-choice">
+				 		<p id="alarm_creator"></p>
+
+
+				 		<!--<input id="day" name="day" type="text" class="input_time" value="L">-->
+			 		 	<a>
+			 		 		<input type="checkbox" id="Monday" name="Monday" value="0"> <label for="Monday">&nbsp;</label> 
+			 		 		<input type="checkbox" id="Tuesday" name="Tuesday" value="1"><label for="Tuesday">&nbsp;</label><br>
+			 		 	</a>
+						<a>
+							<input type="checkbox"  id="Wednesday" name="Wednesday" value="2"><label for="Wednesday">&nbsp;</label>
+							<input type="checkbox" id="Thursday" name="Thursday" value="3"> <label for="Thursday">&nbsp;</label><br>
+						</a>
+						<a>
+							<input type="checkbox" id="Friday" name="Friday" value="4"><label for="Friday">&nbsp;</label>
+							<input type="checkbox" id="Saturday" name="Saturday" value="5"><label for="Saturday">&nbsp;</label><br>
+						</a>
+						<a>
+							<input type="checkbox" id="Sunday" name="Sunday" value="6"> <label for="Sunday">&nbsp;</label><br>
+						</a>
+			 		 	<div class="alarm_validator_div" id="id_alarm_validator_div">
+				 			<input class="form-control" id="alarm_name" name="alarm_name" type="text" placeholder="Alarm's name" ></text>
+				 			<button id="button_alarm_validator" type="submit" class="alarm_validator form-control"> OK </button>
+			 		 	</div>
+
+				 	</div>
+		 		</div>
+	 		</form>
+	 	</div>
+	 	<div class="row">
+
+	 	</div>
+
+ 	</div>
+
+</div>
+
+
+
+{% endblock body %}
+
+{% block javascript %}
+	<script src="/static/js/calendar.js"></script>
+
+{% raw %}
+<script id="connection-template" type="text/x-handlebars-template">
+	<tr class="event-connection" data-connection-id="{{_id.$oid}}">
+		<td>
+			<span class="device_id">{{receiving_object.device_id}}</span>  {{receiving_object.name}}
+		</td>
+
+		<td>
+			{{method_name}}
+		</td>
+
+		<td>
+			<span class="delete glyphicon glyphicon-remove"></span>
+		</td>
+
+	</tr>
+</script>
+
+<script id="alarm-template" type="text/x-handlebars-template">
+
+	<li class="alarm" data-alarm-id="{{device_id}}" alarm_name="{{name}}" alarm_minutes="{{minutes}}" alarm_day="{{week_days_mask}}">
+		<div class="heading" alarm_name="{{name}}" alarm_minutes="{{minutes}}" alarm_day="{{week_days_mask}}">
+			<span class="device_id">{{device_id}}</span> <span class="name">{{name}}</span> - <span class="time"> {{hours_real minutes}} </span>
+
+			<span class="delete glyphicon glyphicon-remove"></span>
+		</div>
+
+
+		<div class="details">
+			<ul class="list-group infos">
+
+			<li class="list-group-item">
+			{{#if days}}
+				<p class="weekdays">
+ 						Effective days : <span class="value">{{day_str days}}</span>
+				</p>
+			{{/if}}
+                {{#if events}}
+						{{! List of existing event bindings}}
+						<h4>Events' bindings</h4>
+
+						<table class="table table-striped binding-table">
+					      <thead>
+					        <tr>
+					          <th>Actuator</th>
+					          <th>Callback</th>
+					          <th class="iconic"> </th>
+					        </tr>
+					      </thead>
+					      <tbody>
+
+
+						{{#each connections}}
+					        {{> connection-template}}
+						{{/each}}
+
+							{{!-- Binding events should be done inside the table, but it's buggy for some reason --}}
+							<tr class="callback-binding">
+									<input type="hidden" name="event" value="{{name}}" >
+									<td>
+							            {{! Actuators select }}
+										<select class="form-control" name="actuator" placeholder="Actuator">
+										{{#each actuators}}
+								            	<option value="{{device_id}}">{{device_id}} - {{name}}</option>
+						            	{{/each}}
+							            </select>
+							        </td>
+
+									<td>
+							            {{! Each actuator's callbacks select }}
+							            {{#each actuators}}
+							            		<select class="form-control" name="callback" placeholder="Callback" data-actuator-id="{{device_id}}" {{#if @first}}{{else}}disabled{{/if}}>
+												{{#each callbacks}}
+										            	<option value="{{this}}">{{this}}</option>
+								            	{{/each}}
+									            </select>
+						            	{{/each}}
+					            	</td>
+
+					            	<td>
+					            		<span class="add glyphicon glyphicon-plus"></span>
+									</td>
+							</tr>
+
+
+
+					      </tbody>
+					    </table>
+
+				{{/if}}
+				{{!--End of events handling--}}
+
+				</li>
+
+
+
+			</ul>
+
+
+		</div>
+	</li>
+</script>
+{% endraw %}
+{% endblock %}
