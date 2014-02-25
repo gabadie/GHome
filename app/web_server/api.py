@@ -582,7 +582,7 @@ def get_rooms():
 @rest_api.route('/threshold', methods=['POST'])
 def new_threshold():
     thermometer_id = request.json['thermometer_id']
-    threshold_name = request.json['threshold_name']
+    threshold_name = request.json['threshold_name'].encode('utf-8')
     minimum, maximum = request.json['min'], request.json['max']
 
     print request.json
