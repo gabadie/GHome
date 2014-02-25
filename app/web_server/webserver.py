@@ -65,8 +65,7 @@ def music():
     size_tags = int(round(len(combo_options)/2))
     left_tags = [i for i in combo_options[:size_tags]]
     right_tags = [i for i in combo_options[size_tags:int(2*size_tags)]]
-    str_music_playing = json.loads(music_playing())
-    print str_music_playing['result']
+    str_music_playing = music_playing()
     if str_music_playing['ok'] == False:
         play_picture = "../static/img/player_play.png"
         str_music_playing['result'] = ""

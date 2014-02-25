@@ -48,7 +48,12 @@ $(document).ready(function() {
       data: JSON.stringify("data"),
       contentType: 'application/json;charset=UTF-8',
       success : function(data){
+          if (data.ok == "true") {
             $('#pausing').attr('src',data.src);
+          }
+          else {
+            notification.error(data.src);
+          }
         }
     });
     });
@@ -62,7 +67,12 @@ $(document).ready(function() {
       data: JSON.stringify("data"),
       contentType: 'application/json;charset=UTF-8',
       success : function(data){
-            $('#song_text').text(data.name);
+          if (data.ok == true){
+            $('#song_text').text(data.name);    
+          }
+          else {
+            notification.error(data.name)
+          }
         }
     });
     });
@@ -76,7 +86,12 @@ $(document).ready(function() {
       data: JSON.stringify("data"),
       contentType: 'application/json;charset=UTF-8',
       success : function(data){
-            $('#song_text').text(data.name);
+          if (data.ok == true){
+            $('#song_text').text(data.name);    
+          }
+          else {
+            notification.error(data.name)
+          }
         }
     });
     });
@@ -94,7 +109,7 @@ $(document).ready(function() {
       data: JSON.stringify(this_button),
       contentType: 'application/json;charset=UTF-8',
       success : function(data){
-        if (data.ok == "true"){
+        if (data.ok == true){
             $('#pausing').attr('src',"../static/img/player_pause.png");
             $('#song_text').text("----- " + data.name + " -----");
             $('#tag_text').text("Catégorie "+ data.tags);

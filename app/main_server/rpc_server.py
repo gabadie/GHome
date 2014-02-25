@@ -104,46 +104,45 @@ class Raspi(xmlrpc.XMLRPC):
     def xmlrpc_next_music(self, id):
         if id<len(self.rpi):
             if self.rpi[id].macAddress=="":
-                return "Failed, no raspi registered at this ID"
+                return json.dumps(dict(ok = False, result="Failed, no raspi get the ID"+ str(id)))
 
             server = xmlrpclib.Server("http://{}:{}".format(self.rpi[id].ip,self.rpi[id].port))
             next_music = server.next_music()
         else :
-            return "Failed, no raspi get this ID"
-        return next_music
+            return json.dumps(dict(ok = False, result="Failed, no raspi get the ID"+ str(id)))
+        return  json.dumps(dict(ok = True, result=next_music))
 
     def xmlrpc_previous_music(self, id):
         if id<len(self.rpi):
             if self.rpi[id].macAddress=="":
-                return "Failed, no raspi registered at this ID"
+                return json.dumps(dict(ok = False, result="Failed, no raspi get the ID"+ str(id)))
             server = xmlrpclib.Server("http://{}:{}".format(self.rpi[id].ip,self.rpi[id].port))
             previous_music = server.previous_music()
         else :
-            return "Failed, no raspi get this ID"
-        return previous_music
+            return json.dumps(dict(ok = False, result="Failed, no raspi get the ID"+ str(id)))
+        return  json.dumps(dict(ok = True, result=previous_music))
 
     def xmlrpc_pause_music(self, id):
         print "server reached"
         if id<len(self.rpi):
             if self.rpi[id].macAddress=="":
-                return "Failed, no raspi registered at this ID"
-
+                return json.dumps(dict(ok = False, result="Failed, no raspi get the ID"+ str(id)))
             server = xmlrpclib.Server("http://{}:{}".format(self.rpi[id].ip,self.rpi[id].port))
             result = server.pause_music()
         else :
-            return "Failed, no raspi get this ID"
-        return result
+            return json.dumps(dict(ok = False, result="Failed, no raspi get the ID"+ str(id)))
+        return json.dumps(dict(ok = True, result=result))
 
     def xmlrpc_music_playing(self, id):
         if id<len(self.rpi):
             if self.rpi[id].macAddress=="":
-                return json.dumps({  'ok' : False, 'result' : "Failed, no raspi get this ID"})
+                return json.dumps(dict(ok = False, result="Failed, no raspi get the ID"+ str(id)))
             server = xmlrpclib.Server("http://{}:{}".format(self.rpi[id].ip,self.rpi[id].port))
             result = json.loads(server.music_playing())
         else :
-            return json.dumps({  'ok' : False, 'result' : "Failed, no raspi get this ID"})
-        return json.dumps({  'ok' : result['ok'], 'result' : result['result']})
-        
+            return json.dumps(dict(ok = False, result="Failed, no raspi get the ID"+ str(id)))
+        return json.dumps(result)
+
 class RpcServer(xmlrpc.XMLRPC):
 
     def __init__(self, main_server):
