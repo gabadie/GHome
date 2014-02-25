@@ -75,8 +75,8 @@ class SampleListener(Leap.Listener):
 						circle = CircleGesture(gesture)
 						self.m.click((circle.center.x+160)*self.x_dim/320,self.y_dim-(circle.center.y-200)*self.y_dim/200);
 						controller.enable_gesture(Leap.Gesture.TYPE_CIRCLE,False)
-						t=threading.Timer(2.0,timer_disable_circle,[controller])
-						t.start()
+						#t=threading.Timer(2.0,timer_disable_circle,[controller])
+						#t.start()
 
 				if controller.is_gesture_enabled(Leap.Gesture.TYPE_SCREEN_TAP):
 					if len(fingers) == 2 :
@@ -84,8 +84,8 @@ class SampleListener(Leap.Listener):
 							tap =  ScreenTapGesture(gesture)
 							self.m.click(self.m.position()[0],self.m.position()[1])
 							controller.enable_gesture(Leap.Gesture.TYPE_SCREEN_TAP,False)
-							t=threading.Timer(1.0,timer_disable_screen,[controller])
-							t.start()
+							#t=threading.Timer(1.0,timer_disable_screen,[controller])
+							#t.start()
 
 				if controller.is_gesture_enabled(Leap.Gesture.TYPE_SWIPE):
 					if len(fingers) == 3 :
@@ -93,8 +93,14 @@ class SampleListener(Leap.Listener):
 							sw_gest = SwipeGesture(gesture)
 							self.m.scroll(sw_gest.direction.y*10)
 							controller.enable_gesture(Leap.Gesture.TYPE_SWIPE,False)
-							t=threading.Timer(1.0,timer_disable_swipe,[controller])
-							t.start()
+							#t=threading.Timer(1.0,timer_disable_swipe,[controller])
+							#t.start()
+
+
+				#check if need to stop the alarm
+			#	if hand.palm_position().y<-200 :
+
+
 
 
 

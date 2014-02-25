@@ -85,6 +85,14 @@ class WebServerProcess(AbstractServerProcess):
             script_path="webserver.py",
             config=config
         )
+class LeapMotionProcess(AbstractServerProcess):
+
+    def __init__(self, config, cwd="web_server/"):
+        AbstractServerProcess.__init__(self,
+            cwd=cwd,
+            script_path="leap_mouse.py",
+            config=config
+        )
 
     def terminate(self):
         AbstractServerProcess.terminate(self)
