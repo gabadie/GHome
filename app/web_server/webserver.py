@@ -102,9 +102,8 @@ def calendar():
     return render_template('clock.html', alarms = alarms , sensor_types=sensor_types, actuators=actuators)
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1: 
+    if len(sys.argv) > 1:
         config = GlobalConfig.from_json(sys.argv[1])
     db = mongoengine.connect(config.mongo_db)
 
-    app.run(host="0.0.0.0", port=5001, debug=True)
-    #app.run(host="0.0.0.0", port=config.web_server.port, debug=True)
+    app.run(host="0.0.0.0", port=config.web_server.port, debug=True)
