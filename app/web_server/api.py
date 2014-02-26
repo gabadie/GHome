@@ -16,6 +16,9 @@ from metwit import Metwit
 from flask import request, jsonify, Blueprint, current_app
 import mongoengine
 
+import enocean.devices
+import model.devices
+
 from model.devices import Sensor, Actuator
 from enocean.devices import Thermometer
 from model.trigger import ThresholdTrigger
@@ -274,12 +277,14 @@ def all_sensors():
 
         # Finding the sensor class
         subclasses = []
-        for sub in Sensor.__subclasses__():
+        for sub in enocean.devices.Sensor.__subclasses__():
             subclasses.append(sub)
 
-        for sub in Actuator.__subclasses__():
+        for sub in enocean.devices.Actuator.__subclasses__():
             subclasses.append(sub)
 
+        current_app.logger.info(subclasses)
+        current_app.logger.info(d_class)
         DeviceClass = [d_cls for d_cls in subclasses if d_cls.__name__ == d_class][0]
 
         # Creating the new device
@@ -617,7 +622,12 @@ def threshold(threshold_id):
 def device_types(device_type):
     device_types = []
 
-    for cls in eval(device_type).__subclasses__():
+    if device_type == 'sensor':
+        dv_cls = enocean.devices.Sensor
+    else:
+        dv_cls = enocean.devices.Actuator
+
+    for cls in dv_cls.__subclasses__():
         device_types.append(cls.__name__)
 
     resp = dict(ok=True, types=device_types)
