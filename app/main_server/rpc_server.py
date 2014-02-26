@@ -23,8 +23,8 @@ import model.event
 from model import devices
 from model.event import Connection
 from model.phone import Phone
-
-class RaspiUnit(model.devices.Actuator):
+import enocean.devices
+class RaspiUnit(enocean.devices.Actuator):
     name = mongoengine.StringField(default = "rpi")
     ip=mongoengine.StringField(default = "127.0.0.1")
     macAddress= mongoengine.StringField(default = "")
@@ -82,7 +82,7 @@ class Raspi(xmlrpc.XMLRPC):
     def xmlrpc_find_music_url(self, id, tags ):
         if id<len(self.rpi):
             if self.rpi[id].macAddress=="":
-                return json.dumps(dict(ok = False, result="Failed, no raspi registered ID " + str(id))) 
+                return json.dumps(dict(ok = False, result="Failed, no raspi registered ID " + str(id)))
 
             api=API8tracks(config.api_8tracks)
             tags_low=[tag.lower() for tag in tags]
@@ -98,7 +98,7 @@ class Raspi(xmlrpc.XMLRPC):
             else :
                 return json.dumps(dict(ok = False, result="no url found"))
         else :
-            return json.dumps(dict(ok = False, result="Failed, no raspi register ID " + str(id))) 
+            return json.dumps(dict(ok = False, result="Failed, no raspi register ID " + str(id)))
 
 
     def xmlrpc_next_music(self, id):
