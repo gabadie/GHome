@@ -32,8 +32,8 @@ $(document).ready(function() {
 
     //Change the device class list when updating the device type list
     $('#device-type').on('change', function() {
-
-        apiCall('/device/' + this.value, 'GET', {}, function(data) {
+        console.log(this.value);
+        apiCall('/device/' + this.value.toLowerCase(), 'GET', {}, function(data) {
             $('#device-class').html("");
 
             for(var i = 0; i < data.types.length; i++)

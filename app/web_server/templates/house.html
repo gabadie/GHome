@@ -4,7 +4,7 @@
 {% endblock %}
 
 {% block body %}
-<div class="container">
+<div class="container homebg">
     {% include "header.html" %}
 
     <div style="margin: 0 auto; width: 800px;">
@@ -74,9 +74,9 @@
 
 
                       //adjust 3D spherical coordinates of the camera
-                      var positionx =  5*Math.cos(rotateX * Math.PI/180) 
-                      var positiony = 5*Math.sin(rotateX * Math.PI/180) 
-                      var positionz=  10*Math.cos(rotateY * Math.PI/180) + 10*Math.sin(rotateY * Math.PI/180) 
+                      var positionx =  5*Math.cos(rotateX * Math.PI/180)
+                      var positiony = 5*Math.sin(rotateX * Math.PI/180)
+                      var positionz=  10*Math.cos(rotateY * Math.PI/180) + 10*Math.sin(rotateY * Math.PI/180)
 
                     house_view.camera.from = [positionx, positiony, positionz];
                     //alert(positionx);

@@ -9,6 +9,7 @@ import datetime
 
 sys.path.append('..')
 
+import logger
 import enocean.devices
 import model.devices
 from model.trigger import ThresholdTrigger
@@ -22,10 +23,14 @@ from fashion import fetch_fashion
 
 class Generator:
     def __init__(self, config):
-            self.config = config
-            self.db = mongoengine.connect(config.mongo_db)
-            self.db.drop_database(config.mongo_db)
-            self.id = 1337
+        self.config = config
+        self.db = mongoengine.connect(config.mongo_db)
+        logger.info("Connected to localhost database : " + config.mongo_db)
+        self.id = 1337
+
+        logger.info("Initializing database")
+        self.db.drop_database(config.mongo_db)
+        self.generate_sample()
 
     def generate_location(self, name, lat, lon):
         Location(name=name, latitude=lat, longitude=lon).save()
@@ -178,6 +183,10 @@ class Generator:
         self.generate_alarm("Music lesson", 17,29,[4])
         self.generate_alarm("GHome presentation", 8,10,[2])
 
+        # generating a phone
+        phone = Phone(device_id=112233445566, name="Twilio Phone")
+        phone.save()
+
     def generate_rooms(self):
         Room(x=-2.5, y=-2.5, width=5, height=5).save()
         Room(x=+2.5, y=-2.5, width=5, height=4).save()
@@ -191,15 +200,9 @@ class Generator:
 if __name__ == '__main__':
     configuration = GlobalConfig()
 
-
     if len(sys.argv) > 1 and sys.argv[1] != 'fashion':
         configuration = GlobalConfig.from_json(sys.argv[1])
     g = Generator(configuration)
-    g.generate_sample()
-
-    # generating a phone
-    phone = Phone(device_id=112233445566, name="Twilio Phone")
-    phone.save()
 
     if 'fashion' in sys.argv:
         fetch_fashion()
